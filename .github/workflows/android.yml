@@ -78,6 +78,8 @@ jobs:
             exit 0
           fi
           echo "$KS_B64" | base64 -d > "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH"
+          # Every CI build gets a higher Android versionCode so it installs as an update.
+          sed -i "s/^version\/code=.*/version\/code=$((100 + GITHUB_RUN_NUMBER))/" export_presets.cfg
           mkdir -p build
           ~/godot/godot --headless --path . --export-release "Android" build/odd-space.apk
           ls -la build
