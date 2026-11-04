@@ -1,0 +1,24 @@
+{
+	"_doc": "Holographic billboard copy. faction = who owns the sign (shooting it = vandalism against them).",
+	"list": [
+		{"faction": "oxy", "headline": "OXYGENIX", "text": "BREATHE PREMIUM(tm)\nNow 4% less toxic!"},
+		{"faction": "oxy", "headline": "AIR+", "text": "Inhale responsibly.\nExhale is extra."},
+		{"faction": "halcyon", "headline": "HALCYON", "text": "YOUR KIDNEYS\nARE COLLATERAL"},
+		{"faction": "halcyon", "headline": "LOANS 4 KIDS", "text": "Start their debt early!\nAPR: yes"},
+		{"faction": "gristle", "headline": "PROTEIN PASTE", "text": "It's food-ish!\nDon't ask. Chew."},
+		{"faction": "gristle", "headline": "GRISTLE", "text": "Lunch is a right.\nFlavour is a subscription."},
+		{"faction": "paragon", "headline": "PARAGON", "text": "SEE A CRIME?\nREPORT IT! EARN POINTS!"},
+		{"faction": "paragon", "headline": "SAFETY+", "text": "Your safety is our\nquarterly target."},
+		{"faction": "lumen", "headline": "LUMEN NEWS", "text": "Truth, now with\nfewer opinions."},
+		{"faction": "lumen", "headline": "WATCH THIS", "text": "Your eyes are\nsponsored today."}
+	],
+	"ticker": [
+		"OXYGENIX STOCK UP 12% AFTER RECORD BREATHING",
+		"HALCYON: 'DEBT IS JUST FUTURE YOU BEING GENEROUS'",
+		"GRISTLE DENIES PROTEIN PASTE CONTAINS 'THE SCREAMING ONES'",
+		"PARAGON COMPLIANCE WEEK: REPORT A NEIGHBOUR, WIN A TOASTER",
+		"LUMEN POLL: 98% OF CITIZENS 'HAPPY ENOUGH', 2% UNAVAILABLE FOR COMMENT",
+		"WEATHER: CLOUDY WITH A CHANCE OF SPONSORED RAIN",
+		"CONSORTIUM ANNOUNCES 'FREE DAY'. FREE DAY TICKETS ON SALE NOW"
+	]
+}

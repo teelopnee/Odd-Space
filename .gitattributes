@@ -1,0 +1,8 @@
+# Normalize line endings so Android/Windows/Linux editors don't fight.
+* text=auto eol=lf
+*.png binary
+*.wav binary
+*.ogg binary
+*.jpg binary
+*.ttf binary
+*.otf binary

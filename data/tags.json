@@ -1,0 +1,223 @@
+{
+	"background": {
+		"cryo_debtor": {
+			"name": "Cryo-Debtor",
+			"desc": "Frozen as collateral for a loan you don't remember taking. Interest kept compounding while you slept.",
+			"story": "You were put on ice by Halcyon Debt & Trust as 'living collateral'.",
+			"spawn": "cryo_bay",
+			"credits": 20,
+			"items": {"medkit": 1},
+			"mods": {"add": {"max_hp": 10}},
+			"rep": {"halcyon": -15},
+			"reactions": {"faction:halcyon": -10, "trait:poor": 10},
+			"flags": {"debt_origin": true}
+		},
+		"ex_auditor": {
+			"name": "Ex-Corporate Auditor",
+			"desc": "You found one number too many in a Consortium ledger. They froze the number. And you.",
+			"story": "As a Consortium auditor you found the wrong decimal point, and the decimal point found you.",
+			"spawn": "server_room",
+			"credits": 120,
+			"items": {"data_shard": 1},
+			"mods": {"mul": {"price_mult": -0.1, "bribe_mult": -0.15}},
+			"rep": {"paragon": 5, "lumen": -5},
+			"reactions": {"trait:corporate": 15, "trait:poor": -10},
+			"flags": {"knows_ledgers": true}
+		},
+		"asteroid_miner": {
+			"name": "Asteroid Miner",
+			"desc": "Twelve years cracking rocks for Gristle. Your lungs are 30% dust and 70% spite.",
+			"story": "You spent a decade mining asteroids on a contract that paid in 'exposure to vacuum'.",
+			"spawn": "cargo_hold",
+			"credits": 40,
+			"items": {"scrap": 4},
+			"mods": {"add": {"max_hp": 25}, "mul": {"air_cost_mult": -0.2, "move_speed": -0.05}},
+			"rep": {"gristle": -5},
+			"reactions": {"trait:worker": 15, "trait:corporate": -10},
+			"flags": {}
+		},
+		"jingle_composer": {
+			"name": "Disgraced Jingle Composer",
+			"desc": "You wrote the OxyGenix breathing jingle. Then you wrote the parody. Lumen owns both.",
+			"story": "You wrote a jingle so catchy it was classified as a mind-control device, then a parody so honest it was classified as terrorism.",
+			"spawn": "cryo_bay",
+			"credits": 60,
+			"items": {"synth_keytar": 1},
+			"mods": {"mul": {"witness_time_mult": 0.15}},
+			"rep": {"lumen": -10, "oxy": 5},
+			"reactions": {"faction:lumen": -5, "trait:artsy": 20},
+			"flags": {"famous_jingle": true}
+		},
+		"street_medic": {
+			"name": "Street Medic",
+			"desc": "Patched up workers the Consortium's insurance wouldn't. They called it 'unlicensed compassion'.",
+			"story": "You ran a back-alley clinic for people who couldn't afford to bleed.",
+			"spawn": "medbay",
+			"credits": 30,
+			"items": {"medkit": 3},
+			"mods": {"add": {"max_hp": 5}},
+			"rep": {"paragon": -10},
+			"reactions": {"trait:poor": 20, "trait:worker": 10, "faction:paragon": -5},
+			"flags": {"medic": true}
+		},
+		"clone_reject": {
+			"name": "Clone Reject #4471",
+			"desc": "A factory-recalled clone. Slight defect: free will. Your warranty expired before you did.",
+			"story": "You were a recalled clone, binned for the manufacturing defect known as 'having opinions'.",
+			"spawn": "cargo_hold",
+			"credits": 0,
+			"items": {"barcode_tattoo": 1},
+			"mods": {"add": {"roll_speed": 1.5}, "mul": {"roll_cooldown": -0.15}},
+			"rep": {"gristle": -5, "halcyon": -5},
+			"reactions": {"trait:corporate": -15, "trait:weird": 20},
+			"flags": {"clone": true}
+		}
+	},
+	"motivation": {
+		"pay_debt": {
+			"name": "Pay Off The Debt",
+			"desc": "Clear your Halcyon debt and walk free. Probably. Read the fine print.",
+			"story": "Now you want one thing: a zero balance.",
+			"credits": 0,
+			"items": {},
+			"mods": {"mul": {"loot_mult": 0.15}},
+			"rep": {"halcyon": 5},
+			"reactions": {"faction:halcyon": 5},
+			"flags": {"goal": "debt"}
+		},
+		"burn_consortium": {
+			"name": "Burn The Consortium",
+			"desc": "Five companies own the stars. You own a grudge and a second-hand blaster.",
+			"story": "Now you want to watch the Consortium's stock price hit absolute zero.",
+			"credits": 0,
+			"items": {},
+			"mods": {"add": {"damage": 2}},
+			"rep": {"paragon": -5, "lumen": -5},
+			"reactions": {"trait:rebel": 25, "trait:corporate": -20},
+			"flags": {"goal": "revolution"}
+		},
+		"find_sibling": {
+			"name": "Find Your Sibling",
+			"desc": "Your twin was sold to a different cryo-vault. The receipt is the only family photo you have.",
+			"story": "Now you want to find the sibling who was frozen in the vault next door, then sold separately.",
+			"credits": 0,
+			"items": {"old_receipt": 1},
+			"mods": {"mul": {"crew_approval_mult": 0.2}},
+			"rep": {},
+			"reactions": {"trait:poor": 5},
+			"flags": {"goal": "sibling"}
+		},
+		"get_famous": {
+			"name": "Become A Celebrity",
+			"desc": "Lumen will put anyone on the feed if they're interesting enough. You plan to be very interesting.",
+			"story": "Now you want your face on every billboard in the Sprawl, preferably not on a WANTED poster.",
+			"credits": 25,
+			"items": {},
+			"mods": {"mul": {"witness_time_mult": -0.1}},
+			"rep": {"lumen": 10},
+			"reactions": {"faction:lumen": 10, "trait:artsy": 10},
+			"flags": {"goal": "fame"}
+		},
+		"buy_a_planet": {
+			"name": "Buy A Planet",
+			"desc": "If you can't beat the Consortium, become a tiny, independent, deeply suspicious sixth member.",
+			"story": "Now you want to buy a planet of your own, and charge everyone for the air.",
+			"credits": 50,
+			"items": {},
+			"mods": {"mul": {"price_mult": -0.05}},
+			"rep": {"halcyon": 5, "oxy": 5},
+			"reactions": {"trait:corporate": 10, "trait:rebel": -10},
+			"flags": {"goal": "tycoon"}
+		}
+	},
+	"secret": {
+		"wanted_alias": {
+			"name": "Wanted Under Another Name",
+			"desc": "Paragon has a bounty on a face that looks exactly like yours. Because it is yours.",
+			"story": "Your secret: Paragon still has an open warrant on your old name.",
+			"credits": 0,
+			"items": {"fake_id": 1},
+			"mods": {"mul": {"witness_time_mult": -0.15}},
+			"rep": {"paragon": -20},
+			"bounty": {"paragon": 150},
+			"reactions": {"faction:paragon": -15},
+			"flags": {"has_alias": true}
+		},
+		"synth_air_allergy": {
+			"name": "Allergic To Synthetic Air",
+			"desc": "OxyGenix air gives you hives. Premium organic air costs triple. Breathe sparingly.",
+			"story": "Your secret: you're allergic to the only air you can afford.",
+			"credits": 0,
+			"items": {"antihistamine": 2},
+			"mods": {"mul": {"air_cost_mult": 0.5}, "add": {"accuracy": 0.05}},
+			"rep": {"oxy": -5},
+			"reactions": {},
+			"flags": {}
+		},
+		"compulsive_liar": {
+			"name": "Compulsive Liar",
+			"desc": "You lie when you're nervous. You're nervous when you breathe. Bluffs work great until they don't.",
+			"story": "Your secret: you can't stop lying, and you're very, very good at it.",
+			"credits": 15,
+			"items": {},
+			"mods": {"mul": {"bribe_mult": -0.25, "crew_approval_mult": -0.15}},
+			"rep": {},
+			"reactions": {"trait:corporate": 5},
+			"flags": {"liar": true}
+		},
+		"sleeper_agent": {
+			"name": "Corporate Sleeper Agent",
+			"desc": "Somewhere in your head is a trigger phrase. You don't know which company installed it. Neither does QUACK.",
+			"story": "Your secret: someone installed a sleeper protocol in your brain, and it is still asleep. Mostly.",
+			"credits": 0,
+			"items": {},
+			"mods": {"add": {"damage": 3, "accuracy": 0.05}, "mul": {"crew_approval_mult": -0.1}},
+			"rep": {},
+			"reactions": {"trait:weird": 10},
+			"flags": {"sleeper": true}
+		},
+		"kleptomaniac": {
+			"name": "Kleptomaniac",
+			"desc": "Your hands file paperwork without asking your brain. Things just end up in your pockets.",
+			"story": "Your secret: things simply migrate into your pockets.",
+			"credits": 0,
+			"items": {"lockpick": 2},
+			"mods": {"mul": {"loot_mult": 0.25}},
+			"rep": {},
+			"reactions": {"trait:poor": 5, "trait:corporate": -5},
+			"flags": {"klepto": true}
+		}
+	},
+	"synergies": [
+		{
+			"tags": ["ex_auditor", "burn_consortium"],
+			"name": "Whistleblower",
+			"text": "Synergy WHISTLEBLOWER: you know exactly which ledgers to burn.",
+			"mods": {"mul": {"bribe_mult": -0.15}, "add": {"damage": 2}}
+		},
+		{
+			"tags": ["cryo_debtor", "pay_debt"],
+			"name": "Repayment Plan",
+			"text": "Synergy REPAYMENT PLAN: Halcyon's interest rate on you is merely predatory instead of apocalyptic.",
+			"mods": {"mul": {"price_mult": -0.05, "loot_mult": 0.1}}
+		},
+		{
+			"tags": ["jingle_composer", "get_famous"],
+			"name": "One-Hit Wonder",
+			"text": "Synergy ONE-HIT WONDER: people hum your jingle while reporting your crimes, which slows them down.",
+			"mods": {"mul": {"witness_time_mult": 0.25}}
+		},
+		{
+			"tags": ["clone_reject", "find_sibling"],
+			"name": "Batch Mates",
+			"text": "Synergy BATCH MATES: your 'sibling' might be one of 4,470 other clones. Crew find this oddly moving.",
+			"mods": {"mul": {"crew_approval_mult": 0.25}}
+		},
+		{
+			"tags": ["street_medic", "kleptomaniac"],
+			"name": "Pharmacy Redistribution",
+			"text": "Synergy PHARMACY REDISTRIBUTION: you steal medicine and give it away. Loot heals a little.",
+			"mods": {"add": {"max_hp": 10}, "mul": {"loot_mult": 0.1}}
+		}
+	]
+}

@@ -1,0 +1,89 @@
+{
+	"_doc": "Flaw & Perk system. Each 'mishap' kind counts repeated failures. At 'threshold' the game OFFERS the linked flaw: accept it -> permanent downside + free skill points. Declining raises the next threshold. Perks are bought with skill points. mods: add = flat bonus, mul = percent (0.2 = +20%).",
+	"mishaps": {
+		"failed_parry": {"threshold": 4, "flaw": "parry_hesitation"},
+		"missed_shots": {"threshold": 3, "flaw": "jittery_trigger"},
+		"bitten": {"threshold": 4, "flaw": "bug_magnet"},
+		"took_explosion": {"threshold": 2, "flaw": "shell_shock"},
+		"air_debt": {"threshold": 3, "flaw": "subscription_lungs"},
+		"caught_stealing": {"threshold": 2, "flaw": "wanted_face"},
+		"shot_in_back": {"threshold": 8, "flaw": "paranoid_spine"},
+		"food_poisoning": {"threshold": 1, "flaw": "paste_intolerance"},
+		"spooked": {"threshold": 2, "flaw": "ghost_jitters"},
+		"hacked": {"threshold": 1, "flaw": "spam_brain"}
+	},
+	"flaws": {
+		"parry_hesitation": {
+			"name": "Parry Hesitation",
+			"desc": "You flinch a hair too long before every parry.",
+			"mods": {"add": {"parry_window": -0.04}},
+			"skill_points": 2
+		},
+		"jittery_trigger": {
+			"name": "Jittery Trigger Finger",
+			"desc": "Your trigger finger has trust issues. Accuracy -8%.",
+			"mods": {"add": {"accuracy": -0.08}},
+			"skill_points": 2
+		},
+		"bug_magnet": {
+			"name": "Bug Magnet",
+			"desc": "Insects find you delicious. Bug bites hurt more.",
+			"mods": {"mul": {"bug_damage_taken": 0.4}},
+			"skill_points": 2
+		},
+		"shell_shock": {
+			"name": "Shell Shock",
+			"desc": "Explosions rattle you. Dodge roll recovers 15% slower.",
+			"mods": {"mul": {"roll_cooldown": 0.15}},
+			"skill_points": 2
+		},
+		"subscription_lungs": {
+			"name": "Subscription Lungs",
+			"desc": "Your lungs got used to premium air. Breathing costs 25% more.",
+			"mods": {"mul": {"air_cost_mult": 0.25}},
+			"skill_points": 2
+		},
+		"wanted_face": {
+			"name": "Memorable Face",
+			"desc": "Everyone recognises you now. Witnesses report 25% faster.",
+			"mods": {"mul": {"witness_time_mult": -0.25}},
+			"skill_points": 3
+		},
+		"paranoid_spine": {
+			"name": "Paranoid Spine",
+			"desc": "You keep checking behind you. Move speed -5%.",
+			"mods": {"mul": {"move_speed": -0.05}},
+			"skill_points": 1
+		},
+		"paste_intolerance": {
+			"name": "Paste Intolerance",
+			"desc": "Protein Paste(tm) and you are no longer on speaking terms. Max HP -10.",
+			"mods": {"add": {"max_hp": -10}},
+			"skill_points": 1
+		},
+		"ghost_jitters": {
+			"name": "Ghost Jitters",
+			"desc": "Derelicts make your hands shake. Fire rate -10%.",
+			"mods": {"mul": {"fire_rate": -0.1}},
+			"skill_points": 2
+		},
+		"spam_brain": {
+			"name": "Spam Brain",
+			"desc": "Forty newsletters live in your head now. Shop prices +5% (you keep impulse-buying extended warranties).",
+			"mods": {"mul": {"price_mult": 0.05}},
+			"skill_points": 1
+		}
+	},
+	"perks": {
+		"quick_roll": {"name": "Quick Roll", "desc": "Dodge roll cooldown -25%.", "cost": 1, "mods": {"mul": {"roll_cooldown": -0.25}}},
+		"steady_hands": {"name": "Steady Hands", "desc": "Subsystem accuracy +8%.", "cost": 1, "mods": {"add": {"accuracy": 0.08}}},
+		"deep_breather": {"name": "Deep Breather", "desc": "Air subscription costs -30%.", "cost": 1, "mods": {"mul": {"air_cost_mult": -0.3}}},
+		"loot_goblin": {"name": "Loot Goblin", "desc": "+40% credits from loot.", "cost": 1, "mods": {"mul": {"loot_mult": 0.4}}},
+		"silver_tongue": {"name": "Silver Tongue", "desc": "Bribes cost 30% less and work more often.", "cost": 2, "mods": {"mul": {"bribe_mult": -0.3}}},
+		"ghost_step": {"name": "Ghost Step", "desc": "Witnesses take 40% longer to finish their radio call.", "cost": 2, "mods": {"mul": {"witness_time_mult": 0.4}}},
+		"iron_gut": {"name": "Iron Gut", "desc": "Max HP +25.", "cost": 2, "mods": {"add": {"max_hp": 25}}},
+		"parry_maestro": {"name": "Parry Maestro", "desc": "Parry window +0.06s. Parried enemies stay staggered longer.", "cost": 2, "mods": {"add": {"parry_window": 0.06, "stagger_time": 0.6}}},
+		"trigger_happy": {"name": "Trigger Happy", "desc": "Fire rate +30%.", "cost": 2, "mods": {"mul": {"fire_rate": 0.3}}},
+		"demolitionist": {"name": "Demolitionist", "desc": "Jetpack and tank explosions deal +50% damage (and you take 50% less from them).", "cost": 2, "mods": {"mul": {"explosion_damage": 0.5, "explosion_damage_taken": -0.5}}}
+	}
+}

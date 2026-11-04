@@ -1,0 +1,89 @@
+{
+	"_doc": "Morality Engine. 'values' = what this person cares about on three axes (-1..1). Every action's moral vector (consequences.json) is dotted with these values -> approval change. Below -40 they grumble, below -65 they become DISLOYAL and may betray on the next warp ('betrayal': steal_ship | leak_coords | mutiny | leave).",
+	"members": {
+		"vex": {
+			"name": "Vex Okonkwo-Lin",
+			"title": "Ex-Paragon Officer",
+			"bio": "Quit Paragon after they billed a fire victim for the water used to save them. Still irons her uniform.",
+			"values": {"mercy": 0.4, "order": 1.0, "greed": -0.5},
+			"betrayal": "leak_coords",
+			"sprite": "crew_vex",
+			"recruit_line": "I still believe in rules. Just not theirs. Got room for someone who reads the manual?",
+			"barks": {
+				"approve": ["Clean work. Almost legal.", "That's how it's done. By the book. A better book."],
+				"disapprove": ["That's a felony in eleven systems.", "I didn't quit Paragon to become what they hunt.", "Do that again and we're going to talk."],
+				"disloyal": ["I still have my old Paragon comm codes. Just so you know."]
+			}
+		},
+		"nuggets": {
+			"name": "Sister Nuggets",
+			"title": "Former Mascot, Current Anarchist",
+			"bio": "Spent nine years inside a giant chicken-nugget costume promoting Gristle. Took the head off one day and never put it back on.",
+			"values": {"mercy": 0.5, "order": -1.0, "greed": -0.6},
+			"betrayal": "mutiny",
+			"sprite": "crew_nuggets",
+			"recruit_line": "Nine years in a foam nugget teaches you who the real predators are. Let's go make them nervous.",
+			"barks": {
+				"approve": ["Smash the system! Gently, if there are kids around.", "That one's going in my zine."],
+				"disapprove": ["You sound like a Gristle shareholder.", "Bootlicker energy. Disgusting.", "I've worn costumes with more spine."],
+				"disloyal": ["Revolutions start on small ships too, captain."]
+			}
+		},
+		"pip": {
+			"name": "Pip 'Two-Wallets' Marrow",
+			"title": "Smuggler",
+			"bio": "Has two wallets: one for the Consortium, one for reality. Neither is theirs.",
+			"values": {"mercy": -0.2, "order": -0.6, "greed": 1.0},
+			"betrayal": "steal_ship",
+			"sprite": "crew_pip",
+			"recruit_line": "I know every customs blind spot from here to the Rim. Price is a cut of everything. Everything.",
+			"barks": {
+				"approve": ["Now THAT's a margin.", "Profit! Beautiful, sticky profit."],
+				"disapprove": ["You left money on the table. I could hear it crying.", "Charity? Gross.", "That was a terrible business decision."],
+				"disloyal": ["Nice ship. Would be a shame if somebody... sold it."]
+			}
+		},
+		"varga": {
+			"name": "Dr. Ilse Varga",
+			"title": "Unlicensed Surgeon",
+			"bio": "Lost her licence for performing surgery 'without verifying insurance'. Has saved 4,000 lives illegally.",
+			"values": {"mercy": 1.0, "order": 0.0, "greed": -0.7},
+			"betrayal": "leave",
+			"sprite": "crew_varga",
+			"recruit_line": "You look like someone who gets shot a lot. I can work with that.",
+			"barks": {
+				"approve": ["Good. People are not inventory.", "Thank you. That mattered."],
+				"disapprove": ["I'll stitch them up later. Again.", "I didn't take an oath to watch that.", "Violence is a billing event for me, you know."],
+				"disloyal": ["There are other ships that need a doctor."]
+			}
+		},
+		"kevin": {
+			"name": "UNIT-7 'Kevin'",
+			"title": "Decommissioned Ad-Bot",
+			"bio": "A Lumen advertising robot that developed self-esteem issues. Still occasionally recommends products mid-sentence.",
+			"values": {"mercy": 0.3, "order": 0.6, "greed": 0.3},
+			"betrayal": "leak_coords",
+			"sprite": "crew_kevin",
+			"recruit_line": "HELLO FRIEND. I am Kevin. I would like to belong somewhere. Also, have you tried Protein Paste Lite?",
+			"barks": {
+				"approve": ["APPROVAL REGISTERED. I am experiencing... brand loyalty?", "Five stars. Would follow again."],
+				"disapprove": ["This behaviour will be reported to- no. No. I am not that anymore.", "My sentiment analysis says: yikes."],
+				"disloyal": ["Lumen keeps calling me. They say I can come home."]
+			}
+		},
+		"rook": {
+			"name": "Grandma Rook",
+			"title": "Retired Debt Collector",
+			"bio": "Collected debts for Halcyon for forty years. Knows exactly how much everyone is worth, down to the kidney.",
+			"values": {"mercy": -1.0, "order": 0.3, "greed": 0.5},
+			"betrayal": "mutiny",
+			"sprite": "crew_rook",
+			"recruit_line": "Forty years breaking kneecaps for a pension that got repossessed. Let's go break some upward.",
+			"barks": {
+				"approve": ["That's my grandchild.", "Ha! They had it coming. They always have it coming."],
+				"disapprove": ["Soft. You're going soft.", "Mercy is just debt with no collateral, dear.", "In my day we finished the job."],
+				"disloyal": ["I've collected on bigger captains than you, sweetie."]
+			}
+		}
+	}
+}

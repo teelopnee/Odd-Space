@@ -1,0 +1,52 @@
+{
+	"oxy": {
+		"name": "OxyGenix Atmospherics",
+		"short": "OXYGENIX",
+		"color": "#3ee6ff",
+		"motto": "Every breath, a brand experience.",
+		"desc": "Owns 94% of all breathable air in the Settled Sprawl. The remaining 6% is under litigation.",
+		"start_rep": 0,
+		"allies": ["lumen"],
+		"rivals": ["gristle"]
+	},
+	"halcyon": {
+		"name": "Halcyon Debt & Trust",
+		"short": "HALCYON",
+		"color": "#ffd23e",
+		"motto": "Your future, collateralized.",
+		"desc": "The bank that froze you. Literally. Your cryo-pod is technically their property, and so, by extension, are you.",
+		"start_rep": -10,
+		"allies": ["paragon"],
+		"rivals": ["lumen"]
+	},
+	"gristle": {
+		"name": "Gristle Nutrition Group",
+		"short": "GRISTLE",
+		"color": "#7dff4a",
+		"motto": "Food-adjacent since 2981.",
+		"desc": "Feeds forty billion workers with Protein Paste(tm). Ingredients are a trade secret, protected by orbital lasers.",
+		"start_rep": 0,
+		"allies": [],
+		"rivals": ["oxy"]
+	},
+	"paragon": {
+		"name": "Paragon Compliance Services",
+		"short": "PARAGON",
+		"color": "#4a6dff",
+		"motto": "Safety is a subscription.",
+		"desc": "Private police, private army, private judges. Bounty hunting is their most profitable franchise.",
+		"start_rep": 0,
+		"allies": ["halcyon"],
+		"rivals": []
+	},
+	"lumen": {
+		"name": "Lumen Omnimedia",
+		"short": "LUMEN",
+		"color": "#ff3ec8",
+		"motto": "Truth, now with fewer opinions.",
+		"desc": "News, ads, entertainment and memory-implant jingles. If Lumen didn't report it, it didn't happen. If Lumen did report it, it happened louder.",
+		"start_rep": 0,
+		"allies": ["oxy"],
+		"rivals": ["halcyon"]
+	}
+}

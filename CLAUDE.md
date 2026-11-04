@@ -1,0 +1,55 @@
+# ODD-SPACE — notes for AI coding sessions
+
+Sci-fi HD-2D action-RPG (Octopath-style visuals, original retro-80s dark-satire setting) in
+**Godot 4.7, GDScript, Mobile renderer**. The owner develops on a **Samsung Galaxy Tab S12 Ultra**
+with the Godot Android editor and syncs through GitHub (`main`), so:
+
+- Commit + push finished work to `main` regularly (the owner explicitly wants this for cross-device work).
+  Always `git pull --rebase origin main` first — the tablet pushes too.
+- Talk to the owner in **Thai**; in-game text, code and comments are **English**.
+- Keep everything editable on a tablet: prefer data in `data/*.json`, ASCII level layouts, and
+  small scripts over giant scenes. Touch controls must keep working (`src/ui/hud.gd`).
+- Original IP only: never copy Octopath Traveler (or any game's) characters, art, music, names.
+
+## Layout
+- `src/autoload/` singletons (order matters, see `project.godot`): `EventBus`, `DataDB`, `Game`,
+  `Factions`, `Causality`, `Origin`, `Crew`, `FlawPerk`, `Encounters`, `ShipAI`, `Audio`, `Router`.
+  Systems communicate via `EventBus` signals. Persistent systems implement `reset()/to_save()/from_save()`
+  and are registered in `Game._systems()` + `Game.save_game()/load_game()`.
+- `src/actors/` Player / Enemy (data-driven subsystems) / NPC (witness, dialogue) / Projectile.
+- `src/world/` `LevelBuilder` (ASCII → 3D), `Level` base (environment, navmesh bake, spawning, HUD),
+  `station_prologue.gd`, `planet_surface.gd` (procedural), `CameraRig` (tilt-shift, occluder fade).
+- `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
+- `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
+
+## Validate before every push
+Download Godot once (Linux x86_64) into your scratchpad:
+`https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip`
+```bash
+godot --headless --path . --import                                  # (re)generate .godot cache, *.uid, *.import
+godot --headless --path . --script res://tools/check_project.gd     # compiles all scripts + scenes, exit code = failures
+godot --headless --path . --script res://tools/smoke_test.gd        # plays station -> ship -> all planets -> save/load
+```
+`grep "SCRIPT ERROR"` on the smoke-test output must be empty.
+Screenshots (software Vulkan): `apt-get install mesa-vulkan-drivers xvfb`, then
+`VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --resolution 1280x800 --script res://tools/capture_screens.gd -- <out_dir>`
+
+Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
+
+## Gotchas learned the hard way (Godot 4.7)
+- `VirtualJoystick` is a **native class** in 4.7 → ours is `TouchStick`. Check `ClassDB.class_exists()` before naming classes.
+- No `match` inside a multi-line lambda passed as a call argument (parser error). Use a named method.
+- `var x := <Variant expression>` fails ("cannot infer type") → write `var x: bool = ...`.
+- `%g` is not a GDScript format specifier.
+- Controls created at runtime inside the tree: use `set_anchors_and_offsets_preset(PRESET_FULL_RECT)`,
+  not `set_anchors_preset` (that keeps the old zero-size rect).
+- Don't pass `--rendering-driver vulkan` on the CLI: it silently switches the renderer to Forward+.
+- `tools/*.gd` run with `--script`: autoloads only exist from the first `_process` frame, and
+  referencing game `class_name`s at compile time poisons the script cache — compare by `get_global_name()`.
+- Depth-based DOF (`CameraAttributesPractical`) blurred everything on lavapipe; default is the
+  screen-space tilt-shift shader (`assets/shaders/tilt_shift.gdshader`), selectable in Settings.
+- Mobile renderer: max 8 omni lights per mesh → floors are built in 6x6-tile chunks.
+
+## Regenerating placeholder assets
+`python3 tools/gen_sprites.py` (Pillow) and `python3 tools/gen_audio.py` (numpy). Sprite sheets are
+6x7 frames of 32x40 px (layout in `src/actors/billboard_sprite.gd`); real art can replace them 1:1.

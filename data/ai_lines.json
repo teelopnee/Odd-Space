@@ -1,0 +1,61 @@
+{
+	"_doc": "Q.U.A.C.K. (Quasi-Unlicensed Autonomous Cognitive Kernel), the Odd Duck's ship AI. Keys are events. Tokens: {name} {planet} {crisis} {faction} {target} {count} {credits} {member}.",
+	"on_wake": [
+		"Oh good, you're thawed. I was about to list you on the secondhand market as 'vintage meat'.",
+		"Welcome back to consciousness, {name}. It's the 32nd century. Everything costs money, including this sentence."
+	],
+	"on_tutorial_move": ["Movement detected. Congratulations on your legs."],
+	"on_theft": [
+		"Ah, the classic five-finger discount. The Consortium calls it 'shrinkage'. I call it Tuesday.",
+		"Stealing from the people who own air. Bold. Stupid, but bold."
+	],
+	"on_murder": [
+		"That's going in the Causality Log. In bold. With a little skull emoji.",
+		"I'm legally required to say 'that was bad'. I'm not legally required to mean it. ...That was bad, though."
+	],
+	"on_assault": ["You know they have insurance, right? You don't."],
+	"on_vandalism": ["Somewhere in a Lumen tower, an executive just felt a cold shiver. Good."],
+	"on_witness": [
+		"Heads up: someone saw that and is calling it in. You have a few seconds to make them... reconsider.",
+		"Witness on the radio. Bribe them, outrun them, or make some very regrettable decisions."
+	],
+	"on_reported": [
+		"Report filed. Congratulations, you're content now.",
+		"And there it goes, onto the Lumen feed. Your mother would be so proud. If she weren't repossessed."
+	],
+	"on_suppressed": [
+		"Witness... silenced. The story dies with them. I'll pretend I didn't log that. I did log it.",
+		"No report, no crime. That's not ethics, that's accounting."
+	],
+	"on_secret": ["Nobody saw. As far as the universe is concerned, that never happened. Except to me. I remember everything."],
+	"on_low_hp": [
+		"Your vitals look like a Halcyon credit score. Use a medkit.",
+		"You're leaking. I'd help, but I'm a ship."
+	],
+	"on_parry": ["Parried! Even I'm impressed, and I'm programmed to be disappointed.", "Ooh, rude. Do it again."],
+	"on_jetpack_boom": ["You shot the jetpack. Physics did the rest. I love physics.", "Kaboom. That's a technical term."],
+	"on_legs_broken": ["Leg shot! Now they're on the payment plan for walking."],
+	"on_kill": ["Target liquidated. Like their assets.", "One less shareholder."],
+	"on_land": [
+		"Welcome to {planet}. Current crisis: {crisis}. So, a normal day.",
+		"Landing on {planet}. Remember: the air here isn't free. Nothing is. Not even this reminder."
+	],
+	"on_warp": ["Engaging warp. Please keep your limbs inside the ship and your expectations low.", "Warping. If we die, it was the cheapest engine on the market."],
+	"on_flaw": ["You accepted a flaw for skill points. That's literally how capitalism works. Proud of you.", "Character development! Downward, but still."],
+	"on_perk": ["New perk installed. You're 3% less disappointing now."],
+	"on_rep_crash": ["Your standing with {faction} just fell off a cliff. The cliff is also owned by {faction}."],
+	"on_bounty": ["There's a bounty on you now. You're worth something! Just not alive."],
+	"on_crew_unhappy": ["{member} is unhappy with you. I'd keep an eye on the airlock controls."],
+	"on_betrayal": ["Well. That happened. I did warn you. I always warn you. Nobody listens to the duck."],
+	"on_air_debt": ["You just went into air debt. Halcyon now owns a small percentage of your next breath."],
+	"on_scammed": ["It was a scam. Of course it was a scam. Everything's a scam. I'm probably a scam."],
+	"on_death": ["Vital signs: zero. Subscription: cancelled. Reloading your last save, because I'm too lazy to find a new pilot."],
+	"on_board": ["Welcome aboard the Odd Duck. Please ignore the smell. It's structural."],
+	"idle": [
+		"Fun fact: OxyGenix trademarked the sound of breathing in 3011. You owe them 0.2 credits for listening to yourself.",
+		"I ran the numbers. Your life expectancy is 'pending review'.",
+		"Did you know the Consortium is just five companies in a trench coat? It's true. I've seen the trench coat.",
+		"I composed a synthwave track about our situation. It's called 'Despair, but with reverb'.",
+		"Reminder: Paragon's slogan is 'Safety is a subscription'. Your subscription lapsed in 2998."
+	]
+}

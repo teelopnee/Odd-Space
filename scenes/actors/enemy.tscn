@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/actors/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://src/actors/billboard_sprite.gd" id="2_sprite"]
+[ext_resource type="Script" path="res://src/actors/witness_component.gd" id="3_witness"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.5
+
+[node name="Enemy" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_enemy")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+pixel_size = 0.045
+script = ExtResource("2_sprite")
+sheet_name = "officer"
+
+[node name="NavAgent" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.7
+target_desired_distance = 0.9
+radius = 0.45
+
+[node name="Witness" type="Node3D" parent="."]
+script = ExtResource("3_witness")

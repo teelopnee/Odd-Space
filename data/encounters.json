@@ -1,0 +1,264 @@
+{
+	"_doc": "Space encounters rolled during warp. Choice keys: cost (credits, x bribe_mult when bribe=true), requires {flag|min_credits|has_item|crew_size_min}, chance (0..1) + chance_mods {'flag:liar': 0.2, 'perk:silver_tongue': 0.15}, then success/fail or result -> {text, effects}. Effects: credits, credits_pct, hp, rep{}, bounty{}, clear_bounty, items{}, record{verb,target_faction,public}, recruit (id|'random'), skill_points, flag{}, mishap, air_debt, ai (ShipAI line key). Text tokens: {bounty} {credits} {air_debt} {bribe}.",
+	"chance_per_warp": 0.7,
+	"list": [
+		{
+			"id": "ghost_ship",
+			"title": "GHOST SHIP",
+			"text": "A derelict liner, the 'Quarterly Projection', drifts across your lane. Every window is dark except one, which spells out WE ARE CLOSED.",
+			"weight": 3,
+			"requires": {},
+			"choices": [
+				{
+					"id": "board",
+					"text": "Board and salvage",
+					"chance": 0.6,
+					"chance_mods": {"perk:loot_goblin": 0.1},
+					"success": {"text": "You find a stash of unclaimed severance packages and a working medkit. Nobody is left to claim them.", "effects": {"credits": 90, "items": {"medkit": 1, "scrap": 3}}},
+					"fail": {"text": "Something in the dark bills you for the visit. In blood. You leave with a scrap of hull and a new fear.", "effects": {"hp": -25, "items": {"scrap": 1}, "mishap": "spooked"}}
+				},
+				{
+					"id": "scan_cryo",
+					"text": "Scan for survivors in cryo",
+					"chance": 0.5,
+					"success": {"text": "One pod still hums. You thaw its occupant. They look at you, then at the Odd Duck, and decide you're the lesser evil.", "effects": {"recruit": "random", "record": {"verb": "mercy", "public": false}}},
+					"fail": {"text": "All pods read EMPTY - REPOSSESSED. You mark the wreck for the next fool.", "effects": {"items": {"scrap": 1}}}
+				},
+				{
+					"id": "leave",
+					"text": "Leave it alone",
+					"result": {"text": "QUACK plays a mournful kazoo solo as the ghost ship fades behind you.", "effects": {}}
+				}
+			]
+		},
+		{
+			"id": "fake_distress",
+			"title": "DISTRESS SIGNAL",
+			"text": "\"MAYDAY... hull breach... please help... also, pre-order our debut album, out now on Lumen.\"",
+			"weight": 3,
+			"requires": {},
+			"choices": [
+				{
+					"id": "answer",
+					"text": "Answer the call",
+					"chance": 0.35,
+					"success": {"text": "It's real. A smuggler named Pip is stuck in a leaking shuttle. They're grateful. Suspiciously grateful.", "effects": {"recruit": "pip", "record": {"verb": "mercy", "public": false}}},
+					"fail": {"text": "It's a pirate ambush. They board, take a 'convenience fee', and leave you a one-star review.", "effects": {"credits_pct": -0.3, "hp": -15, "ai": "on_scammed"}}
+				},
+				{
+					"id": "ignore",
+					"text": "Ignore it",
+					"result": {"text": "The signal fades. You'll never know. Your crew will bring it up later, though.", "effects": {"record": {"verb": "desert", "public": false}}}
+				},
+				{
+					"id": "report",
+					"text": "Forward it to Paragon Compliance",
+					"result": {"text": "Paragon thanks you for your civic engagement and charges you a 5-credit processing fee.", "effects": {"credits": -5, "record": {"verb": "comply", "target_faction": "paragon", "public": true}}}
+				}
+			]
+		},
+		{
+			"id": "paragon_inspection",
+			"title": "COMPLIANCE CHECKPOINT",
+			"text": "A Paragon cruiser hails you: \"Random inspection. You have been randomly selected by our completely random algorithm, which selected you specifically.\"",
+			"weight": 2,
+			"weight_bounty": 0.01,
+			"requires": {},
+			"choices": [
+				{
+					"id": "comply",
+					"text": "Comply and pay the 'inspection fee'",
+					"result": {"text": "They scan you, fine you 10% of your savings for 'having savings', and wish you a compliant day.", "effects": {"credits_pct": -0.1, "record": {"verb": "comply", "target_faction": "paragon", "public": true}}}
+				},
+				{
+					"id": "bribe",
+					"text": "Offer a 'tip' ({bribe} cr)",
+					"cost": 60,
+					"bribe": true,
+					"chance": 0.75,
+					"chance_mods": {"flag:liar": 0.15, "perk:silver_tongue": 0.15},
+					"success": {"text": "The officer pockets it. \"Have a safe flight, valued customer.\"", "effects": {"record": {"verb": "bribe", "target_faction": "paragon", "public": true}}},
+					"fail": {"text": "\"Attempted bribery of a Compliance Officer is a premium offence.\" They keep the money anyway.", "effects": {"rep": {"paragon": -10}, "bounty": {"paragon": 80}}}
+				},
+				{
+					"id": "run",
+					"text": "Punch it and run",
+					"chance": 0.5,
+					"chance_mods": {"perk:quick_roll": 0.1},
+					"success": {"text": "The Odd Duck coughs, wheezes and somehow outruns a military cruiser. QUACK is insufferable about it.", "effects": {"rep": {"paragon": -8}, "bounty": {"paragon": 50}}},
+					"fail": {"text": "They clip your engines with a 'warning shot' that was not a warning.", "effects": {"hp": -25, "rep": {"paragon": -5}, "bounty": {"paragon": 30}}}
+				}
+			]
+		},
+		{
+			"id": "ad_drone",
+			"title": "AD DRONE LATCHED",
+			"text": "An Ad Drone magnetically clamps onto your hull. \"Watch thirty seconds of content to unlock your vessel!\"",
+			"weight": 2,
+			"requires": {},
+			"choices": [
+				{
+					"id": "watch",
+					"text": "Watch the ad",
+					"result": {"text": "You watch a man in a suit eat Protein Paste and weep with joy. You receive 15 credits and a faint craving.", "effects": {"credits": 15, "rep": {"lumen": 2}}}
+				},
+				{
+					"id": "shoot",
+					"text": "Blast it off the hull",
+					"result": {"text": "The drone explodes mid-jingle. Lumen's legal department has been notified automatically.", "effects": {"items": {"scrap": 2}, "record": {"verb": "vandalism", "target_faction": "lumen", "public": true}}}
+				},
+				{
+					"id": "hack",
+					"text": "Hack its payment chip",
+					"chance": 0.5,
+					"chance_mods": {"flag:knows_ledgers": 0.25},
+					"success": {"text": "You redirect its advertising budget to yourself. Capitalism works!", "effects": {"credits": 70}},
+					"fail": {"text": "The drone counter-hacks you and subscribes the Odd Duck to 40 newsletters.", "effects": {"credits": -10, "mishap": "hacked"}}
+				}
+			]
+		},
+		{
+			"id": "bounty_hunter",
+			"title": "BOUNTY HUNTER",
+			"text": "A hunter-ship named 'Due Diligence' matches your velocity. \"There's {bounty} credits on your head, friend. Nothing personal. It's in my KPIs.\"",
+			"weight": 4,
+			"weight_bounty": 0.02,
+			"requires": {"min_bounty": 100},
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay off the bounty ({bounty} cr)",
+					"cost_bounty": true,
+					"result": {"text": "The hunter accepts payment and emails you a receipt titled 'Your Freedom (Temporary)'.", "effects": {"clear_bounty": true}}
+				},
+				{
+					"id": "fight",
+					"text": "Fight",
+					"chance": 0.55,
+					"chance_mods": {"perk:trigger_happy": 0.1, "perk:iron_gut": 0.1},
+					"success": {"text": "The 'Due Diligence' limps away. You salvage its bounty board, which oddly lists you as 'paid'.", "effects": {"credits": 60, "bounty": {"paragon": -100}, "record": {"verb": "kill_hostile", "target_faction": "paragon", "public": true}}},
+					"fail": {"text": "You barely escape. The hunter leaves a sticky note on your hull: 'See you next quarter.'", "effects": {"hp": -40}}
+				},
+				{
+					"id": "bluff",
+					"text": "Claim you're your own evil twin",
+					"requires": {},
+					"chance": 0.25,
+					"chance_mods": {"flag:liar": 0.45, "flag:clone": 0.3},
+					"success": {"text": "\"Oh. Sorry. Wrong twin.\" The hunter leaves to harass your nonexistent sibling.", "effects": {}},
+					"fail": {"text": "\"That's what the real one would say.\" Shots fired.", "effects": {"hp": -30}}
+				}
+			]
+		},
+		{
+			"id": "lumen_reporter",
+			"title": "LUMEN EXCLUSIVE",
+			"text": "A Lumen news-skiff pulls alongside. A reporter with nine cameras for a face asks for 'your side of the story'. Which story? Every story.",
+			"weight": 2,
+			"requires": {"min_reported": 1},
+			"choices": [
+				{
+					"id": "spin",
+					"text": "Spin it. You're the hero here.",
+					"chance": 0.6,
+					"chance_mods": {"flag:liar": 0.25, "flag:famous_jingle": 0.15},
+					"success": {"text": "The segment airs. You're 'a misunderstood entrepreneur'. Paragon lowers your bounty to avoid bad press.", "effects": {"rep": {"lumen": 5}, "bounty": {"paragon": -60}}},
+					"fail": {"text": "They edit your interview into a crime documentary. It's a hit.", "effects": {"rep": {"lumen": 3, "paragon": -5}, "bounty": {"paragon": 40}}}
+				},
+				{
+					"id": "confess",
+					"text": "Tell the truth",
+					"result": {"text": "Lumen has never aired the truth before. Ratings explode. Your crew looks at you differently.", "effects": {"rep": {"lumen": 8}, "skill_points": 1, "record": {"verb": "comply", "public": true}}}
+				},
+				{
+					"id": "decline",
+					"text": "No comment",
+					"result": {"text": "The headline reads: DRIFTER REFUSES TO DENY EVERYTHING.", "effects": {"rep": {"lumen": -3}}}
+				}
+			]
+		},
+		{
+			"id": "gristle_sample",
+			"title": "FREE SAMPLE",
+			"text": "A Gristle promo-pod offers a complimentary tube of NEW Protein Paste Lite(tm): 'Now with 12% less mystery!'",
+			"weight": 2,
+			"requires": {},
+			"choices": [
+				{
+					"id": "eat",
+					"text": "Eat it",
+					"chance": 0.5,
+					"success": {"text": "Surprisingly nutritious. You feel 12% less mysterious.", "effects": {"hp": 30, "rep": {"gristle": 2}}},
+					"fail": {"text": "It was the recalled batch. It contained a tooth. Not yours. Not human.", "effects": {"hp": -10, "mishap": "food_poisoning"}}
+				},
+				{
+					"id": "sell",
+					"text": "Resell it to your crew at a markup",
+					"requires": {"crew_size_min": 1},
+					"result": {"text": "Your crew pays 20 credits. Some of them will remember this.", "effects": {"credits": 20, "record": {"verb": "smuggle", "target_faction": "gristle", "public": false}}}
+				},
+				{
+					"id": "decline",
+					"text": "Politely decline",
+					"result": {"text": "The pod plays a sad trombone and logs you as a 'low-value consumer'.", "effects": {}}
+				}
+			]
+		},
+		{
+			"id": "halcyon_collector",
+			"title": "OVERDUE NOTICE",
+			"text": "Halcyon Debt & Trust: \"Our records show {air_debt} credits of unpaid breathing. Please remit, or we will be forced to repossess your lungs.\"",
+			"weight": 4,
+			"requires": {"min_air_debt": 1},
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay the debt ({air_debt} cr)",
+					"cost_air_debt": true,
+					"result": {"text": "Debt cleared. Halcyon sends a 'We'll miss you' card. It's a threat.", "effects": {"air_debt": -999999, "rep": {"halcyon": 4}}}
+				},
+				{
+					"id": "negotiate",
+					"text": "Negotiate a 'restructuring'",
+					"chance": 0.5,
+					"chance_mods": {"flag:knows_ledgers": 0.3, "perk:silver_tongue": 0.2},
+					"success": {"text": "You restructure the debt into a smaller debt with a bigger font. Halcyon accepts.", "effects": {"air_debt": -40}},
+					"fail": {"text": "They restructure your debt upward. With fees for restructuring.", "effects": {"air_debt": 25, "rep": {"halcyon": -3}}}
+				},
+				{
+					"id": "ignore",
+					"text": "Hang up",
+					"result": {"text": "Halcyon flags your account. A repossession drone has your scent now.", "effects": {"rep": {"halcyon": -10}, "bounty": {"halcyon": 60}}}
+				}
+			]
+		},
+		{
+			"id": "cryo_auction",
+			"title": "CRYO AUCTION",
+			"text": "A Halcyon auction barge is selling 'pre-owned humans' in cryo. One pod's label reads: 'Barely used. Has opinions.'",
+			"weight": 1,
+			"requires": {"max_crew": 3},
+			"choices": [
+				{
+					"id": "buy",
+					"text": "Buy the pod (120 cr)",
+					"cost": 120,
+					"result": {"text": "You buy a person to set them free. Halcyon calls it 'a great deal'. Your new crewmate calls it 'complicated'.", "effects": {"recruit": "random", "record": {"verb": "charity", "public": true}}}
+				},
+				{
+					"id": "steal",
+					"text": "Steal the pod during the auction",
+					"chance": 0.45,
+					"chance_mods": {"flag:klepto": 0.25},
+					"success": {"text": "You swap the pod with a crate of Protein Paste. Nobody notices for hours.", "effects": {"recruit": "random", "record": {"verb": "theft", "target_faction": "halcyon", "public": false}}},
+					"fail": {"text": "Alarms. You escape empty-handed and very much on camera.", "effects": {"record": {"verb": "theft", "target_faction": "halcyon", "public": true}}}
+				},
+				{
+					"id": "leave",
+					"text": "Fly on",
+					"result": {"text": "The auctioneer shouts 'SOLD!' behind you. To whom, you'll never know.", "effects": {}}
+				}
+			]
+		}
+	]
+}

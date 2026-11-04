@@ -1,0 +1,130 @@
+{
+	"_doc": "Causality rules. When an action node becomes REPORTED (a witness finished their radio call, or the action was public) these effects fire. '$target' = the faction that owned/was the victim. 'moral' is how crew judge the act (mercy / order / greed, -2..+2), applied even if nobody reported it, because crew always find out.",
+	"theft": {
+		"label": "Theft",
+		"severity": 2,
+		"rep": {"$target": -8},
+		"bounty": 40,
+		"news": [
+			"LUMEN FLASH: Petty thief strikes {location}. Shareholders 'mildly inconvenienced'.",
+			"BREAKING: {target_name} property relocated without a receipt at {location}. Experts call it 'theft'."
+		],
+		"moral": {"mercy": 0, "order": -1, "greed": 1}
+	},
+	"vandalism": {
+		"label": "Vandalism",
+		"severity": 1,
+		"rep": {"$target": -5},
+		"bounty": 20,
+		"news": [
+			"LUMEN FLASH: Advertising surface assaulted at {location}. The ad is reportedly 'still believing in you'.",
+			"BREAKING: Hooligan disrespects a billboard at {location}. Billboard declines to comment, as it is broken."
+		],
+		"moral": {"mercy": 0, "order": -1, "greed": 0}
+	},
+	"assault": {
+		"label": "Assault",
+		"severity": 2,
+		"rep": {"$target": -10},
+		"bounty": 60,
+		"news": [
+			"LUMEN FLASH: Unprovoked violence at {location}! Victim's productivity down 40%."
+		],
+		"moral": {"mercy": -1, "order": -1, "greed": 0}
+	},
+	"murder": {
+		"label": "Murder",
+		"severity": 5,
+		"rep": {"$target": -25, "paragon": -10},
+		"bounty": 250,
+		"news": [
+			"BREAKING: Homicide at {location}. {target_name} mourns the loss of a fully-depreciated asset.",
+			"LUMEN EXCLUSIVE: Killer at large near {location}! Paragon Compliance offers a bounty and a discount on grief counselling."
+		],
+		"moral": {"mercy": -2, "order": -2, "greed": 0}
+	},
+	"kill_hostile": {
+		"label": "Combat kill",
+		"severity": 1,
+		"rep": {"$target": -3},
+		"bounty": 0,
+		"news": [
+			"LUMEN SPORTS: Armed altercation at {location}. Final score: one drifter, {target_name} nil."
+		],
+		"moral": {"mercy": -0.5, "order": 0, "greed": 0}
+	},
+	"bribe": {
+		"label": "Bribery",
+		"severity": 1,
+		"rep": {"paragon": -2},
+		"bounty": 0,
+		"news": [
+			"LUMEN BUSINESS: Informal transaction at {location}. Economists praise 'market efficiency'."
+		],
+		"moral": {"mercy": 0, "order": -1, "greed": 0.5}
+	},
+	"mercy": {
+		"label": "Mercy",
+		"severity": 0,
+		"rep": {},
+		"bounty": 0,
+		"news": [
+			"LUMEN HUMAN INTEREST: Someone at {location} did something nice. Analysts are baffled."
+		],
+		"moral": {"mercy": 2, "order": 0, "greed": -1}
+	},
+	"charity": {
+		"label": "Charity",
+		"severity": 0,
+		"rep": {"halcyon": -1},
+		"bounty": 0,
+		"news": [
+			"LUMEN BUSINESS: Unlicensed generosity reported at {location}. Halcyon warns it could 'destabilise poverty'."
+		],
+		"moral": {"mercy": 1.5, "order": 0, "greed": -2}
+	},
+	"trespass": {
+		"label": "Trespass",
+		"severity": 1,
+		"rep": {"$target": -3},
+		"bounty": 10,
+		"news": [
+			"LUMEN FLASH: Unauthorised footsteps detected at {location}."
+		],
+		"moral": {"mercy": 0, "order": -0.5, "greed": 0}
+	},
+	"intimidate": {
+		"label": "Intimidation",
+		"severity": 1,
+		"rep": {"$target": -2},
+		"bounty": 0,
+		"news": [],
+		"moral": {"mercy": -1, "order": -1, "greed": 0}
+	},
+	"comply": {
+		"label": "Compliance",
+		"severity": 0,
+		"rep": {"paragon": 3},
+		"bounty": 0,
+		"news": [],
+		"moral": {"mercy": 0, "order": 1.5, "greed": 0}
+	},
+	"desert": {
+		"label": "Abandonment",
+		"severity": 1,
+		"rep": {},
+		"bounty": 0,
+		"news": [],
+		"moral": {"mercy": -1.5, "order": 0, "greed": 0.5}
+	},
+	"smuggle": {
+		"label": "Smuggling",
+		"severity": 2,
+		"rep": {"paragon": -6, "$target": -4},
+		"bounty": 50,
+		"news": [
+			"LUMEN FLASH: Contraband detected near {location}. Paragon reminds citizens that freedom is a premium feature."
+		],
+		"moral": {"mercy": 0, "order": -1.5, "greed": 1}
+	}
+}

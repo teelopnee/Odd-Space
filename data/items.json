@@ -1,0 +1,14 @@
+{
+	"_doc": "Items. 'use' effects run from the inventory / HUD medkit button. price = base price before faction/crisis multipliers.",
+	"medkit": {"name": "Medkit (Generic)", "desc": "Heals 40 HP. Side effects include a Halcyon invoice.", "price": 35, "use": {"heal": 40}},
+	"air_canister": {"name": "Air Canister", "desc": "Pays 30 credits of air debt. Bottled at the source (a vent).", "price": 25, "use": {"air_debt": -30}},
+	"scrap": {"name": "Scrap", "desc": "Hull junk. Sells for 6 credits each.", "price": 6, "sell": true},
+	"data_shard": {"name": "Ledger Shard", "desc": "Proof that someone, somewhere, embezzled. Sells for 80.", "price": 80, "sell": true},
+	"synth_keytar": {"name": "Synth Keytar", "desc": "Your old instrument. Emotionally priceless. Financially 12 credits.", "price": 12},
+	"barcode_tattoo": {"name": "Barcode Tattoo", "desc": "Scans as 'RECALLED'. Not removable.", "price": 0},
+	"old_receipt": {"name": "Old Receipt", "desc": "'1x Sibling, cryo-preserved. No refunds.'", "price": 0},
+	"fake_id": {"name": "Fake ID", "desc": "Says you're 'Dave'. You don't look like a Dave.", "price": 40},
+	"antihistamine": {"name": "Antihistamine", "desc": "Heals 15 HP. Tastes like regret.", "price": 10, "use": {"heal": 15}},
+	"lockpick": {"name": "Lockpick", "desc": "Makes theft quieter: witnesses take longer to notice.", "price": 15},
+	"bribe_voucher": {"name": "Bribe Voucher", "desc": "Pre-paid hush money. Silences one witness for free.", "price": 50}
+}

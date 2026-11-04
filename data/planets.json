@@ -1,0 +1,173 @@
+{
+	"_doc": "Procedural Planet Matrix. Every planet = 1 environment x 1 controller (faction or lawless) x 1 economic crisis x 1 local anomaly. Colors are hex. 'props' are low-poly prop kinds the level builder knows: rock, crystal, pipe, tank, antenna, ruin, mushroom, crate.",
+	"environments": [
+		{
+			"id": "neon_sprawl",
+			"name": "Neon Megasprawl",
+			"desc": "A city that covers the whole planet. The sky is a ceiling of advertisements.",
+			"weight": 3,
+			"bg": "#0b0420", "ground": "#2a2440", "ground_alt": "#352c52", "wall": "#4a3f6b",
+			"fog": "#3a1060", "fog_density": 0.012,
+			"sun": "#9a7dff", "sun_energy": 0.35, "ambient": "#4a3a80", "ambient_energy": 0.7,
+			"neon": ["#ff3ec8", "#3ee6ff", "#ffd23e"],
+			"props": ["crate", "antenna", "pipe", "tank"],
+			"building_density": 0.9,
+			"air_mult": 1.0
+		},
+		{
+			"id": "toxic_swamp",
+			"name": "Toxic Bio-Swamp",
+			"desc": "Gristle's former 'organic ingredient farm'. The ingredients escaped and formed opinions.",
+			"weight": 2,
+			"bg": "#06140a", "ground": "#1e3320", "ground_alt": "#26402a", "wall": "#3a4a2a",
+			"fog": "#2a6030", "fog_density": 0.03,
+			"sun": "#b8ff8a", "sun_energy": 0.5, "ambient": "#2a5a30", "ambient_energy": 0.8,
+			"neon": ["#7dff4a", "#ffd23e"],
+			"props": ["mushroom", "rock", "pipe", "tank"],
+			"building_density": 0.35,
+			"air_mult": 1.6
+		},
+		{
+			"id": "ad_desert",
+			"name": "Frozen Ad-Desert",
+			"desc": "Glaciers of discarded billboard plastic. Some of them still play the jingle.",
+			"weight": 2,
+			"bg": "#0c1424", "ground": "#6a7e9e", "ground_alt": "#7a90b2", "wall": "#4a5a7a",
+			"fog": "#2e4468", "fog_density": 0.014,
+			"sun": "#d0e4ff", "sun_energy": 0.75, "ambient": "#4a6090", "ambient_energy": 0.6,
+			"neon": ["#3ee6ff", "#ff3ec8"],
+			"props": ["crystal", "ruin", "antenna", "rock"],
+			"building_density": 0.3,
+			"air_mult": 0.9
+		},
+		{
+			"id": "rust_canyon",
+			"name": "Rust Canyon Strip-Mine",
+			"desc": "A planet that has been 70% removed. The remaining 30% is on a payment plan.",
+			"weight": 2,
+			"bg": "#1a0806", "ground": "#6a3020", "ground_alt": "#7a3a26", "wall": "#4a2018",
+			"fog": "#a04a20", "fog_density": 0.018,
+			"sun": "#ffb070", "sun_energy": 1.1, "ambient": "#804030", "ambient_energy": 0.6,
+			"neon": ["#ffd23e", "#ff5a3e"],
+			"props": ["rock", "pipe", "tank", "crate"],
+			"building_density": 0.45,
+			"air_mult": 1.2
+		},
+		{
+			"id": "crystal_moon",
+			"name": "Crystal Debt-Moon",
+			"desc": "Halcyon repossessed this moon. The crystals are collateral. So are you, while you're here.",
+			"weight": 1,
+			"bg": "#0a0618", "ground": "#2a1a40", "ground_alt": "#3a2050", "wall": "#4a2a6a",
+			"fog": "#6a3aa0", "fog_density": 0.015,
+			"sun": "#c0a0ff", "sun_energy": 0.6, "ambient": "#5a3a90", "ambient_energy": 0.8,
+			"neon": ["#c07dff", "#3ee6ff"],
+			"props": ["crystal", "crystal", "rock", "ruin"],
+			"building_density": 0.25,
+			"air_mult": 1.1
+		}
+	],
+	"crises": [
+		{
+			"id": "air_bubble",
+			"name": "Air Price Bubble",
+			"desc": "Breathing futures have tripled overnight. Citizens are advised to 'breathe strategically'.",
+			"weight": 2,
+			"air_mult": 2.0,
+			"price_mult": 1.1,
+			"enemy_mult": 1.0,
+			"favored_faction": "oxy"
+		},
+		{
+			"id": "debt_strike",
+			"name": "General Debt Strike",
+			"desc": "Workers stopped paying their debts. Halcyon has deployed repossession drones to repossess the concept of hope.",
+			"weight": 2,
+			"air_mult": 1.0,
+			"price_mult": 0.9,
+			"enemy_mult": 1.4,
+			"favored_faction": "halcyon"
+		},
+		{
+			"id": "paste_recall",
+			"name": "Protein Paste Recall",
+			"desc": "Batch #88 of Protein Paste(tm) has been recalled for 'containing teeth'. Food prices have spiked.",
+			"weight": 2,
+			"air_mult": 1.0,
+			"price_mult": 1.35,
+			"enemy_mult": 1.0,
+			"favored_faction": "gristle"
+		},
+		{
+			"id": "ad_overload",
+			"name": "Advertising Overload",
+			"desc": "Lumen's ad servers achieved sentience and maximised engagement. Everything is sponsored now. Even silence.",
+			"weight": 1,
+			"air_mult": 1.0,
+			"price_mult": 0.8,
+			"enemy_mult": 1.0,
+			"favored_faction": "lumen"
+		},
+		{
+			"id": "compliance_week",
+			"name": "Compliance Week(tm)",
+			"desc": "Paragon is running a 'Seven Days of Safety' promotion. Every crime reported earns the reporter a coupon.",
+			"weight": 1,
+			"air_mult": 1.0,
+			"price_mult": 1.0,
+			"enemy_mult": 1.2,
+			"witness_mult": 0.6,
+			"favored_faction": "paragon"
+		}
+	],
+	"anomalies": [
+		{
+			"id": "gravity_hiccups",
+			"name": "Gravity Hiccups",
+			"desc": "Local gravity occasionally forgets itself. Hold onto your snacks.",
+			"weight": 2,
+			"effects": {"gravity_scale": 0.55}
+		},
+		{
+			"id": "sentient_fog",
+			"name": "Sentient Fog",
+			"desc": "The fog is alive, curious, and slightly judgemental.",
+			"weight": 2,
+			"effects": {"fog_add": 0.025}
+		},
+		{
+			"id": "ad_ghosts",
+			"name": "Ad Ghosts",
+			"desc": "Holograms of discontinued products drift through the streets, still trying to sell themselves.",
+			"weight": 2,
+			"effects": {"ad_ghosts": 8}
+		},
+		{
+			"id": "reverse_rain",
+			"name": "Reverse Rain",
+			"desc": "It rains upwards here. OxyGenix is suing the weather.",
+			"weight": 1,
+			"effects": {"reverse_rain": true}
+		},
+		{
+			"id": "time_stutter",
+			"name": "Time Stutter",
+			"desc": "Time skips like a cheap holo-disc. Everyone moves a bit faster, including the bill collectors.",
+			"weight": 1,
+			"effects": {"enemy_speed_mult": 1.25}
+		},
+		{
+			"id": "polite_bugs",
+			"name": "Polite Bug Migration",
+			"desc": "Millions of Gristle grubs are migrating. They apologise before biting.",
+			"weight": 1,
+			"effects": {"extra_bugs": 4}
+		}
+	],
+	"names": {
+		"prefix": ["Kel", "Vos", "Ari", "Mon", "Zeb", "Tor", "Lun", "Quix", "Dra", "Hal", "Oru", "Pex", "Syl", "Nym", "Gar"],
+		"middle": ["a", "o", "e", "i", "u", "ar", "on", "ex", "ul", "is"],
+		"suffix": ["prime", "tis", "dor", "nia", "vex", "lon", "sar", "ka", "mos", "ria"],
+		"brand": ["Lettuce Prospect", "Quarterly Heights", "Synergy Gulch", "Brand Haven", "Equity Falls", "Dividend Bay", "Upsell Ridge", "Merger Flats", "Liquidity Lagoon", "Overdraft Point"]
+	}
+}

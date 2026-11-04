@@ -1,0 +1,15 @@
+# Godot 4 cache / imports (regenerated automatically on every machine)
+.godot/
+/android/
+*.translation
+# Export output
+/build/
+/export/
+*.apk
+*.aab
+# OS junk
+.DS_Store
+Thumbs.db
+*.tmp
+# Python
+__pycache__/
