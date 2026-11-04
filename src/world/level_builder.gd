@@ -6,8 +6,11 @@ extends RefCounted
 ## STRUCTURE           PROPS                         ACTORS / MARKERS
 ##   #  wall            =  crate                      1-4 spawn (cryo_bay/cargo_hold/medbay/server_room)
 ##   .  floor           S  stash (stealable)          P   default player spawn
-##   ' ' void           C  cryo pod                   D   dock / landing pad (3x3 block)
-##   b  building block  V  vending machine (AIR-O-MAT) E repo drone   G compliance officer
+##   ,  grate floor     C  cryo pod                   D   dock / landing pad (3x3 block)
+##   _  tiled floor     V  vending machine (AIR-O-MAT) E repo drone   G compliance officer
+##   O  window to space h  hologram projector
+##   ' ' void
+##   b  building block
 ##                      A  holo ad billboard          B   grub        H debt collector
 ##                      L  neon light                 R   pirate      N civilian
 ##                      T  terminal (causality log)   M   merchant    W recruitable crew
@@ -24,7 +27,8 @@ const FLOOR_T := 0.3
 const CHUNK := 6
 const LAYER_WORLD := 1
 const LAYER_OCCLUDER := 128
-const WALKABLE_EXCLUDE := ["#", " ", "b"]
+const WALKABLE_EXCLUDE := ["#", " ", "b", "O"]
+const SHAFT_TEX := "res://assets/textures/light_shaft.png"
 const SPAWN_CHARS := {"1": "cryo_bay", "2": "cargo_hold", "3": "medbay", "4": "server_room", "P": "default"}
 const ACTOR_CHARS := ["E", "G", "B", "H", "R", "N", "M", "W"]
 
@@ -69,6 +73,9 @@ func build(layout: Array) -> Dictionary:
 	_build_buildings()
 	_build_cells()
 	_build_floor_collision()
+	_build_atmosphere()
+	if outdoor:
+		_build_outdoor()
 	return result
 
 
@@ -105,10 +112,15 @@ func _tex(file_name: String) -> Texture2D:
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
-func _textured(tex_name: String, color: Color, scale: float = 0.5, rough: float = 0.75, metal: float = 0.2) -> StandardMaterial3D:
+func _textured(tex_name: String, color: Color, scale: float = 0.5, rough: float = 0.75, metal: float = 0.2, normal_strength: float = 1.0) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.albedo_texture = _tex(tex_name)
+	var n := _tex(tex_name + "_n")
+	if n != null and normal_strength > 0.0:
+		m.normal_enabled = true
+		m.normal_texture = n
+		m.normal_scale = normal_strength
 	m.uv1_triplanar = true
 	m.uv1_world_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
@@ -132,15 +144,33 @@ func emissive(color: Color, energy: float = 3.0) -> StandardMaterial3D:
 
 
 func _make_materials() -> void:
-	var floor_tex := "ground_rock" if outdoor else "floor_metal"
-	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, 0.85, 0.1 if outdoor else 0.35)
+	var floor_tex: String = palette.get("ground_tex", "ground_rock") if outdoor else "floor_metal"
+	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, 0.85 if outdoor else 0.38, 0.1 if outdoor else 0.45, 1.4)
 	floor_mat.vertex_color_use_as_albedo = true
 	_mats["floor"] = floor_mat
-	_mats["wall"] = _textured("rock_cliff" if outdoor else "wall_panel", pcolor("wall", "#4a3f6b"), 0.5, 0.8, 0.25)
-	_mats["crate"] = _textured("crate", Color(0.85, 0.75, 0.6), 0.75, 0.8, 0.1)
-	_mats["metal"] = _textured("wall_panel", Color(0.55, 0.58, 0.68), 1.0, 0.45, 0.6)
-	_mats["dark"] = _textured("wall_panel", Color(0.18, 0.16, 0.24), 1.0, 0.6, 0.4)
-	_mats["rock"] = _textured("rock_cliff", pcolor("ground_alt", "#556070").lightened(0.1), 0.6, 0.95, 0.0)
+	for kind in [["grate", "floor_grate", 0.5, 0.6], ["tile", "floor_tile", 0.5, 0.2], ["hazard", "hazard", 0.5, 0.5]]:
+		var m := _textured(kind[1], Color.WHITE, 0.5, kind[3], 0.3, 1.2)
+		m.vertex_color_use_as_albedo = true
+		_mats["floor_" + kind[0]] = m
+	_mats["wall"] = _textured("rock_cliff" if outdoor else "wall_panel", pcolor("wall", "#4a3f6b"), 0.5, 0.8, 0.25, 1.6)
+	_mats["crate"] = _textured("crate", Color(0.85, 0.75, 0.6), 0.75, 0.8, 0.1, 1.4)
+	_mats["metal"] = _textured("wall_panel", Color(0.55, 0.58, 0.68), 1.0, 0.4, 0.6, 1.2)
+	_mats["dark"] = _textured("wall_panel", Color(0.18, 0.16, 0.24), 1.0, 0.6, 0.4, 1.2)
+	_mats["rock"] = _textured("rock_cliff", pcolor("ground_alt", "#556070").lightened(0.1), 0.6, 0.95, 0.0, 1.8)
+	_mats["concrete"] = _textured("concrete", pcolor("wall", "#4a3f6b").lightened(0.15), 0.5, 0.85, 0.05, 1.2)
+	var pipe := StandardMaterial3D.new()
+	pipe.albedo_color = Color(0.42, 0.44, 0.52)
+	pipe.metallic = 0.75
+	pipe.roughness = 0.35
+	_mats["pipe"] = pipe
+	var shaft := StandardMaterial3D.new()
+	shaft.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	shaft.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	shaft.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	shaft.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shaft.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	shaft.albedo_texture = load(SHAFT_TEX) if ResourceLoader.exists(SHAFT_TEX) else null
+	_mats["shaft"] = shaft
 	var glass := StandardMaterial3D.new()
 	glass.albedo_color = Color(0.4, 0.95, 1.0, 0.35)
 	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -212,43 +242,65 @@ func add_light(pos: Vector3, color: Color, energy: float = 2.0, light_range: flo
 
 # --- Floor ----------------------------------------------------------------------------------
 
+func _floor_kind(x: int, z: int) -> String:
+	if outdoor:
+		return "floor"
+	var c := cell(x, z)
+	if c == ",":
+		return "floor_grate"
+	if c == "_":
+		return "floor_tile"
+	# Doorway thresholds get hazard stripes: a gap in a wall row/column.
+	if (cell(x - 1, z) == "#" and cell(x + 1, z) == "#") or (cell(x, z - 1) == "#" and cell(x, z + 1) == "#"):
+		return "floor_hazard"
+	return "floor"
+
+
 func _build_floor() -> void:
 	var a := pcolor("ground", "#2a2440")
 	var b := pcolor("ground_alt", "#352c52")
-	var gap := 1.0 if outdoor else 0.97
+	var gap := 1.0 if outdoor else 0.985
 	var tile_mesh := box(Vector3(TILE * gap, FLOOR_T, TILE * gap))
 	for cz in range(0, height, CHUNK):
 		for cx in range(0, width, CHUNK):
-			var positions: Array[Vector3] = []
-			var colors: Array[Color] = []
+			var groups := {}  # kind -> [positions, colors]
 			for z in range(cz, mini(cz + CHUNK, height)):
 				for x in range(cx, mini(cx + CHUNK, width)):
 					var c := cell(x, z)
-					if c == " " or c == "#":
+					if c == " " or c == "#" or c == "O":
 						continue
 					var p := center(x, z)
 					p.y = -FLOOR_T * 0.5
 					if outdoor:
-						p.y += rng.randf_range(-0.04, 0.04)
-					positions.append(p)
+						p.y += rng.randf_range(-0.05, 0.05)
+					var kind := _floor_kind(x, z)
+					if not groups.has(kind):
+						groups[kind] = [[], []]
+					groups[kind][0].append(p)
 					var base := a if (x + z) % 2 == 0 else b
-					colors.append(base.lightened(rng.randf_range(-0.05, 0.08)))
-			if positions.is_empty():
-				continue
-			var mm := MultiMesh.new()
-			mm.transform_format = MultiMesh.TRANSFORM_3D
-			mm.use_colors = true
-			mm.mesh = tile_mesh
-			mm.instance_count = positions.size()
-			for i in positions.size():
-				mm.set_instance_transform(i, Transform3D(Basis(), positions[i]))
-				mm.set_instance_color(i, colors[i])
-			var mmi := MultiMeshInstance3D.new()
-			mmi.name = "Floor_%d_%d" % [cx, cz]
-			mmi.multimesh = mm
-			mmi.material_override = _mats["floor"]
-			mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			root.add_child(mmi)
+					if kind != "floor":
+						base = Color(0.8, 0.8, 0.85) if kind != "floor_hazard" else Color(1, 1, 1)
+					groups[kind][1].append(base.lightened(rng.randf_range(-0.06, 0.08)))
+			for kind in groups:
+				var positions: Array = groups[kind][0]
+				var colors: Array = groups[kind][1]
+				var mm := MultiMesh.new()
+				mm.transform_format = MultiMesh.TRANSFORM_3D
+				mm.use_colors = true
+				mm.mesh = tile_mesh
+				mm.instance_count = positions.size()
+				for i in positions.size():
+					var basis := Basis()
+					if outdoor:
+						basis = Basis(Vector3.UP, rng.randi_range(0, 3) * PI * 0.5)
+					mm.set_instance_transform(i, Transform3D(basis, positions[i]))
+					mm.set_instance_color(i, colors[i])
+				var mmi := MultiMeshInstance3D.new()
+				mmi.name = "Floor_%s_%d_%d" % [kind, cx, cz]
+				mmi.multimesh = mm
+				mmi.material_override = _mats[kind]
+				mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				root.add_child(mmi)
 
 
 func _build_floor_collision() -> void:
@@ -264,6 +316,10 @@ func _wall_is_low(x: int, z: int) -> bool:
 
 
 func _build_walls() -> void:
+	for z in height:
+		for x in width:
+			if cell(x, z) == "O":
+				_window(x, z)
 	for z in height:
 		var x := 0
 		while x < width:
@@ -299,6 +355,10 @@ func _wall_run(x0: int, x1: int, z: int, low: bool) -> void:
 		add_mesh(root, box(Vector3(length, 0.08, 0.06)), emissive(next_neon(), 3.0),
 			Vector3(cx, h - 0.35, cz + TILE * 0.5 + 0.03), 0.0, false)
 		add_mesh(root, box(Vector3(length, 0.3, 0.1)), _mats["dark"], Vector3(cx, 0.15, cz + TILE * 0.5 + 0.05), 0.0, false)
+		_dress_wall(x0, x1, z, h)
+	# Ceiling cap: a dark beam on top of tall walls frames the diorama.
+	if not low:
+		add_mesh(root, box(Vector3(length + 0.05, 0.25, TILE + 0.1)), _mats["dark"], Vector3(cx, h + 0.12, cz), 0.0, false)
 
 
 # --- Buildings (planets) --------------------------------------------------------------------
@@ -424,6 +484,8 @@ func _build_cells() -> void:
 					_antenna(p)
 				"z":
 					_ruin(p)
+				"h":
+					_holo_projector(p)
 	if not dock_tiles.is_empty():
 		var sum := Vector3.ZERO
 		for t in dock_tiles:
@@ -538,7 +600,9 @@ func _lamp(p: Vector3) -> void:
 		add_light(p + Vector3(0.4, 2.9, 0.2), col, 2.4, 8.0)
 	else:
 		add_mesh(root, box(Vector3(1.2, 0.08, 0.25)), emissive(col, 5.0), p + Vector3(0, 3.0, 0), 0.0, false)
-		add_light(p + Vector3(0, 2.7, 0), col, 2.0, 7.5)
+		add_mesh(root, cylinder(0.02, 0.6, 4), _mats["dark"], p + Vector3(0, 3.35, 0), 0.0, false)
+		add_light(p + Vector3(0, 2.7, 0), col, 2.2, 7.5)
+		light_shaft(p + Vector3(0, 1.45, 0.05), col, 2.6, 2.9)
 
 
 func _terminal(p: Vector3) -> void:
@@ -719,3 +783,295 @@ func _odd_duck(p: Vector3) -> void:
 	ship.add_child(label)
 	add_light(p + Vector3(-2.6, 1.2, 0), Color(0.3, 0.8, 1.0), 2.5, 5.0)
 	add_box_collider(ship, Vector3(5.6, 2.6, 2.4), Vector3(0.2, 1.3, 0))
+
+
+
+# --- HD-2D dressing ----------------------------------------------------------------------------
+
+## Fake volumetric light: an additive gradient quad facing the camera.
+func light_shaft(pos: Vector3, color: Color, w: float = 2.4, h: float = 3.0, strength: float = 0.22) -> void:
+	var q := QuadMesh.new()
+	q.size = Vector2(w, h)
+	var m: StandardMaterial3D = _mats["shaft"].duplicate()
+	m.albedo_color = Color(color.r, color.g, color.b, strength)
+	q.material = m
+	var mi := MeshInstance3D.new()
+	mi.mesh = q
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.position = pos
+	root.add_child(mi)
+
+
+## Pipes, vents, wall lamps and status LEDs along a tall wall facing the room.
+func _dress_wall(x0: int, x1: int, z: int, h: float) -> void:
+	var face_z := z * TILE + TILE + 0.12
+	var x_start := x0 * TILE
+	var x_end := (x1 + 1) * TILE
+	var length := x_end - x_start
+	# A pipe run (sometimes two) along the wall.
+	var py := rng.randf_range(2.2, 2.8)
+	var pipe := add_mesh(root, cylinder(0.11, length, 8), _mats["pipe"], Vector3((x_start + x_end) * 0.5, py, face_z + 0.05), 0.0, true)
+	pipe.rotation.z = PI * 0.5
+	if rng.randf() < 0.5:
+		var pipe2 := add_mesh(root, cylinder(0.07, length, 6), _mats["pipe"], Vector3((x_start + x_end) * 0.5, py - 0.3, face_z + 0.05), 0.0, false)
+		pipe2.rotation.z = PI * 0.5
+	var x := x_start + 1.0
+	while x < x_end - 0.5:
+		var roll := rng.randf()
+		if roll < 0.28:
+			# Vent with a status LED.
+			add_mesh(root, box(Vector3(0.9, 0.6, 0.06)), _mats["dark"], Vector3(x, 1.1, face_z), 0.0, false)
+			for i in 4:
+				add_mesh(root, box(Vector3(0.8, 0.05, 0.08)), _mats["metal"], Vector3(x, 0.9 + i * 0.13, face_z + 0.02), 0.0, false)
+			add_mesh(root, box(Vector3(0.06, 0.06, 0.05)), emissive([Color(0.3, 1, 0.5), Color(1, 0.3, 0.3), Color(1, 0.8, 0.2)][rng.randi() % 3], 6.0), Vector3(x + 0.38, 1.48, face_z + 0.04), 0.0, false)
+		elif roll < 0.42:
+			# Wall lamp with a warm cone of light.
+			var warm := Color(1.0, 0.72, 0.42)
+			add_mesh(root, box(Vector3(0.36, 0.14, 0.22)), emissive(warm, 4.0), Vector3(x, 2.35, face_z + 0.08), 0.0, false)
+			add_light(Vector3(x, 2.1, face_z + 0.6), warm, 1.1, 4.5)
+			light_shaft(Vector3(x, 1.2, face_z + 0.2), warm, 1.3, 2.3, 0.16)
+		elif roll < 0.55:
+			# Cable bundle hanging from the pipe.
+			var cable := add_mesh(root, cylinder(0.035, 1.6, 4), _mats["dark"], Vector3(x, py - 0.8, face_z + 0.1), 0.0, false)
+			cable.rotation.z = rng.randf_range(-0.15, 0.15)
+		elif roll < 0.64:
+			# Info screen.
+			add_mesh(root, box(Vector3(0.7, 0.45, 0.04)), emissive(next_neon().darkened(0.35), 1.6), Vector3(x, 1.6, face_z + 0.02), 0.0, false)
+		x += rng.randf_range(1.6, 2.6)
+
+
+## Window opening in a back wall, looking out onto deep space.
+func _window(x: int, z: int) -> void:
+	var cx := x * TILE + TILE * 0.5
+	var cz := z * TILE + TILE * 0.5
+	var bottom := 0.8
+	var top := 2.9
+	add_box_collider(_walls_body, Vector3(TILE, WALL_H, TILE), Vector3(cx, WALL_H * 0.5, cz))
+	add_mesh(root, box(Vector3(TILE, bottom, TILE)), _mats["wall"], Vector3(cx, bottom * 0.5, cz))
+	add_mesh(root, box(Vector3(TILE, WALL_H - top, TILE)), _mats["wall"], Vector3(cx, (top + WALL_H) * 0.5, cz))
+	for side in [-1.0, 1.0]:
+		add_mesh(root, box(Vector3(0.18, top - bottom, TILE)), _mats["metal"], Vector3(cx + side * (TILE * 0.5 - 0.09), (top + bottom) * 0.5, cz))
+	add_mesh(root, box(Vector3(TILE, 0.12, 0.3)), emissive(Color(0.4, 0.8, 1.0), 2.0), Vector3(cx, bottom + 0.06, cz + TILE * 0.5 - 0.1), 0.0, false)
+	add_mesh(root, box(Vector3(TILE, 0.25, TILE + 0.1)), _mats["dark"], Vector3(cx, WALL_H + 0.12, cz), 0.0, false)
+	# Space backdrop far behind the opening (unshaded so it glows).
+	if not _mats.has("space"):
+		var sm := StandardMaterial3D.new()
+		sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		sm.albedo_texture = _tex("space_backdrop")
+		sm.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		sm.albedo_color = Color(1.4, 1.4, 1.5)
+		_mats["space"] = sm
+		var q := QuadMesh.new()
+		q.size = Vector2(width * TILE + 30.0, (width * TILE + 30.0) * 0.5)
+		q.material = sm
+		var mi := MeshInstance3D.new()
+		mi.mesh = q
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.position = Vector3(width * TILE * 0.5, 2.0, z * TILE - 6.0)
+		root.add_child(mi)
+	add_light(Vector3(cx, 1.9, cz + 1.4), Color(0.55, 0.45, 1.0), 1.2, 4.5)
+	light_shaft(Vector3(cx, 1.2, cz + 1.5), Color(0.6, 0.5, 1.0), 2.0, 2.6, 0.14)
+
+
+func _holo_projector(p: Vector3) -> void:
+	var body := static_body(p)
+	add_mesh(body, cylinder(0.7, 0.35, 12), _mats["metal"], Vector3(0, 0.17, 0))
+	add_mesh(body, cylinder(0.55, 0.05, 12), emissive(Color(0.3, 0.9, 1.0), 4.0), Vector3(0, 0.37, 0), 0.0, false)
+	add_box_collider(body, Vector3(1.4, 0.4, 1.4), Vector3(0, 0.2, 0))
+	var holo := Label3D.new()
+	holo.text = "THE CONSORTIUM\nloves you (terms apply)"
+	holo.font_size = 48
+	holo.pixel_size = 0.006
+	holo.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	holo.modulate = Color(0.5, 1.6, 2.0, 0.85)
+	holo.outline_size = 0
+	holo.position = Vector3(0, 2.0, 0)
+	body.add_child(holo)
+	light_shaft(Vector3(0, 1.3, 0), Color(0.3, 0.9, 1.0), 1.5, 2.2, 0.3)
+	add_light(p + Vector3(0, 1.5, 0.5), Color(0.3, 0.9, 1.0), 1.4, 5.0)
+	var tw := holo.create_tween().set_loops()
+	tw.tween_property(holo, "position:y", 2.2, 1.6).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(holo, "position:y", 2.0, 1.6).set_trans(Tween.TRANS_SINE)
+
+
+## Floating dust motes + a reflection probe for glossy floors.
+func _build_atmosphere() -> void:
+	var size := Vector3(width * TILE, 4.0, height * TILE)
+	var probe := ReflectionProbe.new()
+	probe.size = size + Vector3(0, 6, 0)
+	probe.position = Vector3(size.x * 0.5, 2.0, size.z * 0.5)
+	probe.box_projection = true
+	probe.interior = not outdoor
+	probe.intensity = 0.65
+	probe.update_mode = ReflectionProbe.UPDATE_ONCE
+	root.add_child(probe)
+	if outdoor:
+		return
+	var motes := CPUParticles3D.new()
+	motes.amount = 260
+	motes.lifetime = 9.0
+	motes.preprocess = 9.0
+	motes.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	motes.emission_box_extents = size * 0.5
+	motes.direction = Vector3(0.3, 0.2, 0)
+	motes.spread = 180.0
+	motes.gravity = Vector3(0.05, 0.02, 0)
+	motes.initial_velocity_min = 0.05
+	motes.initial_velocity_max = 0.25
+	motes.scale_amount_min = 0.6
+	motes.scale_amount_max = 1.0
+	var q := QuadMesh.new()
+	q.size = Vector2(0.045, 0.045)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	m.billboard_keep_scale = true
+	m.albedo_color = Color(1.2, 1.1, 1.4, 0.6)
+	q.material = m
+	motes.mesh = q
+	motes.position = Vector3(size.x * 0.5, 2.0, size.z * 0.5)
+	root.add_child(motes)
+
+
+# --- Outdoor: horizon, foliage, wider world ------------------------------------------------------
+
+func _build_outdoor() -> void:
+	var w := width * TILE
+	var d := height * TILE
+	# Ground continues past the playable area so the diorama has no hard edge.
+	var outer := box(Vector3(w + 80.0, 0.1, d + 60.0))
+	var om: StandardMaterial3D = _mats["floor"].duplicate()
+	om.vertex_color_use_as_albedo = false
+	om.albedo_color = pcolor("ground", "#404040").darkened(0.15)
+	add_mesh(root, outer, om, Vector3(w * 0.5, -0.32, d * 0.5 - 5.0), 0.0, false)
+	# Scattered decor outside the walls (no collision).
+	for i in 46:
+		var side := rng.randi() % 3
+		var pos := Vector3.ZERO
+		match side:
+			0:
+				pos = Vector3(rng.randf_range(-30.0, w + 30.0), 0, rng.randf_range(-24.0, -2.0))
+			1:
+				pos = Vector3(rng.randf_range(-30.0, -2.0), 0, rng.randf_range(-20.0, d + 10.0))
+			_:
+				pos = Vector3(rng.randf_range(w + 2.0, w + 30.0), 0, rng.randf_range(-20.0, d + 10.0))
+		var s := rng.randf_range(1.2, 3.8)
+		var rock := SphereMesh.new()
+		rock.radius = s
+		rock.height = s * rng.randf_range(1.0, 2.4)
+		rock.radial_segments = 6
+		rock.rings = 3
+		add_mesh(root, rock, _mats["rock"], pos + Vector3(0, s * 0.3, 0), rng.randf() * TAU)
+	_build_horizon(w, d)
+	_build_foliage()
+	_build_puddles()
+
+
+func _build_horizon(w: float, d: float) -> void:
+	var layers: Array = palette.get("horizon", ["skyline_mountains"])
+	var far_col := pcolor("fog", "#404060")
+	var near_col := pcolor("wall", "#303040").darkened(0.35)
+	# Sky gradient plane far behind everything.
+	var sky := QuadMesh.new()
+	sky.size = Vector2(w + 260.0, 90.0)
+	var sky_mat := ShaderMaterial.new()
+	sky_mat.shader = load("res://assets/shaders/sky_gradient.gdshader")
+	sky_mat.set_shader_parameter("top", pcolor("bg", "#05030e"))
+	sky_mat.set_shader_parameter("bottom", far_col.lightened(0.25))
+	sky.material = sky_mat
+	var sky_mi := MeshInstance3D.new()
+	sky_mi.mesh = sky
+	sky_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	sky_mi.position = Vector3(w * 0.5, 30.0, -78.0)
+	root.add_child(sky_mi)
+	for i in 3:
+		var tex_name: String = layers[i % layers.size()]
+		var tex := _tex(tex_name)
+		if tex == null:
+			continue
+		var q := QuadMesh.new()
+		var dist := 30.0 + i * 16.0
+		var scale := 1.0 + i * 0.5
+		q.size = Vector2(160.0 * scale, 40.0 * scale)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.albedo_texture = tex
+		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		m.alpha_scissor_threshold = 0.5
+		var t := float(i) / 2.0
+		m.albedo_color = near_col.lerp(far_col, t)
+		m.uv1_scale = Vector3(2.0, 1.0, 1.0) if i > 0 else Vector3.ONE
+		q.material = m
+		var mi := MeshInstance3D.new()
+		mi.mesh = q
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.position = Vector3(w * 0.5 + rng.randf_range(-10, 10), q.size.y * 0.5 - 2.0, -dist)
+		root.add_child(mi)
+
+
+func _build_foliage() -> void:
+	var density := float(palette.get("foliage", 0.5))
+	if density <= 0.0:
+		return
+	var spots: Array[Vector3] = []
+	for z in height:
+		for x in width:
+			if cell(x, z) != "." or rng.randf() > density:
+				continue
+			for k in rng.randi_range(1, 3):
+				spots.append(center(x, z) + Vector3(rng.randf_range(-0.9, 0.9), 0, rng.randf_range(-0.9, 0.9)))
+	if spots.is_empty():
+		return
+	var cells: Array = palette.get("foliage_cells", [0, 1, 4, 5])
+	var q := QuadMesh.new()
+	q.size = Vector2(1.1, 1.1)
+	q.center_offset = Vector3(0, 0.55, 0)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
+	mm.use_custom_data = true
+	mm.mesh = q
+	mm.instance_count = spots.size()
+	var base := pcolor("plant", "#7ad06a")
+	for i in spots.size():
+		var sc := rng.randf_range(0.6, 1.35)
+		mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(sc * (1 if rng.randf() < 0.5 else -1), sc, sc)), spots[i]))
+		mm.set_instance_color(i, base.lightened(rng.randf_range(-0.2, 0.15)))
+		mm.set_instance_custom_data(i, Color(float(cells[rng.randi() % cells.size()]), 0, 0, 0))
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://assets/shaders/foliage.gdshader")
+	mat.set_shader_parameter("atlas", _tex("foliage"))
+	mat.set_shader_parameter("emission_strength", float(palette.get("plant_glow", 0.0)))
+	var mmi := MultiMeshInstance3D.new()
+	mmi.name = "Foliage"
+	mmi.multimesh = mm
+	mmi.material_override = mat
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	root.add_child(mmi)
+
+
+func _build_puddles() -> void:
+	var kind := str(palette.get("puddles", ""))
+	if kind == "":
+		return
+	var m := StandardMaterial3D.new()
+	if kind == "toxic":
+		m.albedo_color = Color(0.05, 0.16, 0.05)
+		m.emission_enabled = true
+		m.emission = Color(0.25, 0.8, 0.15)
+		m.emission_energy_multiplier = 0.18
+	else:
+		m.albedo_color = Color(0.03, 0.03, 0.06)
+	m.roughness = 0.04 if kind != "toxic" else 0.25
+	m.metallic = 0.85 if kind != "toxic" else 0.05
+	for i in 14:
+		var x := rng.randi_range(2, width - 3)
+		var z := rng.randi_range(2, height - 3)
+		if cell(x, z) != ".":
+			continue
+		var c := cylinder(rng.randf_range(0.6, 1.6), 0.02, 14)
+		var mi := add_mesh(root, c, m, center(x, z) + Vector3(rng.randf_range(-0.5, 0.5), 0.012, rng.randf_range(-0.5, 0.5)), 0.0, false)
+		mi.scale = Vector3(1.0, 1.0, rng.randf_range(0.5, 0.9))

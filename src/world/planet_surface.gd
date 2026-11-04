@@ -32,13 +32,17 @@ func _setup() -> void:
 	palette = env_layer.duplicate()
 	owner_faction = planet.get("controller", "")
 	level_seed = int(planet.get("seed", 1))
+	# Outdoors the camera tilts up a little to show the horizon.
+	camera_pitch = 30.0
+	camera_distance = 16.0
+	camera_fov = 32.0
 	music = "derelict_ambient"
 	spawn_key = "default"
 	var fx: Dictionary = anomaly_layer.get("effects", {})
 	gravity_scale = float(fx.get("gravity_scale", 1.0))
 	enemy_speed_mult = float(fx.get("enemy_speed_mult", 1.0))
 	# Outdoor maps are bigger and brighter: thin the fog a little.
-	palette["fog_density"] = float(palette.get("fog_density", 0.012)) * 0.7
+	palette["fog_density"] = float(palette.get("fog_density", 0.012)) * 0.5
 	if fx.has("fog_add"):
 		palette["fog_density"] = float(palette.get("fog_density", 0.01)) + float(fx["fog_add"])
 	Game.enter_planet(planet)
@@ -156,6 +160,49 @@ func _post_build() -> void:
 		spawn_enemy("pirate", pos, {"name": "%s (MUTINEER)" % d.get("name", member_id), "sprite": d.get("sprite", ""), "hostile": true})
 		EventBus.toast.emit("%s is here, and they're not here to talk." % d.get("name", member_id), Color(1, 0.3, 0.3))
 	Game.save_game()
+	_ambient_life()
+	_landing()
+
+
+func _ambient_life() -> void:
+	var weather := str(palette.get("weather", ""))
+	Audio.play_ambience("amb_rain" if weather == "rain" else "amb_wind")
+	for i in 3:
+		var d := Critter.new()
+		d.kind = "drone"
+		d.bounds = Rect2(4, 4, W * LevelBuilder.TILE - 8, H * LevelBuilder.TILE - 10)
+		d.seed_value = level_seed + i
+		add_child(d)
+
+
+## The Odd Duck touches down; then you step out and the chapter card rolls.
+func _landing() -> void:
+	var ship: Node3D = nav_region.find_child("OddDuck", true, false) as Node3D
+	player.set_cutscene(true)
+	player.visible = false
+	hud.cinematic(true)
+	if ship:
+		var final_y := ship.position.y
+		ship.position.y = final_y + 14.0
+		var tw := create_tween()
+		tw.tween_property(ship, "position:y", final_y, 2.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		camera_rig.target = ship
+		await tw.finished
+		Audio.play_sfx("land")
+		FX.shake(get_tree(), 0.5)
+		FX.rumble(0.4, 0.6, 0.3)
+		for i in 5:
+			FX.dust(self, ship.global_position + Vector3(randf_range(-3, 3), 0.1, randf_range(-1.5, 1.5)), 2.0)
+	await get_tree().create_timer(0.6).timeout
+	player.visible = true
+	player.sprite.squash(Vector2(0.8, 1.25))
+	camera_rig.target = player
+	var env := PlanetGenerator.layer(planet, "environments")
+	var crisis := PlanetGenerator.layer(planet, "crises")
+	hud.title_card(str(planet.get("name", "?")).to_upper(), "%s  //  %s" % [str(env.get("name", "")).to_upper(), str(crisis.get("name", "")).to_upper()], 2.4)
+	await get_tree().create_timer(1.2).timeout
+	hud.cinematic(false)
+	player.set_cutscene(false)
 
 
 func _reverse_rain() -> void:

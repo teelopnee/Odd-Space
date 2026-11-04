@@ -18,6 +18,9 @@ var shooter: Node = null
 var life := 1.6
 var _done := false
 var _mat: StandardMaterial3D
+var charged := false
+var _hit_bodies: Array = []
+var _mesh: MeshInstance3D
 
 
 static func spawn(parent: Node, from: Vector3, dir: Vector3, speed: float, p_damage: float, p_team: String, p_shooter: Node, p_subsystem: String = "") -> Projectile:
@@ -56,9 +59,22 @@ func _ready() -> void:
 	mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mesh_instance.rotation_degrees.x = 90.0  # capsule along local -Z
 	add_child(mesh_instance)
+	_mesh = mesh_instance
+	if charged:
+		_mesh.scale = Vector3(3.0, 3.0, 2.2)
 	_update_color()
 	body_entered.connect(_on_body_entered)
 	_orient()
+
+
+## Charge shot: bigger, faster, pierces through enemies, chips 2 shield points.
+func make_charged() -> void:
+	charged = true
+	life = 1.2
+	if _mesh:
+		_mesh.scale = Vector3(3.0, 3.0, 2.2)
+	if _mat:
+		_mat.emission_energy_multiplier = 9.0
 
 
 func _update_mask() -> void:
@@ -89,10 +105,12 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-	if _done or body == shooter:
+	if _done or body == shooter or _hit_bodies.has(body):
 		return
+	_hit_bodies.append(body)
 	var info := {"damage": damage, "attacker": shooter, "kind": "projectile", "subsystem": subsystem,
-		"position": global_position, "projectile": self, "direction": velocity.normalized()}
+		"position": global_position, "projectile": self, "direction": velocity.normalized(),
+		"charged": charged, "shield_damage": 2 if charged else 1, "push": velocity.normalized() * (6.0 if charged else 1.2)}
 	if team == "enemy" and body.has_method("receive_attack"):
 		var result: String = body.receive_attack(info)
 		if result == "parried":
@@ -104,6 +122,9 @@ func _on_body_entered(body: Node) -> void:
 		return
 	if body.has_method("take_hit"):
 		body.take_hit(info)
+	if charged and (body is Enemy or body.is_in_group("npc")):
+		FX.spark(get_parent(), global_position, Color(0.5, 1.0, 1.0), 14)
+		return  # pierce
 	_hit(body)
 
 

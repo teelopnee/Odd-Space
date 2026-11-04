@@ -1,87 +1,74 @@
 # ODD-SPACE
 
 > **Sci-Fi HD-2D Action-RPG** · Retro-Futurism ยุค 80s/90s · Dark Satire เสียดสีทุนนิยมอวกาศ
-> พัฒนาด้วย **Godot 4.7** (Mobile renderer / Vulkan) ออกแบบให้ทำงานบน **Samsung Galaxy Tab S12 Ultra** ได้ 100%
+> Godot **4.7** (Mobile renderer / Vulkan) · ออกแบบให้พัฒนาและเล่นบน **Samsung Galaxy Tab S12 Ultra** · รองรับ **จอย / จอสัมผัส / คีย์บอร์ด**
 
 ![Station](docs/screenshots/station.jpg)
 
 ศตวรรษที่ 32 · กลุ่มทุนบิ๊ก 5 **The Consortium** เก็บเงินกับทุกอย่าง แม้แต่อากาศหายใจ
 คุณตื่นจากตู้แช่แข็งบนสถานีร้าง *Cold Storage Lot 47* พร้อมยานมือสอง **The Odd Duck**
-และ AI ประจำยานปากแจ๋ว **Q.U.A.C.K.** (Quasi-Unlicensed Autonomous Cognitive Kernel)
+และ AI ประจำยานปากแจ๋ว **Q.U.A.C.K.**
 
 | | |
 |---|---|
-| ![Title](docs/screenshots/title.jpg) | ![Character creation](docs/screenshots/character_creation.jpg) |
-| ![Star map](docs/screenshots/star_map.jpg) | ![Planet](docs/screenshots/planet_canyon.jpg) |
-
-*(ภาพ placeholder ทั้งหมดสร้างด้วยโค้ด — แทนที่ด้วยงานภาพจริงได้ทันทีโดยใช้ชื่อไฟล์/เลย์เอาต์เดิม)*
+| ![Intro](docs/screenshots/intro.jpg) | ![Combat](docs/screenshots/combat.jpg) |
+| ![Swamp](docs/screenshots/planet_swamp.jpg) | ![Landing](docs/screenshots/planet_landing.jpg) |
 
 ---
 
-## สถานะตอนนี้ (v0.1.0 — Vertical Slice)
+## ▶ เล่นได้ทันที (Android / Galaxy Tab)
 
-เล่นได้ครบลูป: **สร้างตัวละคร → ตื่นในสถานี → สู้/ขโมย/ติดสินบนพยาน → ขึ้นยาน → แผนที่ดาว → วาร์ป (เจอเหตุการณ์สุ่ม) → ลงจอดดาวสุ่ม → เซฟ/โหลด**
+1. บนแท็บเล็ต เปิด **[หน้า Releases](https://github.com/teelopnee/Odd-Space/releases)** → ดาวน์โหลด `odd-space.apk`
+2. แตะไฟล์เพื่อติดตั้ง (ครั้งแรกให้อนุญาต *ติดตั้งแอปที่ไม่รู้จัก* ให้เบราว์เซอร์/ไฟล์)
+3. เปิดเกม **ODD-SPACE** — ต่อจอย Bluetooth (Xbox / PlayStation / 8BitDo ฯลฯ) ได้เลย ปุ่มสัมผัสจะซ่อนเองเมื่อใช้จอย และกลับมาเมื่อแตะจอ
 
-| ระบบ | สถานะ | ไฟล์หลัก |
-|---|---|---|
-| HD-2D: สไปรต์ 2D pixel art แบบ Billboard ในฉาก 3D, เงาจริง, Bloom นีออน, Tilt-shift DOF, หมอก | ✅ | `src/actors/billboard_sprite.gd`, `src/world/camera_rig.gd`, `src/world/level_base.gd` |
-| Dynamic Origin & Tag Engine (Background / Motivation / Secret + Synergy) | ✅ | `src/autoload/origin_system.gd`, `data/tags.json` |
-| **Causality Graph Engine** — ทุกการกระทำเป็นโหนด, พยานต้องวิทยุแจ้ง, ฆ่า/ติดสินบน/ขู่ ก่อนวิทยุจบ = ข่าวไม่แพร่ | ✅ | `src/autoload/causality_graph.gd`, `src/actors/witness_component.gd`, `data/consequences.json` |
-| Fast Combat: Dodge Roll (i-frames), Parry (สะท้อนกระสุน x2 / ทำให้ศัตรูเซ), Subsystem Targeting (ขา/เจ็ตแพ็ก/อาวุธ/หัว) | ✅ | `src/actors/player.gd`, `src/actors/enemy.gd`, `data/enemies.json` |
-| Procedural Planet Matrix 4 ชั้น (สภาพแวดล้อม / ผู้ควบคุม / วิกฤตเศรษฐกิจ / ความผิดปกติ) | ✅ | `src/core/planet_generator.gd`, `src/world/planet_surface.gd`, `data/planets.json` |
-| Space Encounters ระหว่างวาร์ป (Ghost Ship, สัญญาณหลอก, ด่านตรวจ Paragon, นักล่าค่าหัว ฯลฯ) | ✅ | `src/autoload/encounter_director.gd`, `data/encounters.json` |
-| Faction Reputation 5 บริษัท (-100..+100) → ราคาสินค้า, การ์ดยิงทันทีที่เห็น, ค่าหัว | ✅ | `src/autoload/faction_manager.gd`, `data/factions.json` |
-| Morality Engine ลูกเรือ 4 คน (ขโมยยานหนี / ขายพิกัด / ก่อกบฏ) | ✅ | `src/autoload/crew_manager.gd`, `data/crew.json` |
-| Flaw & Perk (พลาดซ้ำๆ → เสนอจุดอ่อนแลกแต้มสกิล) | ✅ | `src/autoload/flaw_perk_system.gd`, `data/flaws_perks.json` |
-| ค่าอากาศหายใจ (OxyGenix เก็บเงินทุก 10 วิ, จ่ายไม่ไหว = หนี้ Halcyon) | ✅ | `src/autoload/game_state.gd` |
-| Diegetic UI: ป้ายโฆษณาโฮโลแกรม (ยิงได้ = ทำลายทรัพย์สิน), แถบข่าว Lumen, ปุ่มสัมผัส | ✅ | `src/world/level_builder.gd`, `src/ui/hud.gd` |
-| เพลง Synthwave + เครื่องสายดีด (Karplus-Strong) / เสียงเอฟเฟกต์ | ✅ placeholder | `tools/gen_audio.py` |
-| งานภาพจริง (สไปรต์/โมเดล Low-poly) | ⏳ ใช้ placeholder ที่สร้างด้วยโค้ด | `tools/gen_sprites.py` |
+> ต้องการให้ GitHub สร้าง APK ใหม่อัตโนมัติทุกครั้งที่ push? ดูหัวข้อ *Auto-build APK* ใน [docs/TABLET_WORKFLOW.md](docs/TABLET_WORKFLOW.md)
 
----
+## 🎮 การควบคุม
 
-## วิธีเปิดโปรเจกต์
-
-### บนแท็บเล็ต (Galaxy Tab S12 Ultra)
-1. ติดตั้ง **Godot Engine 4.7+** (Android editor) จาก Play Store
-2. Clone repo ลงเครื่อง — ดูขั้นตอนละเอียดที่ **[docs/TABLET_WORKFLOW.md](docs/TABLET_WORKFLOW.md)**
-3. ใน Godot → *Import* → เลือกโฟลเดอร์ `Odd-Space` → เปิด แล้วกด ▶ (F5)
-
-### บน PC
-```bash
-git clone https://github.com/teelopnee/Odd-Space.git
-```
-เปิดด้วย Godot 4.7+ แล้วกด Run
-
-## การควบคุม
-
-| แอ็กชัน | แท็บเล็ต (สัมผัส) | คีย์บอร์ด | จอย |
+| แอ็กชัน | จอย (Xbox / PS) | แท็บเล็ต | คีย์บอร์ด |
 |---|---|---|---|
-| เดิน | จอยซ้าย (แตะตรงไหนก็ได้ครึ่งซ้ายล่าง) | WASD / ลูกศร | Left stick |
-| ยิง (เล็งอัตโนมัติ) | FIRE (กดค้าง) | J | X / RT |
-| กลิ้งหลบ (i-frames) | ROLL | Space / K | A |
-| ปัดป้อง (กดตอนศัตรูกระพริบส้ม) | PARRY | L | RB |
-| เลือกเป้าหมาย / เลือกชิ้นส่วน | TGT / PART หรือ **แตะที่ตัวศัตรู/ชิ้นส่วนโดยตรง** | Tab / Q | LB / B |
-| ใช้ / คุย / ขโมย | ปุ่มข้อความกลางจอ | F / E | Y |
-| เมนู (สถานะ, เพิร์ก, ฝ่าย, ลูกเรือ, Causality Log, เซฟ) | MENU | Esc / P | Start |
+| เดิน / วิ่ง (กดแรง = วิ่ง) | L-Stick | จอยซ้าย | WASD |
+| **ฟัน 3 จังหวะ (คอมโบ)** | X / □ | MELEE | J |
+| ยิง (แตะ) / **ยิงชาร์จ** (กดค้าง แล้วปล่อย ทะลุศัตรู) | RT / R2 | FIRE | K |
+| กลิ้งหลบ (i-frame) — หลบนาทีสุดท้าย = **PERFECT DODGE** สโลว์โม | A / ✕ | ROLL | Space |
+| ปัดป้อง — ศัตรูเซ, กระสุนสะท้อนกลับ x2 | RB / R1 | PARRY | L |
+| **OVERCLOCK** (ใช้เกจ 3 ช่องที่สะสมจากการตี/ปัด/หลบ) | B / ○ | BOOST | R |
+| เปลี่ยนเป้า / เปลี่ยนชิ้นส่วนที่เล็ง | LB / R-Stick ซ้ายขวา · LT / R-Stick ขึ้นลง | TGT / PART / **แตะที่ศัตรู** | Tab / Q |
+| คุย / ขโมย / ใช้ | Y / △ | ปุ่มกลางจอ | F |
+| เมนู · Causality Log | Start · Back | MENU | Esc · C |
 
----
+## ✨ มีอะไรในเวอร์ชันนี้ (v0.2.0)
 
-## โครงสร้างโปรเจกต์
+**ภาพแบบ HD-2D (สไตล์เดียวกับ Octopath แต่เป็นงานออริจินัลทั้งหมด)**
+- ตัวละคร pixel art **8 ทิศทาง** + แอนิเมชันลื่น (เดิน/วิ่ง/กลิ้ง/คอมโบ 3 ท่า/ยิง/ชาร์จ/ปัด/บาดเจ็บ/ล้ม/คุย) สร้างด้วย *Sprite Forge* (โมเดล 3D → ลงสีแบบ pixel art อัตโนมัติ)
+- ฉาก 3D พร้อม **normal map** แสงนีออน/โคมไฟสะท้อนพื้นผิว, หน้าต่างมองเห็นเนบิวลา, ลำแสงฝุ่น, ฝุ่นลอย, พื้นสะท้อนแสง, หญ้า/พืชต่างดาวพลิ้วตามลม, ฝน/หิมะ/สปอร์/ประกายไฟ
+- เลนส์แบบ HD-2D: **tilt-shift**, bloom ฟุ้ง, vignette, chromatic aberration, grain, color grading
+- **คัตซีน**: แถบ letterbox, การ์ดชื่อฉาก (Chapter card), ยานลงจอดทุกครั้งที่ถึงดาวใหม่ — ฉากต่อฉาก
 
+**การต่อสู้มันส์ ๆ**
+- คอมโบฟัน + พุ่งเข้าใส่, hitstop, กล้องสั่น/ซูมกระแทก, จอยสั่น, ตัวเลขดาเมจเด้ง
+- **BREAK**: ศัตรูมีโล่ + จุดอ่อน (เช่น MEL / BLS / LEG / JET) — ตีจุดอ่อนจนโล่แตก = มึน + ดาเมจ x2
+- **Subsystem Targeting**: ยิงขาให้ล้ม, ยิงเจ็ตแพ็กให้ระเบิดใส่พวกเดียวกัน, ยิงอาวุธให้หลุด
+- ศัตรูวิ่งวน (strafe) ยิงจากระยะ, ศัตรูประชิดมีวงเตือนบนพื้นก่อนพุ่ง, ตายแล้วเหรียญเด้งเข้าหาตัว
+
+**โลกมีชีวิต**: NPC พูดลอย ๆ (speech bubble), คุยกันเอง, หันมามองเรา, วิ่งหนีเวลามีการต่อสู้, หุ่นยนต์ทำความสะอาด, โดรนโฆษณาบินพร้อมไฟส่อง, ยานบินผ่านนอกหน้าต่าง, เสียงบรรยากาศ
+
+**ระบบหลักเดิม**: Tag Engine · Causality Graph (พยานวิทยุแจ้ง, ฆ่า/ติดสินบน/ขู่ก่อนแจ้งเสร็จ = ข่าวไม่แพร่) · ดาวสุ่ม 4 ชั้น · เหตุการณ์อวกาศ · ชื่อเสียง 5 บริษัท · ลูกเรือทรยศได้ · Flaw & Perk · ค่าอากาศหายใจ
+
+## เปิดโปรเจกต์ (พัฒนาต่อ)
+- แท็บเล็ต: Godot Engine 4.7+ (Android) → Import โฟลเดอร์ repo — ขั้นตอนเต็ม: **[docs/TABLET_WORKFLOW.md](docs/TABLET_WORKFLOW.md)**
+- PC: `git clone https://github.com/teelopnee/Odd-Space.git` แล้วเปิดด้วย Godot 4.7+
+
+## โครงสร้าง
 ```
-data/            ← ออกแบบเกมด้วย JSON (แก้ได้บนแท็บเล็ตโดยไม่ต้องแตะโค้ด)
-src/autoload/    ← ระบบหลัก (Singleton): Game, Causality, Factions, Origin, Crew, FlawPerk, Encounters, ShipAI ...
-src/actors/      ← Player, Enemy, NPC, Projectile, Witness, BillboardSprite
-src/world/       ← LevelBuilder (ASCII → 3D), Level, Station, Planet, Camera, Props
-src/ui/          ← HUD, ปุ่มสัมผัส, เมนู, สร้างตัวละคร, แผนที่ดาว
-scenes/          ← ไฟล์ .tscn
-assets/          ← สไปรต์ / เท็กซ์เจอร์ / เสียง / shader / theme
-tools/           ← สคริปต์สร้าง asset + ตรวจโปรเจกต์อัตโนมัติ
-docs/            ← GDD, สถาปัตยกรรม, วิธีทำงานบนแท็บเล็ต
+data/            ออกแบบเกมด้วย JSON (ศัตรู, แท็ก, ดาว, เหตุการณ์, ลูกเรือ, บทพูด NPC ...)
+src/autoload/    ระบบหลัก: Game, Causality, Factions, Origin, Crew, FlawPerk, Encounters, ShipAI, Audio, Router
+src/actors/      Player, Enemy (BREAK/subsystems), NPC, Projectile, Pickup, BillboardSprite (8 ทิศ)
+src/world/       LevelBuilder (ASCII → ฉาก 3D), Level, Station (คัตซีนเปิดเกม), Planet (ลงจอด), CameraRig, Critter
+src/ui/          HUD, ปุ่มสัมผัส, เมนู, สร้างตัวละคร, แผนที่ดาว
+tools/           sprite_forge.py · gen_textures.py · gen_fx.py · gen_audio.py · ตรวจโปรเจกต์/ถ่ายภาพอัตโนมัติ
 ```
+แก้ด่านสถานีได้ที่ตัวอักษรใน `LAYOUT` ของ `src/world/station_prologue.gd` (สัญลักษณ์อธิบายใน `src/world/level_builder.gd`)
 
-- แก้ด่านสถานี: แก้ตัวอักษรใน `LAYOUT` ใน `src/world/station_prologue.gd` (คำอธิบายสัญลักษณ์อยู่หัวไฟล์ `src/world/level_builder.gd`)
-- เพิ่มเหตุการณ์อวกาศ / ศัตรู / ลูกเรือ / แท็ก: แก้ไฟล์ใน `data/`
-
-เอกสารเพิ่มเติม: [GDD](docs/GDD.md) · [Architecture](docs/ARCHITECTURE.md) · [Tablet workflow](docs/TABLET_WORKFLOW.md)
+เอกสาร: [GDD](docs/GDD.md) · [Architecture](docs/ARCHITECTURE.md) · [Tablet workflow](docs/TABLET_WORKFLOW.md)

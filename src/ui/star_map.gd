@@ -99,6 +99,10 @@ func _build_planet_buttons() -> void:
 		_map.add_child(b)
 	_map.resized.connect(_layout_planets)
 	_layout_planets.call_deferred()
+	for b in _map.get_children():
+		if b is Button:
+			b.call_deferred("grab_focus")
+			break
 
 
 func _layout_planets() -> void:
@@ -167,6 +171,8 @@ func _select(p: Dictionary) -> void:
 	_info.text = text
 	_warp_btn.disabled = false
 	_warp_btn.text = "WARP TO %s" % str(p.name).to_upper()
+	if Router.input_device == "gamepad":
+		_warp_btn.call_deferred("grab_focus")
 
 
 func _refresh_side() -> void:
@@ -278,6 +284,10 @@ func _ask(title: String, text: String, choices: Array) -> Dictionary:
 		v.add_child(b)
 	_modal.visible = true
 	_modal_panel.visible = true
+	for b in v.get_children():
+		if b is Button and not b.disabled:
+			b.call_deferred("grab_focus")
+			break
 	var picked: Dictionary = await _answered
 	_modal.visible = false
 	Audio.play_sfx("confirm")
@@ -286,3 +296,21 @@ func _ask(title: String, text: String, choices: Array) -> Dictionary:
 
 func _show_message(title: String, text: String) -> void:
 	await _ask(title, text, [{"id": "ok", "text": "CONTINUE"}])
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _warping:
+		return
+	if event.is_action_pressed("pause") or event.is_action_pressed("log"):
+		if _menu.visible:
+			_menu.closed.emit()
+		elif not _modal.visible:
+			_open_menu()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel") and _menu.visible:
+		_menu.closed.emit()
+		get_viewport().set_input_as_handled()
+	elif _menu.visible and event.is_action_pressed("target_cycle"):
+		_menu.switch_tab(-1)
+	elif _menu.visible and event.is_action_pressed("parry"):
+		_menu.switch_tab(1)

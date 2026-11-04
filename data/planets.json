@@ -1,70 +1,228 @@
 {
-	"_doc": "Procedural Planet Matrix. Every planet = 1 environment x 1 controller (faction or lawless) x 1 economic crisis x 1 local anomaly. Colors are hex. 'props' are low-poly prop kinds the level builder knows: rock, crystal, pipe, tank, antenna, ruin, mushroom, crate.",
+	"_doc": "Procedural Planet Matrix. Every planet = 1 environment x 1 controller (faction or lawless) x 1 economic crisis x 1 local anomaly. Colors are hex. 'props' are low-poly prop kinds the level builder knows: rock, crystal, pipe, tank, antenna, ruin, mushroom, crate. Art keys per environment: ground_tex, horizon (3 silhouette layers), foliage (density 0..1), foliage_cells (atlas cells), plant (tint), plant_glow, puddles (water|toxic|''), weather (rain|snow|spores|embers|motes).",
 	"environments": [
 		{
 			"id": "neon_sprawl",
 			"name": "Neon Megasprawl",
 			"desc": "A city that covers the whole planet. The sky is a ceiling of advertisements.",
 			"weight": 3,
-			"bg": "#0b0420", "ground": "#2a2440", "ground_alt": "#352c52", "wall": "#4a3f6b",
-			"fog": "#3a1060", "fog_density": 0.012,
-			"sun": "#9a7dff", "sun_energy": 0.35, "ambient": "#4a3a80", "ambient_energy": 0.7,
-			"neon": ["#ff3ec8", "#3ee6ff", "#ffd23e"],
-			"props": ["crate", "antenna", "pipe", "tank"],
+			"bg": "#0b0420",
+			"ground": "#2a2440",
+			"ground_alt": "#352c52",
+			"wall": "#4a3f6b",
+			"fog": "#3a1060",
+			"fog_density": 0.012,
+			"sun": "#9a7dff",
+			"sun_energy": 0.35,
+			"ambient": "#4a3a80",
+			"ambient_energy": 0.7,
+			"neon": [
+				"#ff3ec8",
+				"#3ee6ff",
+				"#ffd23e"
+			],
+			"props": [
+				"crate",
+				"antenna",
+				"pipe",
+				"tank"
+			],
 			"building_density": 0.9,
-			"air_mult": 1.0
+			"air_mult": 1.0,
+			"ground_tex": "concrete",
+			"horizon": [
+				"skyline_city",
+				"skyline_city",
+				"skyline_city"
+			],
+			"foliage": 0.08,
+			"foliage_cells": [
+				0,
+				4
+			],
+			"plant": "#5a9a7a",
+			"plant_glow": 0.0,
+			"puddles": "water",
+			"weather": "rain"
 		},
 		{
 			"id": "toxic_swamp",
 			"name": "Toxic Bio-Swamp",
 			"desc": "Gristle's former 'organic ingredient farm'. The ingredients escaped and formed opinions.",
 			"weight": 2,
-			"bg": "#06140a", "ground": "#1e3320", "ground_alt": "#26402a", "wall": "#3a4a2a",
-			"fog": "#2a6030", "fog_density": 0.03,
-			"sun": "#b8ff8a", "sun_energy": 0.5, "ambient": "#2a5a30", "ambient_energy": 0.8,
-			"neon": ["#7dff4a", "#ffd23e"],
-			"props": ["mushroom", "rock", "pipe", "tank"],
+			"bg": "#06140a",
+			"ground": "#26402a",
+			"ground_alt": "#2e4a30",
+			"wall": "#3a4a2a",
+			"fog": "#1e4424",
+			"fog_density": 0.022,
+			"sun": "#b8ff8a",
+			"sun_energy": 0.5,
+			"ambient": "#2a5a30",
+			"ambient_energy": 0.8,
+			"neon": [
+				"#7dff4a",
+				"#ffd23e"
+			],
+			"props": [
+				"mushroom",
+				"rock",
+				"pipe",
+				"tank"
+			],
 			"building_density": 0.35,
-			"air_mult": 1.6
+			"air_mult": 1.6,
+			"ground_tex": "ground_moss",
+			"horizon": [
+				"skyline_spires",
+				"skyline_mountains",
+				"skyline_mountains"
+			],
+			"foliage": 0.7,
+			"foliage_cells": [
+				0,
+				1,
+				2,
+				4,
+				5,
+				6
+			],
+			"plant": "#8ae06a",
+			"plant_glow": 0.55,
+			"puddles": "toxic",
+			"weather": "spores"
 		},
 		{
 			"id": "ad_desert",
 			"name": "Frozen Ad-Desert",
 			"desc": "Glaciers of discarded billboard plastic. Some of them still play the jingle.",
 			"weight": 2,
-			"bg": "#0c1424", "ground": "#6a7e9e", "ground_alt": "#7a90b2", "wall": "#4a5a7a",
-			"fog": "#2e4468", "fog_density": 0.014,
-			"sun": "#d0e4ff", "sun_energy": 0.75, "ambient": "#4a6090", "ambient_energy": 0.6,
-			"neon": ["#3ee6ff", "#ff3ec8"],
-			"props": ["crystal", "ruin", "antenna", "rock"],
+			"bg": "#0c1424",
+			"ground": "#6a7e9e",
+			"ground_alt": "#7a90b2",
+			"wall": "#4a5a7a",
+			"fog": "#2e4468",
+			"fog_density": 0.014,
+			"sun": "#d0e4ff",
+			"sun_energy": 0.75,
+			"ambient": "#4a6090",
+			"ambient_energy": 0.6,
+			"neon": [
+				"#3ee6ff",
+				"#ff3ec8"
+			],
+			"props": [
+				"crystal",
+				"ruin",
+				"antenna",
+				"rock"
+			],
 			"building_density": 0.3,
-			"air_mult": 0.9
+			"air_mult": 0.9,
+			"ground_tex": "ground_sand",
+			"horizon": [
+				"skyline_mountains",
+				"skyline_city",
+				"skyline_mountains"
+			],
+			"foliage": 0.1,
+			"foliage_cells": [
+				3,
+				7
+			],
+			"plant": "#c0e0ff",
+			"plant_glow": 0.2,
+			"puddles": "",
+			"weather": "snow"
 		},
 		{
 			"id": "rust_canyon",
 			"name": "Rust Canyon Strip-Mine",
 			"desc": "A planet that has been 70% removed. The remaining 30% is on a payment plan.",
 			"weight": 2,
-			"bg": "#1a0806", "ground": "#6a3020", "ground_alt": "#7a3a26", "wall": "#4a2018",
-			"fog": "#a04a20", "fog_density": 0.018,
-			"sun": "#ffb070", "sun_energy": 1.1, "ambient": "#804030", "ambient_energy": 0.6,
-			"neon": ["#ffd23e", "#ff5a3e"],
-			"props": ["rock", "pipe", "tank", "crate"],
+			"bg": "#140806",
+			"ground": "#5a3e32",
+			"ground_alt": "#664638",
+			"wall": "#4a2a20",
+			"fog": "#4a2418",
+			"fog_density": 0.014,
+			"sun": "#ffd0a0",
+			"sun_energy": 1.0,
+			"ambient": "#4a3040",
+			"ambient_energy": 0.55,
+			"neon": [
+				"#ffd23e",
+				"#ff5a3e"
+			],
+			"props": [
+				"rock",
+				"pipe",
+				"tank",
+				"crate"
+			],
 			"building_density": 0.45,
-			"air_mult": 1.2
+			"air_mult": 1.2,
+			"ground_tex": "ground_rust",
+			"horizon": [
+				"skyline_mountains",
+				"skyline_mountains",
+				"skyline_spires"
+			],
+			"foliage": 0.14,
+			"foliage_cells": [
+				0,
+				4,
+				3
+			],
+			"plant": "#c8a060",
+			"plant_glow": 0.0,
+			"puddles": "",
+			"weather": "embers"
 		},
 		{
 			"id": "crystal_moon",
 			"name": "Crystal Debt-Moon",
 			"desc": "Halcyon repossessed this moon. The crystals are collateral. So are you, while you're here.",
 			"weight": 1,
-			"bg": "#0a0618", "ground": "#2a1a40", "ground_alt": "#3a2050", "wall": "#4a2a6a",
-			"fog": "#6a3aa0", "fog_density": 0.015,
-			"sun": "#c0a0ff", "sun_energy": 0.6, "ambient": "#5a3a90", "ambient_energy": 0.8,
-			"neon": ["#c07dff", "#3ee6ff"],
-			"props": ["crystal", "crystal", "rock", "ruin"],
+			"bg": "#0a0618",
+			"ground": "#2a1a40",
+			"ground_alt": "#3a2050",
+			"wall": "#4a2a6a",
+			"fog": "#6a3aa0",
+			"fog_density": 0.015,
+			"sun": "#c0a0ff",
+			"sun_energy": 0.6,
+			"ambient": "#5a3a90",
+			"ambient_energy": 0.8,
+			"neon": [
+				"#c07dff",
+				"#3ee6ff"
+			],
+			"props": [
+				"crystal",
+				"crystal",
+				"rock",
+				"ruin"
+			],
 			"building_density": 0.25,
-			"air_mult": 1.1
+			"air_mult": 1.1,
+			"ground_tex": "ground_crystal",
+			"horizon": [
+				"skyline_spires",
+				"skyline_spires",
+				"skyline_mountains"
+			],
+			"foliage": 0.35,
+			"foliage_cells": [
+				3,
+				7,
+				2,
+				6
+			],
+			"plant": "#c8a8ff",
+			"plant_glow": 0.8,
+			"puddles": "",
+			"weather": "motes"
 		}
 	],
 	"crises": [
@@ -126,48 +284,109 @@
 			"name": "Gravity Hiccups",
 			"desc": "Local gravity occasionally forgets itself. Hold onto your snacks.",
 			"weight": 2,
-			"effects": {"gravity_scale": 0.55}
+			"effects": {
+				"gravity_scale": 0.55
+			}
 		},
 		{
 			"id": "sentient_fog",
 			"name": "Sentient Fog",
 			"desc": "The fog is alive, curious, and slightly judgemental.",
 			"weight": 2,
-			"effects": {"fog_add": 0.025}
+			"effects": {
+				"fog_add": 0.025
+			}
 		},
 		{
 			"id": "ad_ghosts",
 			"name": "Ad Ghosts",
 			"desc": "Holograms of discontinued products drift through the streets, still trying to sell themselves.",
 			"weight": 2,
-			"effects": {"ad_ghosts": 8}
+			"effects": {
+				"ad_ghosts": 8
+			}
 		},
 		{
 			"id": "reverse_rain",
 			"name": "Reverse Rain",
 			"desc": "It rains upwards here. OxyGenix is suing the weather.",
 			"weight": 1,
-			"effects": {"reverse_rain": true}
+			"effects": {
+				"reverse_rain": true
+			}
 		},
 		{
 			"id": "time_stutter",
 			"name": "Time Stutter",
 			"desc": "Time skips like a cheap holo-disc. Everyone moves a bit faster, including the bill collectors.",
 			"weight": 1,
-			"effects": {"enemy_speed_mult": 1.25}
+			"effects": {
+				"enemy_speed_mult": 1.25
+			}
 		},
 		{
 			"id": "polite_bugs",
 			"name": "Polite Bug Migration",
 			"desc": "Millions of Gristle grubs are migrating. They apologise before biting.",
 			"weight": 1,
-			"effects": {"extra_bugs": 4}
+			"effects": {
+				"extra_bugs": 4
+			}
 		}
 	],
 	"names": {
-		"prefix": ["Kel", "Vos", "Ari", "Mon", "Zeb", "Tor", "Lun", "Quix", "Dra", "Hal", "Oru", "Pex", "Syl", "Nym", "Gar"],
-		"middle": ["a", "o", "e", "i", "u", "ar", "on", "ex", "ul", "is"],
-		"suffix": ["prime", "tis", "dor", "nia", "vex", "lon", "sar", "ka", "mos", "ria"],
-		"brand": ["Lettuce Prospect", "Quarterly Heights", "Synergy Gulch", "Brand Haven", "Equity Falls", "Dividend Bay", "Upsell Ridge", "Merger Flats", "Liquidity Lagoon", "Overdraft Point"]
+		"prefix": [
+			"Kel",
+			"Vos",
+			"Ari",
+			"Mon",
+			"Zeb",
+			"Tor",
+			"Lun",
+			"Quix",
+			"Dra",
+			"Hal",
+			"Oru",
+			"Pex",
+			"Syl",
+			"Nym",
+			"Gar"
+		],
+		"middle": [
+			"a",
+			"o",
+			"e",
+			"i",
+			"u",
+			"ar",
+			"on",
+			"ex",
+			"ul",
+			"is"
+		],
+		"suffix": [
+			"prime",
+			"tis",
+			"dor",
+			"nia",
+			"vex",
+			"lon",
+			"sar",
+			"ka",
+			"mos",
+			"ria"
+		],
+		"brand": [
+			"Lettuce Prospect",
+			"Quarterly Heights",
+			"Synergy Gulch",
+			"Brand Haven",
+			"Equity Falls",
+			"Dividend Bay",
+			"Upsell Ridge",
+			"Merger Flats",
+			"Liquidity Lagoon",
+			"Overdraft Point"
+		]
 	}
 }

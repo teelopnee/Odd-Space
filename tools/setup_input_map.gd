@@ -13,13 +13,17 @@ func _init() -> void:
 		"move_right": [_key(KEY_D), _key(KEY_RIGHT), _axis(JOY_AXIS_LEFT_X, 1.0), _btn(JOY_BUTTON_DPAD_RIGHT)],
 		"move_up": [_key(KEY_W), _key(KEY_UP), _axis(JOY_AXIS_LEFT_Y, -1.0), _btn(JOY_BUTTON_DPAD_UP)],
 		"move_down": [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0), _btn(JOY_BUTTON_DPAD_DOWN)],
-		"attack": [_key(KEY_J), _btn(JOY_BUTTON_X), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)],
-		"dodge": [_key(KEY_SPACE), _key(KEY_K), _btn(JOY_BUTTON_A)],
+		# Gamepad layout (Xbox names; PlayStation: A=Cross, B=Circle, X=Square, Y=Triangle)
+		"melee": [_key(KEY_J), _btn(JOY_BUTTON_X)],
+		"attack": [_key(KEY_K), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)],
+		"dodge": [_key(KEY_SPACE), _btn(JOY_BUTTON_A)],
 		"parry": [_key(KEY_L), _btn(JOY_BUTTON_RIGHT_SHOULDER)],
+		"overclock": [_key(KEY_R), _btn(JOY_BUTTON_B)],
 		"interact": [_key(KEY_F), _key(KEY_E), _btn(JOY_BUTTON_Y)],
 		"target_cycle": [_key(KEY_TAB), _btn(JOY_BUTTON_LEFT_SHOULDER)],
-		"subsystem_next": [_key(KEY_Q), _btn(JOY_BUTTON_B)],
+		"subsystem_next": [_key(KEY_Q), _axis(JOY_AXIS_TRIGGER_LEFT, 1.0)],
 		"pause": [_key(KEY_ESCAPE), _key(KEY_P), _btn(JOY_BUTTON_START)],
+		"log": [_key(KEY_C), _btn(JOY_BUTTON_BACK)],
 	}
 	for action_name in actions:
 		ProjectSettings.set_setting("input/" + action_name, {

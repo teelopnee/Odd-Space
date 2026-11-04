@@ -45,12 +45,23 @@
    air debt, getting caught stealing...) offer a permanent flaw for free skill points.
 9. **Air billing** — OxyGenix charges every 10 s; unpaid air becomes Halcyon debt.
 
+## 3b. Combat feel (v0.2)
+- Melee: 3-hit energy-baton combo with lunges, slash arcs, hitstop; roll-cancel after a hit lands.
+- Blaster: tap to shoot the locked subsystem; hold to CHARGE a piercing shot (2 shield damage).
+- Perfect dodge (roll at the last instant): slow-mo + Overclock gain. Parry: zoom punch, stagger, reflect.
+- OVERCLOCK: 3-pip boost meter from hits/parries/perfects/breaks; spend for a damage/speed burst.
+- BREAK: shields + weaknesses (MEL/BLS/CHG/EXP/PRY/part names), discovered on first hit, shown over enemies.
+- Enemies: flinch/knockback (armoured ones don't), strafing ranged AI, telegraph rings for melee lunges,
+  last-kill slow-mo, credit chips that magnetise to you.
+
 ## 4. Next milestones (proposal)
-- [ ] Real art pass: hero/NPC sprite sheets, low-poly kits (station, sprawl, swamp, desert, canyon, moon).
+- [x] HD-2D art pass v1 (sprite forge, normal-mapped kits, lens post, weather, foliage, cutscenes).
+- [ ] Hand-painted hero portraits for dialogue; more building/prop kits per biome.
 - [ ] Ship interior hub (walkable Odd Duck) instead of the nav-console screen.
+- [ ] Boss fights (Paragon mech, Halcyon repo-walker) with multi-part BREAK shields.
 - [ ] Quests generated from the Causality Graph (e.g. a reported murder spawns a vengeful sibling).
 - [ ] Bounty hunters as on-planet enemies; Paragon raids when heat is high.
 - [ ] Crew in the field (follow + assist + react live), crew personal quests.
 - [ ] Sleeper-agent trigger event, sibling search storyline, motivation endings.
 - [ ] Localization (Thai/English) with a Thai-capable font.
-- [ ] Android export preset & performance profiling on the Tab S12 Ultra.
+- [x] Android export preset + signed APK release; [ ] performance profiling on the Tab S12 Ultra.

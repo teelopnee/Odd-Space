@@ -94,6 +94,18 @@ func _ready() -> void:
 	foot.add_child(go)
 	_randomize()
 	Audio.play_music("odd_duck_theme")
+	foot.add_child(HUD.make_label("  START = thaw  |  B = back", 13, Color(0.7, 0.8, 1.0)))
+	var first: Button = _buttons["background"].values()[0]
+	first.call_deferred("grab_focus")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		_start()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel") and not _name_edit.has_focus():
+		Router.goto(Router.TITLE)
+		get_viewport().set_input_as_handled()
 
 
 func _button(text: String, cb: Callable) -> Button:

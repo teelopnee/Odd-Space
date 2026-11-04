@@ -55,6 +55,10 @@ func _ready() -> void:
 	ver.position = Vector2(10, 8)
 	add_child(ver)
 	Audio.play_music("odd_duck_theme")
+	for c in v.get_children():
+		if c is Button:
+			c.call_deferred("grab_focus")
+			break
 	var timer := Timer.new()
 	timer.wait_time = 4.0
 	timer.autostart = true

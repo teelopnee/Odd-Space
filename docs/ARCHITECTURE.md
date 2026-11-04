@@ -45,6 +45,15 @@ Every gameplay number that can be modified reads `Game.stat("name")`.
 HUD. `StationPrologue` uses a hand-written layout; `PlanetSurface` generates one from the planet's
 4 layers and applies anomaly effects (gravity, fog, ad ghosts, reverse rain, mutineers...).
 
+## Presentation layer
+- `BillboardSprite` - JSON-driven 8-direction sprite player (squash & stretch, flashes, afterimages).
+- `FXSprite` / `FX` - pixel VFX, damage numbers, hitstop, slow-mo, camera shake/punch, rumble.
+- `CameraRig` - follow + look-ahead + combat zoom; `hd2d_post.gdshader` lens (tilt-shift, vignette,
+  chromatic aberration, grain, split toning) on a CanvasLayer under the HUD.
+- `LevelBuilder` dressing - pipes/vents/lamps on walls, windows onto a nebula backdrop, light shafts,
+  dust motes, reflection probe, outdoor horizon silhouettes, wind-swayed foliage (MultiMesh shader).
+- `HUD.cinematic()` / `title_card()` / `await say()` - cutscene tools; `Critter` - ambient life.
+
 ## Physics layers
 1 world · 2 player · 3 enemy · 4 npc · 5 projectile · 6 interact · 7 target_pick (tap-to-target areas) · 8 occluder (fade buildings)
 

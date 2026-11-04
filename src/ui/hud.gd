@@ -36,6 +36,19 @@ var _touch_root: Control
 var _joystick: TouchStick
 var _touch_buttons: Array[TouchButton] = []
 var _use_btn: TouchButton
+var _oc_bar: HBoxContainer
+var _oc_pips: Array[ColorRect] = []
+var _oc_label: Label
+var _hint_label: Label
+var _hint_time := 25.0
+var _bar_top: ColorRect
+var _bar_bottom: ColorRect
+var _card: VBoxContainer
+var _card_title: Label
+var _card_sub: Label
+var _gameplay_ui: Array[Control] = []
+var cinematic_on := false
+signal _dialogue_closed(choice: String)
 
 var _modal: Control
 var _dialogue_panel: PanelContainer
@@ -67,9 +80,82 @@ func _ready() -> void:
 	_build_witness_alert()
 	_build_prompt()
 	_build_touch()
+	_build_cinematic()
 	_build_modal()
 	_connect_signals()
 	_refresh_status()
+
+
+func _build_cinematic() -> void:
+	_bar_top = ColorRect.new()
+	_bar_top.color = Color(0, 0, 0)
+	_bar_top.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_bar_top.offset_bottom = 0
+	_bar_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_bar_top)
+	_bar_bottom = ColorRect.new()
+	_bar_bottom.color = Color(0, 0, 0)
+	_bar_bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	_bar_bottom.offset_top = 0
+	_bar_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_bar_bottom)
+	_card = VBoxContainer.new()
+	_card.set_anchors_preset(Control.PRESET_CENTER)
+	_card.offset_left = -500
+	_card.offset_right = 500
+	_card.offset_top = -90
+	_card.offset_bottom = 60
+	_card.alignment = BoxContainer.ALIGNMENT_CENTER
+	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_card.modulate.a = 0.0
+	root.add_child(_card)
+	_card_sub = make_label("", 20, Color(1.0, 0.82, 0.45))
+	_card_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_card.add_child(_card_sub)
+	_card_title = make_label("", 54, Color(1.0, 0.97, 0.9))
+	_card_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_card_title.add_theme_color_override("font_outline_color", Color(0.2, 0.05, 0.25))
+	_card_title.add_theme_constant_override("outline_size", 12)
+	_card.add_child(_card_title)
+	var rule := ColorRect.new()
+	rule.color = Color(1.0, 0.82, 0.45, 0.8)
+	rule.custom_minimum_size = Vector2(420, 2)
+	rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_card.add_child(rule)
+
+
+## Letterbox bars + hide gameplay HUD for cutscenes.
+func cinematic(on: bool) -> void:
+	cinematic_on = on
+	var h := 86.0 if on else 0.0
+	var tw := create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(_bar_top, "offset_bottom", h, 0.6)
+	tw.tween_property(_bar_bottom, "offset_top", -h, 0.6)
+	for c in root.get_children():
+		if c in [_bar_top, _bar_bottom, _card, _modal, _comm_panel, _toasts] or c is ColorRect:
+			continue
+		c.visible = not on if c != _target_panel and c != _witness_label and c != _prompt_btn else false
+	if not on:
+		_touch_root.visible = touch_enabled()
+		_refresh_status()
+
+
+## Octopath-style chapter card: subtitle + big title, fades in and out.
+func title_card(title: String, subtitle: String = "", hold: float = 2.4) -> void:
+	_card_title.text = title
+	_card_sub.text = subtitle
+	var tw := create_tween()
+	tw.tween_property(_card, "modulate:a", 1.0, 0.8)
+	tw.tween_interval(hold)
+	tw.tween_property(_card, "modulate:a", 0.0, 0.9)
+	Audio.play_sfx("confirm", 0.0, -8.0)
+
+
+## Await-able dialogue for cutscenes: `await hud.say("Q.U.A.C.K.", "...")`.
+func say(speaker: String, text: String, choices: Array = []) -> String:
+	show_dialogue(speaker, text, choices, func(id: String): _dialogue_closed.emit(id))
+	var picked: String = await _dialogue_closed
+	return picked
 
 
 func bind_player(p: Player, rig: CameraRig) -> void:
@@ -103,6 +189,8 @@ func _build_overlay() -> void:
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat := ShaderMaterial.new()
 	mat.shader = SCANLINES
+	mat.set_shader_parameter("line_strength", 0.025)
+	mat.set_shader_parameter("vignette", 0.0)
 	overlay.material = mat
 	root.add_child(overlay)
 
@@ -126,6 +214,17 @@ func _build_status() -> void:
 	hp_row.add_child(_hp_bar)
 	_hp_label = make_label("100/100", 16)
 	hp_row.add_child(_hp_label)
+	_oc_bar = HBoxContainer.new()
+	_oc_bar.add_theme_constant_override("separation", 3)
+	v.add_child(_oc_bar)
+	for i in 3:
+		var pip := ColorRect.new()
+		pip.custom_minimum_size = Vector2(72, 9)
+		pip.color = Color(0.25, 0.1, 0.25, 0.8)
+		_oc_bar.add_child(pip)
+		_oc_pips.append(pip)
+	_oc_label = make_label("OVERCLOCK", 12, Color(1.0, 0.4, 0.9))
+	_oc_bar.add_child(_oc_label)
 	_credits_label = make_label("", 17, Color(1.0, 0.85, 0.3))
 	v.add_child(_credits_label)
 	_air_label = make_label("", 14, Color(0.4, 0.95, 1.0))
@@ -241,8 +340,9 @@ func touch_enabled() -> bool:
 		return true
 	if mode == "off":
 		return false
-	return DisplayServer.is_touchscreen_available() or OS.has_feature("mobile") \
-		or OS.get_cmdline_user_args().has("--touch")
+	if OS.get_cmdline_user_args().has("--touch"):
+		return true
+	return Router.input_device == "touch"
 
 
 func apply_settings() -> void:
@@ -250,6 +350,7 @@ func apply_settings() -> void:
 		_touch_root.visible = touch_enabled()
 	if camera_rig:
 		camera_rig.set_dof_mode(str(Game.settings.get("dof_mode", "tilt_shift")))
+	_update_hint()
 
 
 func _build_touch() -> void:
@@ -265,20 +366,45 @@ func _build_touch() -> void:
 	_joystick.anchor_bottom = 1.0
 	_joystick.offset_bottom = -32
 	_touch_root.add_child(_joystick)
-	_add_touch_button("attack", "FIRE", Vector2(150, 160), 78, Color(1.0, 0.3, 0.6), 24)
-	_add_touch_button("dodge", "ROLL", Vector2(310, 110), 54, Color(0.3, 0.95, 1.0))
-	_add_touch_button("parry", "PARRY", Vector2(150, 330), 54, Color(1.0, 0.82, 0.24))
-	_add_touch_button("target_cycle", "TGT", Vector2(300, 270), 40, Color(0.7, 0.6, 1.0), 16)
-	_add_touch_button("subsystem_next", "PART", Vector2(300, 375), 40, Color(0.7, 0.6, 1.0), 16)
-	var med := _add_touch_button("", "MED", Vector2(440, 90), 38, Color(0.4, 1.0, 0.6), 16)
+	_add_touch_button("melee", "MELEE", Vector2(140, 150), 74, Color(0.35, 1.0, 0.95), 22)
+	_add_touch_button("attack", "FIRE", Vector2(305, 118), 56, Color(1.0, 0.3, 0.6), 20)
+	_add_touch_button("dodge", "ROLL", Vector2(130, 320), 54, Color(0.5, 0.75, 1.0))
+	_add_touch_button("parry", "PARRY", Vector2(282, 270), 50, Color(1.0, 0.82, 0.24), 18)
+	_add_touch_button("overclock", "BOOST", Vector2(445, 112), 42, Color(1.0, 0.35, 0.9), 15)
+	_add_touch_button("target_cycle", "TGT", Vector2(420, 290), 36, Color(0.7, 0.6, 1.0), 15)
+	_add_touch_button("subsystem_next", "PART", Vector2(268, 405), 36, Color(0.7, 0.6, 1.0), 15)
+	var med := _add_touch_button("", "MED", Vector2(575, 92), 34, Color(0.4, 1.0, 0.6), 15)
 	med.tapped.connect(func(): Game.use_item("medkit") or Game.use_item("antihistamine"))
 	var menu := _add_touch_button("", "MENU", Vector2(60, 0), 34, Color(0.85, 0.97, 1.0), 14)
-	# MENU sits top-right instead of bottom-right.
 	menu.anchor_top = 0.0
 	menu.anchor_bottom = 0.0
 	menu.offset_top = 150
 	menu.offset_bottom = 150 + 68
 	menu.tapped.connect(open_menu.bind(""))
+	_hint_label = make_label("", 14, Color(0.85, 0.95, 1.0, 0.85))
+	_hint_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_hint_label.offset_left = 16
+	_hint_label.offset_top = -64
+	_hint_label.offset_bottom = -36
+	root.add_child(_hint_label)
+	EventBus.input_device_changed.connect(func(_d):
+		if not _modal.visible:
+			_touch_root.visible = touch_enabled()
+		_hint_time = 20.0
+		_update_hint())
+	_update_hint()
+
+
+func _update_hint() -> void:
+	if _hint_label == null:
+		return
+	var dev := Router.input_device
+	if dev == "touch":
+		_hint_label.text = "MELEE combo  |  hold FIRE = charge shot  |  ROLL at the last moment = PERFECT  |  tap enemy parts to target"
+	elif dev == "gamepad":
+		_hint_label.text = "X melee  RT shoot (hold: charge)  A roll  RB parry  B overclock  LB/R-stick target  LT part  Y use  START menu"
+	else:
+		_hint_label.text = "J melee  K shoot (hold: charge)  SPACE roll  L parry  R overclock  TAB target  Q part  F use  ESC menu"
 
 
 func _add_touch_button(action: String, text: String, from_br: Vector2, radius: float, color: Color, fs: int = 20) -> TouchButton:
@@ -308,7 +434,7 @@ func _release_touch() -> void:
 
 func _build_modal() -> void:
 	_modal = ColorRect.new()
-	(_modal as ColorRect).color = Color(0.02, 0.0, 0.06, 0.55)
+	(_modal as ColorRect).color = Color(0.02, 0.0, 0.06, 0.35)
 	_modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_modal.mouse_filter = Control.MOUSE_FILTER_STOP
 	_modal.visible = false
@@ -316,10 +442,11 @@ func _build_modal() -> void:
 	# Dialogue box.
 	_dialogue_panel = PanelContainer.new()
 	_dialogue_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_dialogue_panel.offset_left = -440
-	_dialogue_panel.offset_right = 440
-	_dialogue_panel.offset_top = -420
-	_dialogue_panel.offset_bottom = -60
+	_dialogue_panel.offset_left = -560
+	_dialogue_panel.offset_right = 560
+	_dialogue_panel.offset_top = -40
+	_dialogue_panel.offset_bottom = -40
+	_dialogue_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_dialogue_panel.visible = false
 	_modal.add_child(_dialogue_panel)
 	var v := VBoxContainer.new()
@@ -330,7 +457,7 @@ func _build_modal() -> void:
 	_dialogue_text = RichTextLabel.new()
 	_dialogue_text.bbcode_enabled = true
 	_dialogue_text.fit_content = true
-	_dialogue_text.custom_minimum_size = Vector2(820, 60)
+	_dialogue_text.custom_minimum_size = Vector2(1080, 50)
 	_dialogue_text.add_theme_font_size_override("normal_font_size", 19)
 	_dialogue_text.add_theme_font_size_override("bold_font_size", 20)
 	v.add_child(_dialogue_text)
@@ -402,6 +529,7 @@ func _connect_signals() -> void:
 	EventBus.flaw_offered.connect(_on_flaw_offered)
 	EventBus.mishap.connect(_on_mishap)
 	EventBus.inventory_changed.connect(func(_i, _c): _refresh_status())
+	EventBus.overclock_changed.connect(_on_overclock)
 
 
 func _refresh_status() -> void:
@@ -433,6 +561,19 @@ func toast(text: String, color: Color = Color(0.85, 0.97, 1.0)) -> void:
 	tw.tween_interval(4.5)
 	tw.tween_property(l, "modulate:a", 0.0, 0.8)
 	tw.tween_callback(l.queue_free)
+
+
+func _on_overclock(meter: float, active_time: float) -> void:
+	for i in _oc_pips.size():
+		var fill := clampf((meter - i * 33.4) / 33.4, 0.0, 1.0)
+		_oc_pips[i].color = Color(1.0, 0.3, 0.9, 0.95) if fill >= 1.0 else Color(0.25 + 0.5 * fill, 0.1, 0.25 + 0.4 * fill, 0.85)
+	if active_time > 0.0:
+		_oc_label.text = "OVERCLOCK!"
+		for pip in _oc_pips:
+			pip.color = Color(1.0, 0.85, 0.3)
+	else:
+		var g := Router.glyph("overclock")
+		_oc_label.text = "OVERCLOCK" + (" [%s]" % g if g != "" and meter >= 33.4 else "")
 
 
 func _on_ai_say(text: String, _mood: String) -> void:
@@ -503,7 +644,8 @@ func _on_flaw_offered(flaw_id: String, mishap_kind: String) -> void:
 
 
 func _on_prompt(text: String) -> void:
-	_prompt_btn.text = text.to_upper() + ("" if touch_enabled() else "   [F]")
+	var g := Router.glyph("interact")
+	_prompt_btn.text = ("[%s]  " % g if g != "" else "") + text.to_upper()
 	_prompt_btn.visible = text != ""
 
 
@@ -566,6 +708,9 @@ func _process(delta: float) -> void:
 			_next_ticker()
 	_update_target_panel()
 	_update_witness_alert()
+	if _hint_label and _hint_time > 0.0:
+		_hint_time -= delta
+		_hint_label.modulate.a = clampf(_hint_time / 3.0, 0.0, 1.0)
 
 
 func _next_ticker() -> void:
@@ -580,13 +725,22 @@ func _next_ticker() -> void:
 # --- Input: pause & tap-to-target ------------------------------------------------------------
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause"):
+	if event.is_action_pressed("pause") or (event.is_action_pressed("ui_cancel") and _menu.visible):
 		if _menu.visible:
 			_close_menu()
 		elif not _modal.visible:
 			open_menu("")
 		get_viewport().set_input_as_handled()
 		return
+	if event.is_action_pressed("log") and not _modal.visible:
+		open_menu("causality")
+		get_viewport().set_input_as_handled()
+		return
+	if _menu.visible:
+		if event.is_action_pressed("target_cycle"):
+			_menu.switch_tab(-1)
+		elif event.is_action_pressed("parry"):
+			_menu.switch_tab(1)
 	if _modal.visible or player == null or camera_rig == null:
 		return
 	var tap_pos := Vector2(-1, -1)
@@ -675,7 +829,7 @@ func _open_modal() -> void:
 
 func _close_modal() -> void:
 	_modal.visible = false
-	_touch_root.visible = touch_enabled()
+	_touch_root.visible = touch_enabled() and not cinematic_on
 	get_tree().paused = false
 	if player:
 		player.refresh_interaction()
@@ -744,6 +898,7 @@ func _fill_shop(vendor: String, faction_id: String, stock: Array) -> void:
 		row.add_child(sell)
 	var close := Button.new()
 	close.text = "DONE"
+	close.call_deferred("grab_focus")
 	close.pressed.connect(func():
 		_shop_panel.visible = false
 		_after_modal_closed())
@@ -771,6 +926,10 @@ func show_death_screen() -> void:
 	_menu.visible = false
 	_open_modal()
 	_death_panel.visible = true
+	for c in _death_panel.get_child(0).get_children():
+		if c is Button:
+			c.call_deferred("grab_focus")
+			break
 
 
 func _on_reload() -> void:

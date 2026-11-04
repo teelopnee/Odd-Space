@@ -1,0 +1,54 @@
+{
+	"_doc": "Ambient one-liners NPCs say out loud (speech bubbles). Keys: role, 'infamous' (when the Causality Graph says they've heard of you), 'crisis:<id>', 'station', 'combat', 'pair' (NPC-to-NPC small talk).",
+	"civilian": [
+		"Is it just me or did the air get pricier?",
+		"My lungs are on a payment plan.",
+		"Don't make eye contact with the ads.",
+		"I sold my dreams to Lumen. They're running them as reruns.",
+		"Three jobs and I still can't afford silence.",
+		"Heard the Odd Duck is back in port. Smells like it.",
+		"My kid wants to be a shareholder when she grows up.",
+		"Paragon fined me for loitering in my own shadow."
+	],
+	"merchant": [
+		"Fresh medkits! Barely expired!",
+		"Air canisters! Bottled at the source! The source is a vent!",
+		"Everything must go! Including me, if Halcyon finds out.",
+		"Bribe vouchers, 2-for-1, no questions asked!"
+	],
+	"recruit": [
+		"Anyone hiring? I'll work for air.",
+		"I need off this rock. Like, yesterday.",
+		"Looking for a crew that isn't a cult. Or is a fun cult."
+	],
+	"infamous": [
+		"That's them. From the news.",
+		"Don't look. Just... don't look.",
+		"I hear they rob vending machines for fun.",
+		"Hide your credits, the drifter's here."
+	],
+	"combat": [
+		"AAAH! Not again!",
+		"I'm calling Paragon! ...Their hold music is so long!",
+		"Somebody bill them for this!",
+		"My insurance doesn't cover this!"
+	],
+	"pair": [
+		"...and then the billboard ASKED me how my day was.",
+		"Protein Paste tastes like regret today.",
+		"You hear about the debt strike?",
+		"Lumen said it's sunny. It's raining. Lumen's never wrong.",
+		"My cousin got repossessed last week.",
+		"Wanna split an air canister?"
+	],
+	"station": [
+		"This station's been dead since the repo drones moved in.",
+		"Cryo-bay's full of collateral. Some of them still snore.",
+		"Halcyon's drones are scanning everything. Even the rats."
+	],
+	"crisis:air_bubble": ["Breathing futures are up again. I'm shorting my lungs."],
+	"crisis:debt_strike": ["We're not paying! They can't repossess ALL of us. ...Can they?"],
+	"crisis:paste_recall": ["They found a tooth in Batch 88. Not a human tooth. Not an animal tooth."],
+	"crisis:ad_overload": ["Even my dreams have unskippable ads now."],
+	"crisis:compliance_week": ["Report a neighbour, win a toaster! I already reported myself twice."]
+}

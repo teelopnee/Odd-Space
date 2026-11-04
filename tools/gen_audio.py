@@ -252,13 +252,58 @@ def build_sfx():
         "heal": sweep(400, 1600, 0.6, "sine", 3) * 0.4,
         "warp": mix(sweep(80, 2400, 1.4, "saw", 1.5) * 0.35, noise_burst(1.4, 2500, 2.0) * 0.3),
     }
+    sfx.update({
+        "step": mix(noise_burst(0.05, 900, 60) * 0.8, tone(90, 0.06, "sine", 40) * 0.6),
+        "slash": mix(noise_burst(0.16, 4500, 18) * 0.6, sweep(1800, 600, 0.14, "saw", 16) * 0.25),
+        "melee_hit": mix(noise_burst(0.12, 2500, 25) * 0.8, sweep(400, 90, 0.15, "square", 18) * 0.5, tone(1200, 0.08, "sine", 30) * 0.3),
+        "charge": sweep(200, 1400, 0.5, "saw", 1.0) * 0.35,
+        "charge_shot": mix(sweep(2200, 200, 0.35, "square", 6) * 0.5, noise_burst(0.3, 3000, 8) * 0.5),
+        "overclock": mix(sweep(300, 2400, 0.6, "saw", 2.5) * 0.4, cat(*[tone(f, 0.07, "square", 15) for f in (523, 784, 1046, 1568)]) * 0.3),
+        "perfect": mix(sum(tone(f, 0.7, "sine", 5) for f in (880, 1320, 1760)) * 0.3, sweep(3000, 800, 0.4, "sine", 6) * 0.3),
+        "shield_break": mix(noise_burst(0.5, 7000, 7) * 0.6, sum(tone(f, 0.6, "sine", 7) for f in (1500, 2250, 3375)) * 0.3, sweep(600, 80, 0.5, "square", 6) * 0.4),
+        "pod_open": mix(noise_burst(1.4, 1800, 2.2) * 0.7, sweep(120, 60, 1.2, "sine", 2) * 0.5),
+        "land": mix(noise_burst(1.0, 900, 3) * 0.8, sweep(80, 40, 0.9, "sine", 3) * 0.7),
+    })
     for name, data in sfx.items():
         data = np.asarray(data, dtype=np.float64)
         data /= max(1e-6, np.max(np.abs(data)))
         write_wav(os.path.join(SFX_DIR, name + ".wav"), data * 0.8)
 
 
+def loop_fold(x, tail):
+    """Crossfade the end into the start so the loop is seamless."""
+    n = int(tail * SR)
+    body = x[:-n].copy()
+    fade = np.linspace(0, 1, n)
+    body[:n] = body[:n] * fade + x[-n:] * (1 - fade)
+    return body
+
+
+def build_ambience():
+    os.makedirs(MUSIC_DIR, exist_ok=True)
+    dur = 12.0
+    t = t_arr(dur + 1.0)
+    # Station: low electrical hum + air handlers + distant beeps.
+    hum = np.sin(2 * np.pi * 50 * t) * 0.25 + np.sin(2 * np.pi * 100 * t) * 0.12 + np.sin(2 * np.pi * 150.5 * t) * 0.05
+    air = lowpass(rng.uniform(-1, 1, len(t)), 300) * 0.9
+    st = hum + air
+    for k in range(6):
+        add(st, tone(rng.choice([880, 1175, 1568]), 0.12, "sine", 12) * 0.15, rng.uniform(0.5, dur - 1))
+    write_wav(os.path.join(MUSIC_DIR, "amb_station.wav"), loop_fold(st / np.max(np.abs(st)) * 0.6, 1.0))
+    # Wind: band-limited noise with slow gusts.
+    n = rng.uniform(-1, 1, len(t))
+    gust = 0.5 + 0.5 * np.sin(2 * np.pi * t / 6.0) * np.sin(2 * np.pi * t / 2.3 + 1)
+    wind = (lowpass(n, 700) - lowpass(n, 120)) * (0.4 + 0.6 * gust)
+    write_wav(os.path.join(MUSIC_DIR, "amb_wind.wav"), loop_fold(wind / np.max(np.abs(wind)) * 0.6, 1.0))
+    # Rain: dense hiss + drops.
+    rain = (rng.uniform(-1, 1, len(t)) - lowpass(rng.uniform(-1, 1, len(t)), 2500)) * 0.5
+    for k in range(300):
+        add(rain, noise_burst(0.02, 5000, 120) * rng.uniform(0.1, 0.4), rng.uniform(0, dur))
+    write_wav(os.path.join(MUSIC_DIR, "amb_rain.wav"), loop_fold(rain / np.max(np.abs(rain)) * 0.6, 1.0))
+
+
 if __name__ == "__main__":
     build_sfx()
+    build_ambience()
     build_music()
     print("audio written")

@@ -28,6 +28,12 @@ var _wander_target := Vector3.ZERO
 var _timer := 0.0
 var _flee_from := Vector3.ZERO
 var _rng := RandomNumberGenerator.new()
+var _talking := 0.0
+var _bark_timer := 0.0
+var _bubble: Label3D
+var _player: Node3D
+var _partner: Node3D = null
+static var _barks: Dictionary = {}
 
 
 func _ready() -> void:
@@ -43,6 +49,23 @@ func _ready() -> void:
 	_wander_target = _home
 	witness.calls_faction = faction if faction != "" else "paragon"
 	talk.interacted.connect(_on_talk)
+	_bark_timer = _rng.randf_range(3.0, 14.0)
+	_bubble = Label3D.new()
+	_bubble.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_bubble.no_depth_test = true
+	_bubble.pixel_size = 0.0042
+	_bubble.font_size = 36
+	_bubble.outline_size = 12
+	_bubble.modulate = Color(1.0, 1.0, 0.92)
+	_bubble.outline_modulate = Color(0.08, 0.04, 0.14, 0.95)
+	_bubble.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_bubble.width = 520
+	_bubble.position = Vector3(0, 2.55, 0)
+	_bubble.render_priority = 4
+	_bubble.visible = false
+	add_child(_bubble)
+	EventBus.enemy_killed.connect(func(_e, _i): _on_combat_nearby())
+	EventBus.subsystem_broken.connect(func(_e, _s, _f): _on_combat_nearby())
 	name_label.text = npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
 	_update_prompt()
 
@@ -55,6 +78,8 @@ func _physics_process(delta: float) -> void:
 	if state == "dead":
 		return
 	_timer -= delta
+	_talking -= delta
+	_life(delta)
 	var move := Vector3.ZERO
 	match state:
 		"idle":
@@ -72,8 +97,16 @@ func _physics_process(delta: float) -> void:
 	velocity.z = move.z * speed
 	velocity.y = -0.5 if is_on_floor() else velocity.y - GRAVITY * gravity_scale * delta
 	move_and_slide()
-	sprite.face(move.x)
-	sprite.play("walk" if move.length() > 0.1 else ("guard" if state == "reporting" else "idle"))
+	if move.length() > 0.1:
+		sprite.set_facing(move)
+	elif _partner != null and is_instance_valid(_partner):
+		sprite.set_facing(_partner.global_position - global_position)
+	elif _player != null and global_position.distance_to(_player.global_position) < 3.5:
+		sprite.set_facing(_player.global_position - global_position)
+	if state == "flee":
+		sprite.play("run")
+	else:
+		sprite.play("walk" if move.length() > 0.1 else ("talk" if state == "reporting" or _talking > 0.0 else "idle"))
 
 
 func _wander() -> Vector3:
@@ -306,3 +339,75 @@ func _on_civilian_choice(choice: String) -> void:
 
 func _pick(options: Array) -> String:
 	return options[_rng.randi() % options.size()]
+
+
+# --- Ambient life -----------------------------------------------------------------------------
+
+static func barks() -> Dictionary:
+	if _barks.is_empty():
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://data/barks.json"))
+		_barks = parsed if parsed is Dictionary else {"civilian": ["..."]}
+	return _barks
+
+
+func _life(delta: float) -> void:
+	if _player == null or not is_instance_valid(_player):
+		_player = get_tree().get_first_node_in_group("player") as Node3D
+	_bark_timer -= delta
+	if _bark_timer > 0.0 or state != "idle" or _player == null:
+		return
+	_bark_timer = _rng.randf_range(9.0, 22.0)
+	var d := global_position.distance_to(_player.global_position)
+	if d > 11.0:
+		return
+	# Small talk with a neighbour?
+	_partner = null
+	for n in get_tree().get_nodes_in_group("npc"):
+		if n != self and n.state == "idle" and n.global_position.distance_to(global_position) < 3.2:
+			_partner = n
+			break
+	var pool: Array = []
+	var b := barks()
+	if not Causality.known_crimes_at(Game.location_id, faction).is_empty() and _rng.randf() < 0.6:
+		pool = b.get("infamous", [])
+	elif _partner != null and _rng.randf() < 0.6:
+		pool = b.get("pair", [])
+		_partner.call_deferred("hear_partner")
+	elif not Game.current_planet.is_empty() and _rng.randf() < 0.3:
+		pool = b.get("crisis:" + str(Game.current_planet.get("crisis", "")), [])
+	elif Game.current_planet.is_empty() and _rng.randf() < 0.3:
+		pool = b.get("station", [])
+	if pool.is_empty():
+		pool = b.get(role, b.get("civilian", []))
+	if not pool.is_empty():
+		say(pool[_rng.randi() % pool.size()])
+
+
+func hear_partner() -> void:
+	_talking = 2.5
+	_bark_timer = maxf(_bark_timer, 4.0)
+
+
+func say(text: String, duration: float = 3.4) -> void:
+	_bubble.text = text
+	_bubble.visible = true
+	_bubble.modulate.a = 0.0
+	_talking = duration
+	var tw := create_tween()
+	tw.tween_property(_bubble, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(duration)
+	tw.tween_property(_bubble, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(func(): _bubble.visible = false)
+	EventBus.speech_bubble.emit(self, text)
+
+
+func _on_combat_nearby() -> void:
+	if state != "idle" or _player == null or not is_instance_valid(_player):
+		return
+	if global_position.distance_to(_player.global_position) < 10.0 and _rng.randf() < 0.5:
+		var lines: Array = barks().get("combat", [])
+		if not lines.is_empty():
+			say(lines[_rng.randi() % lines.size()], 2.0)
+		state = "flee"
+		_timer = 2.5
+		_flee_from = _player.global_position

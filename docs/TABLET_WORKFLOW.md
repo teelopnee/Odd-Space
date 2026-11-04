@@ -75,3 +75,19 @@ git fetch origin && git reset --hard origin/main
 - สั่งงานใน Claude Code ได้เลย ("เพิ่มศัตรูใหม่", "แก้บั๊กกลิ้งหลบ") — Claude จะ commit + push ขึ้น `main`
 - กลับมาที่แท็บเล็ต: `bash tools/sync.sh pull` แล้วเปิด Godot
 - Claude อ่าน `CLAUDE.md` ใน repo เพื่อรู้ธรรมเนียมของโปรเจกต์ทุกครั้ง
+
+## 6) ติดตั้ง/อัปเดตเกมบนแท็บเล็ต (APK)
+
+- ดาวน์โหลด `odd-space.apk` จาก https://github.com/teelopnee/Odd-Space/releases แล้วแตะเพื่อติดตั้ง
+- APK ทุกเวอร์ชันต้องเซ็นด้วย **คีย์เดียวกัน** ถึงจะอัปเดตทับได้โดยเซฟไม่หาย (ถ้าคีย์ต่างกัน Android จะให้ถอนการติดตั้งก่อน = เซฟหาย)
+
+## 7) Auto-build APK ด้วย GitHub Actions (ทางเลือก)
+
+ไฟล์ `.github/workflows/android.yml` จะ build APK ใหม่ทุกครั้งที่ push ขึ้น `main` และอัปโหลดเป็น Release ชื่อ **latest**
+แต่ต้องเพิ่ม secret 2 ตัวก่อน (ทำเองบน GitHub — ไม่ควรเก็บคีย์ไว้ใน repo เพราะ repo เป็น public):
+
+1. GitHub → repo **Odd-Space** → *Settings* → *Secrets and variables* → *Actions* → *New repository secret*
+2. `ANDROID_KEYSTORE_BASE64` = เนื้อหา base64 ของไฟล์ keystore (alias `oddspace`)
+3. `ANDROID_KEYSTORE_PASSWORD` = รหัสผ่านของ keystore
+
+ถ้ายังไม่เพิ่ม secret: workflow ยังตรวจโค้ดให้ทุก push แต่จะข้ามขั้นตอนสร้าง APK

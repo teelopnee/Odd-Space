@@ -32,35 +32,42 @@ func _process(_delta: float) -> bool:
 			_shot("02_character_creation")
 			root.get_node("Game").new_game("Rex Vantablack", {"background": "cryo_debtor", "motivation": "burn_consortium", "secret": "kleptomaniac"}, 4242)
 			change_scene_to_file("res://scenes/world/station_prologue.tscn")
-			_next(60)
+			_next(150)
 		3:
-			# Walk the player into the concourse so there is something to see.
+			_shot("03_intro_cutscene")
+			var hud = get_first_node_in_group("hud")
+			for i in 6:
+				if hud._dialogue_open:
+					hud._on_choice("")
+			paused = false
+			# Skip the rest of the intro: release control.
+			hud.cinematic(false)
 			var p = get_first_node_in_group("player")
+			p.set_cutscene(false)
+			var rig = get_first_node_in_group("camera_rig")
+			rig.target = p
+			rig.configure(36.0, 14.5, 31.0)
 			p.global_position = Vector3(25, 0.2, 19)
-			# Keep enemies passive so the screenshot isn't a flaw popup.
 			for e in get_nodes_in_group("enemy"):
 				e.hostile = false
 				e.def["hostility"] = "rep"
 				e.def["hostile_below"] = -999
 			_next(90)
 		4:
-			_shot("03_station_concourse")
-			var args := OS.get_cmdline_user_args()
-			for a in args:
-				if a.begins_with("--dof="):
-					get_first_node_in_group("camera_rig").set_dof_mode(a.split("=")[1])
-					_wait = 3
-					_step = 40
-					return false
+			var hud = get_first_node_in_group("hud")
+			for i in 6:
+				if hud._dialogue_open:
+					hud._on_choice("")
+			paused = false
+			_shot("04_station")
 			var p = get_first_node_in_group("player")
 			for e in get_nodes_in_group("enemy"):
 				e.hostile = true
 			p.cycle_target()
-			p.cycle_subsystem()
-			p.shoot()
-			_next(8)
+			p._start_combo(0)
+			_next(7)
 		5:
-			_shot("04_station_combat")
+			_shot("05_station_combat")
 			root.get_node("Game").enter_ship()
 			change_scene_to_file("res://scenes/ui/star_map.tscn")
 			_next(40)
@@ -69,22 +76,28 @@ func _process(_delta: float) -> bool:
 			sm._select(root.get_node("Game").galaxy[3])
 			_next(10)
 		7:
-			_shot("05_star_map")
+			_shot("06_star_map")
 			var g = root.get_node("Game")
 			root.get_node("Router").params = {"planet_id": g.galaxy[3].id}
 			change_scene_to_file("res://scenes/world/planet_surface.tscn")
-			_next(120)
+			_next(150)
 		8:
-			_shot("06_planet_a")
-			var g = root.get_node("Game")
-			root.get_node("Router").params = {"planet_id": g.galaxy[2].id}
-			change_scene_to_file("res://scenes/world/planet_surface.tscn")
-			_next(120)
+			_shot("07_planet_landing")
+			_next(260)
 		9:
-			_shot("07_planet_b")
-			quit(0)
-		40:
-			_shot("03b_station_dof_variant")
+			_shot("08_planet_a")
+			var g = root.get_node("Game")
+			root.get_node("Router").params = {"planet_id": g.galaxy[1].id}
+			change_scene_to_file("res://scenes/world/planet_surface.tscn")
+			_next(400)
+		10:
+			_shot("09_planet_b")
+			var g = root.get_node("Game")
+			root.get_node("Router").params = {"planet_id": g.galaxy[0].id}
+			change_scene_to_file("res://scenes/world/planet_surface.tscn")
+			_next(400)
+		11:
+			_shot("10_planet_c")
 			quit(0)
 	return false
 

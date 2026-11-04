@@ -1,30 +1,21 @@
 class_name BillboardSprite
 extends Sprite3D
-## HD-2D character sprite: a pixel-art sheet drawn on a Y-axis billboard that
-## always faces the camera, is LIT by real 3D lights, and CASTS real shadows.
+## HD-2D character sprite: pixel-art frames on a Y-axis billboard that always
+## faces the camera, is LIT by the scene's 3D lights and CASTS real shadows.
 ##
-## Sheet layout (all characters share it, see tools/gen_sprites.py):
-##   6 columns x 7 rows, each frame FRAME_W x FRAME_H px
-##   row 0 idle(4) | 1 walk(6) | 2 roll/windup(4) | 3 attack(3)
-##   row 4 guard/stagger(2) | 5 hurt(2) | 6 down/dead(3)
+## Sheets come from tools/sprite_forge.py (or hand-drawn art with the same
+## layout): <name>.png + <name>.json describing frame size, animations and one
+## atlas row per (animation, direction). Directions S, SE, E, NE, N are drawn;
+## SW, W, NW are mirrored, giving 8-way facing.
 
-const FRAME_W := 32
-const FRAME_H := 40
-const COLUMNS := 6
-const ROWS := 7
-const ANIMS := {
-	"idle": {"row": 0, "frames": 4, "fps": 5.0, "loop": true},
-	"walk": {"row": 1, "frames": 6, "fps": 11.0, "loop": true},
-	"roll": {"row": 2, "frames": 4, "fps": 13.0, "loop": false},
-	"windup": {"row": 2, "frames": 4, "fps": 8.0, "loop": false},
-	"attack": {"row": 3, "frames": 3, "fps": 12.0, "loop": false},
-	"guard": {"row": 4, "frames": 2, "fps": 10.0, "loop": true},
-	"stagger": {"row": 4, "frames": 2, "fps": 6.0, "loop": true},
-	"hurt": {"row": 5, "frames": 2, "fps": 12.0, "loop": false},
-	"dead": {"row": 6, "frames": 3, "fps": 7.0, "loop": false},
-}
+signal animation_finished(anim: String)
 
-## Path under res://assets/sprites/characters/ without extension, e.g. "player".
+const SECTORS := [["S", false], ["SE", false], ["E", false], ["NE", false], ["N", false], ["NE", true], ["E", true], ["SE", true]]
+const DEFAULT_PIXEL_SIZE := 0.034
+
+static var _meta_cache: Dictionary = {}
+
+## File name under res://assets/sprites/characters/ without extension.
 @export var sheet_name := "player":
 	set(value):
 		sheet_name = value
@@ -32,12 +23,22 @@ const ANIMS := {
 			_load_sheet()
 @export var ground_align := true
 
+var meta: Dictionary = {}
 var current := ""
 var finished := false
+var direction := "S"
+var mirrored := false
+var speed_scale := 1.0
 var base_modulate := Color.WHITE
+var frame_index := 0
+
 var _time := 0.0
+var _fw := 48
+var _fh := 64
 var _flash_time := 0.0
 var _flash_color := Color.WHITE
+var _squash := Vector2.ONE
+var _base_y := 0.0
 
 
 func _ready() -> void:
@@ -47,14 +48,24 @@ func _ready() -> void:
 	alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	hframes = COLUMNS
-	vframes = ROWS
-	if pixel_size == 0.01:  # engine default -> use our HD-2D scale
-		pixel_size = 0.045
-	if ground_align:
-		position.y = FRAME_H * pixel_size * 0.5
+	region_enabled = true
+	if is_equal_approx(pixel_size, 0.01) or is_equal_approx(pixel_size, 0.045):
+		pixel_size = DEFAULT_PIXEL_SIZE
 	_load_sheet()
 	play("idle")
+
+
+static func load_meta(sheet: String) -> Dictionary:
+	if _meta_cache.has(sheet):
+		return _meta_cache[sheet]
+	var path := "res://assets/sprites/characters/%s.json" % sheet
+	var data: Dictionary = {}
+	if FileAccess.file_exists(path):
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if parsed is Dictionary:
+			data = parsed
+	_meta_cache[sheet] = data
+	return data
 
 
 func _load_sheet() -> void:
@@ -63,12 +74,25 @@ func _load_sheet() -> void:
 		texture = load(path)
 	else:
 		push_warning("BillboardSprite: missing sheet %s" % path)
+	meta = load_meta(sheet_name)
+	_fw = int(meta.get("frame_w", 48))
+	_fh = int(meta.get("frame_h", 64))
+	if ground_align:
+		var foot := float(meta.get("foot_row", _fh - 4))
+		_base_y = (foot - _fh * 0.5) * pixel_size
+		position.y = _base_y
+	if current != "":
+		_apply_frame()
+
+
+func has_anim(anim: String) -> bool:
+	return meta.get("anims", {}).has(anim)
 
 
 func play(anim: String, restart: bool = false) -> void:
+	if not has_anim(anim):
+		anim = "idle" if has_anim("idle") else anim
 	if anim == current and not restart:
-		return
-	if not ANIMS.has(anim):
 		return
 	current = anim
 	finished = false
@@ -76,9 +100,28 @@ func play(anim: String, restart: bool = false) -> void:
 	_apply_frame()
 
 
+func anim_length(anim: String) -> float:
+	var a: Dictionary = meta.get("anims", {}).get(anim, {})
+	if a.is_empty():
+		return 0.3
+	return float(a.get("frames", 1)) / maxf(1.0, float(a.get("fps", 10)))
+
+
+## Face a world-space direction (XZ). Camera yaw is fixed, so world +Z = screen down.
+func set_facing(dir: Vector3) -> void:
+	if Vector2(dir.x, dir.z).length() < 0.05:
+		return
+	var ang := atan2(dir.x, dir.z)  # 0 = toward camera (S), +PI/2 = screen right (E)
+	var sector := posmod(roundi(ang / (PI / 4.0)), 8)
+	direction = SECTORS[sector][0]
+	mirrored = SECTORS[sector][1]
+	_apply_frame()
+
+
+## Legacy helper: face left/right by screen X.
 func face(direction_x: float) -> void:
 	if absf(direction_x) > 0.05:
-		flip_h = direction_x < 0.0
+		set_facing(Vector3(direction_x, 0, 0.35))
 
 
 func flash(color: Color = Color(3.0, 3.0, 3.0), duration: float = 0.08) -> void:
@@ -86,24 +129,67 @@ func flash(color: Color = Color(3.0, 3.0, 3.0), duration: float = 0.08) -> void:
 	_flash_time = duration
 
 
+## Squash & stretch: e.g. squash(Vector2(1.25, 0.8)) on landing; springs back.
+func squash(amount: Vector2) -> void:
+	_squash = amount
+
+
 func _process(delta: float) -> void:
 	if current != "":
-		_time += delta
+		var before := frame_index
+		_time += delta * speed_scale
 		_apply_frame()
+		if finished and before != frame_index:
+			animation_finished.emit(current)
 	if _flash_time > 0.0:
 		_flash_time -= delta
 		modulate = _flash_color
 	else:
 		modulate = base_modulate
+	_squash = _squash.lerp(Vector2.ONE, 1.0 - exp(-14.0 * delta))
+	scale = Vector3(_squash.x, _squash.y, 1.0)
+	if ground_align:
+		position.y = _base_y * _squash.y
 
 
 func _apply_frame() -> void:
-	var a: Dictionary = ANIMS[current]
-	var count: int = a.frames
-	var idx := int(_time * float(a.fps))
-	if a.loop:
+	var anims: Dictionary = meta.get("anims", {})
+	if not anims.has(current):
+		return
+	var a: Dictionary = anims[current]
+	var count := int(a.get("frames", 1))
+	var idx := int(_time * float(a.get("fps", 10)))
+	if a.get("loop", true):
 		idx = idx % count
 	elif idx >= count:
 		idx = count - 1
 		finished = true
-	frame = int(a.row) * COLUMNS + idx
+	frame_index = idx
+	var rows: Dictionary = a.get("rows", {})
+	var row := int(rows.get(direction, rows.get("S", 0)))
+	region_rect = Rect2(idx * _fw, row * _fh, _fw, _fh)
+	flip_h = mirrored
+
+
+## Leave a fading ghost copy behind (dash afterimages, speed lines).
+func spawn_afterimage(tint: Color = Color(0.4, 1.0, 1.0, 0.6), life: float = 0.28) -> void:
+	var parent := get_tree().current_scene
+	if parent == null:
+		return
+	var ghost := Sprite3D.new()
+	ghost.texture = texture
+	ghost.region_enabled = true
+	ghost.region_rect = region_rect
+	ghost.flip_h = flip_h
+	ghost.pixel_size = pixel_size
+	ghost.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	ghost.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	ghost.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+	ghost.shaded = false
+	ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ghost.modulate = Color(tint.r * 1.6, tint.g * 1.6, tint.b * 1.6, tint.a)
+	parent.add_child(ghost)
+	ghost.global_transform = global_transform
+	var tw := ghost.create_tween()
+	tw.tween_property(ghost, "modulate:a", 0.0, life)
+	tw.tween_callback(ghost.queue_free)

@@ -25,6 +25,10 @@ signal player_dodged
 signal enemy_killed(enemy: Node, info: Dictionary)
 signal subsystem_broken(enemy: Node, subsystem: String, effect: String)
 signal target_changed(target: Node, subsystem: String)
+signal overclock_changed(meter: float, active_time: float)
+signal perfect_dodge
+signal enemy_broken(enemy: Node)
+signal enemy_shield_changed(enemy: Node, shield: int)
 
 # --- Flaws & perks ---------------------------------------------------------------
 signal mishap(kind: String, count: int)
@@ -53,3 +57,7 @@ signal interact_prompt_changed(text: String)
 signal dialogue_requested(speaker: String, text: String, choices: Array, callback: Callable)
 signal shop_requested(vendor_name: String, faction_id: String, stock: Array)
 signal game_loaded
+signal cutscene_started
+signal cutscene_ended
+signal speech_bubble(speaker: Node, text: String)
+signal input_device_changed(device: String)  # "touch" | "keyboard" | "gamepad"

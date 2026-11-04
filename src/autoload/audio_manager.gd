@@ -13,6 +13,8 @@ var sfx_volume_db := -4.0
 
 var _music: AudioStreamPlayer
 var _music_name := ""
+var _amb: AudioStreamPlayer
+var _amb_name := ""
 var _pool: Array[AudioStreamPlayer] = []
 var _next := 0
 var _cache: Dictionary = {}  # path -> AudioStream (or null if missing)
@@ -24,6 +26,10 @@ func _ready() -> void:
 	_music.volume_db = music_volume_db
 	_music.finished.connect(func(): _music.play())  # loop fallback for non-looping streams
 	add_child(_music)
+	_amb = AudioStreamPlayer.new()
+	_amb.volume_db = music_volume_db - 6.0
+	_amb.finished.connect(func(): _amb.play())
+	add_child(_amb)
 	for i in POOL_SIZE:
 		var p := AudioStreamPlayer.new()
 		p.volume_db = sfx_volume_db
@@ -75,6 +81,28 @@ func play_music(music_name: String, fade_time: float = 0.8) -> void:
 		_music.stream = stream
 		_music.play())
 	tw.tween_property(_music, "volume_db", music_volume_db, fade_time * 0.5)
+
+
+## Looping ambience bed (station hum, wind, rain). "" stops it.
+func play_ambience(amb_name: String, volume_offset: float = -6.0) -> void:
+	if amb_name == _amb_name and _amb.playing:
+		return
+	_amb_name = amb_name
+	if amb_name == "":
+		_amb.stop()
+		return
+	var stream := _find(MUSIC_DIR, amb_name)
+	if stream == null:
+		_amb.stop()
+		return
+	if stream is AudioStreamWAV:
+		var wav: AudioStreamWAV = stream
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		wav.loop_end = roundi(wav.get_length() * wav.mix_rate)
+	_amb.stream = stream
+	_amb.volume_db = music_volume_db + volume_offset
+	_amb.play()
 
 
 func stop_music() -> void:

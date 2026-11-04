@@ -24,6 +24,9 @@ var level_seed := 1
 var spawn_key := "default"
 var gravity_scale := 1.0
 var enemy_speed_mult := 1.0
+var camera_pitch := 36.0
+var camera_distance := 14.5
+var camera_fov := 31.0
 
 var nav_region: NavigationRegion3D
 var actors: Node3D
@@ -63,6 +66,7 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	Game.air_billing_active = false
+	Audio.play_ambience("")
 
 
 # --- Virtuals ----------------------------------------------------------------------------
@@ -97,20 +101,22 @@ func _build_environment() -> void:
 	environment.ambient_light_color = pcolor("ambient", "#4a3a80")
 	environment.ambient_light_energy = float(palette.get("ambient_energy", 0.7))
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
-	environment.tonemap_exposure = 1.05
+	environment.tonemap_exposure = 1.1
 	environment.tonemap_white = 6.0
-	# Neon bloom.
+	# Dreamy HD-2D bloom: wide, soft halos around every light and neon strip.
 	environment.glow_enabled = true
-	environment.glow_intensity = 0.9
-	environment.glow_strength = 1.05
-	environment.glow_bloom = 0.08
-	environment.glow_hdr_threshold = 0.85
-	environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	environment.glow_intensity = 0.85
+	environment.glow_strength = 1.1
+	environment.glow_bloom = 0.06
+	environment.glow_hdr_threshold = 0.8
+	environment.glow_hdr_scale = 2.2
+	environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SCREEN
 	environment.set_glow_level(0, 0.0)
-	environment.set_glow_level(1, 0.6)
-	environment.set_glow_level(2, 1.0)
-	environment.set_glow_level(3, 0.8)
-	environment.set_glow_level(4, 0.5)
+	environment.set_glow_level(1, 0.4)
+	environment.set_glow_level(2, 0.8)
+	environment.set_glow_level(3, 1.0)
+	environment.set_glow_level(4, 0.8)
+	environment.set_glow_level(5, 0.5)
 	# Atmospheric depth fog.
 	environment.fog_enabled = true
 	environment.fog_light_color = pcolor("fog", "#3a1060")
@@ -119,8 +125,8 @@ func _build_environment() -> void:
 	environment.fog_sky_affect = 0.0
 	# Retro colour punch.
 	environment.adjustment_enabled = true
-	environment.adjustment_saturation = 1.18
-	environment.adjustment_contrast = 1.06
+	environment.adjustment_saturation = 1.22
+	environment.adjustment_contrast = 1.1
 	world_env = WorldEnvironment.new()
 	world_env.environment = environment
 	add_child(world_env)
@@ -129,7 +135,8 @@ func _build_environment() -> void:
 	sun.light_color = pcolor("sun", "#9a7dff")
 	sun.light_energy = float(palette.get("sun_energy", 0.4))
 	sun.shadow_enabled = true
-	sun.shadow_blur = 1.5
+	sun.shadow_blur = 1.2
+	sun.shadow_opacity = 0.85
 	sun.directional_shadow_max_distance = 45.0
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 	# Light comes from the camera side & above-left so billboards are lit and
@@ -226,8 +233,10 @@ func _spawn_camera_and_hud() -> void:
 	camera_rig = CameraRig.new()
 	camera_rig.name = "CameraRig"
 	add_child(camera_rig)
+	camera_rig.configure(camera_pitch, camera_distance, camera_fov)
 	camera_rig.target = player
 	camera_rig.snap_to_target()
+	_build_weather(str(palette.get("weather", "")))
 	hud = HUD_SCENE.instantiate()
 	add_child(hud)
 	hud.bind_player(player, camera_rig)
@@ -255,3 +264,63 @@ func _on_player_died() -> void:
 	await get_tree().create_timer(1.8).timeout
 	if is_instance_valid(hud) and hud.has_method("show_death_screen"):
 		hud.show_death_screen()
+
+
+## Weather particles ride along with the camera so they always fill the view.
+func _build_weather(kind: String) -> void:
+	if kind == "" or kind == "dust":
+		return
+	var p := CPUParticles3D.new()
+	p.local_coords = false
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	var q := QuadMesh.new()
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	m.billboard_keep_scale = true
+	q.material = m
+	p.mesh = q
+	match kind:
+		"rain":
+			p.amount = 600
+			p.lifetime = 0.9
+			p.emission_box_extents = Vector3(18, 0.5, 14)
+			p.position = Vector3(0, 10, 0)
+			p.direction = Vector3(0.15, -1, 0)
+			p.spread = 2.0
+			p.gravity = Vector3(0, -30, 0)
+			p.initial_velocity_min = 14.0
+			p.initial_velocity_max = 18.0
+			q.size = Vector2(0.03, 0.6)
+			m.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+			m.albedo_color = Color(0.6, 0.75, 1.0, 0.45)
+		"snow":
+			p.amount = 360
+			p.lifetime = 5.0
+			p.preprocess = 5.0
+			p.emission_box_extents = Vector3(18, 0.5, 14)
+			p.position = Vector3(0, 9, 0)
+			p.direction = Vector3(0.3, -1, 0)
+			p.spread = 25.0
+			p.gravity = Vector3(0.2, -1.2, 0)
+			p.initial_velocity_min = 0.5
+			p.initial_velocity_max = 1.2
+			q.size = Vector2(0.07, 0.07)
+			m.albedo_color = Color(0.95, 0.97, 1.0, 0.85)
+		"spores", "embers", "motes":
+			p.amount = 160
+			p.lifetime = 6.0
+			p.preprocess = 6.0
+			p.emission_box_extents = Vector3(16, 2.5, 12)
+			p.position = Vector3(0, 1.5, 0)
+			p.direction = Vector3(0, 1, 0)
+			p.spread = 50.0
+			p.gravity = Vector3(0, 0.35 if kind != "motes" else 0.05, 0)
+			p.initial_velocity_min = 0.1
+			p.initial_velocity_max = 0.5
+			q.size = Vector2(0.06, 0.06)
+			m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+			var c := {"spores": Color(0.6, 1.6, 0.5, 0.9), "embers": Color(2.2, 0.9, 0.3, 0.9), "motes": Color(1.4, 1.0, 2.2, 0.9)}[kind] as Color
+			m.albedo_color = c
+	camera_rig.add_child(p)

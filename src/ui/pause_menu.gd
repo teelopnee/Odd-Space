@@ -6,6 +6,7 @@ extends PanelContainer
 signal closed
 
 var _tabs: TabContainer
+var _close_btn: Button
 
 
 func _ready() -> void:
@@ -21,10 +22,12 @@ func _ready() -> void:
 	var title := HUD.make_label("THE ODD DUCK // SHIP TERMINAL   %s" % Game.player_name.to_upper(), 22, Color(1.0, 0.82, 0.24))
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
+	head.add_child(HUD.make_label("LB/RB: tabs  ", 13, Color(0.7, 0.8, 1.0)))
 	var close := Button.new()
 	close.text = "RESUME  X"
 	close.pressed.connect(func(): closed.emit())
 	head.add_child(close)
+	_close_btn = close
 	_tabs = TabContainer.new()
 	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(_tabs)
@@ -37,6 +40,25 @@ func open(tab: String = "") -> void:
 		for i in _tabs.get_tab_count():
 			if _tabs.get_tab_title(i).to_lower() == tab.to_lower():
 				_tabs.current_tab = i
+
+
+func switch_tab(dir: int) -> void:
+	_tabs.current_tab = posmod(_tabs.current_tab + dir, _tabs.get_tab_count())
+	_focus_first.call_deferred()
+
+
+func _focus_first() -> void:
+	var page := _tabs.get_current_tab_control()
+	if page == null:
+		return
+	var stack: Array = [page]
+	while not stack.is_empty():
+		var n: Node = stack.pop_front()
+		if n is Button and not n.disabled and n.is_visible_in_tree():
+			n.grab_focus()
+			return
+		stack.append_array(n.get_children())
+	_close_btn.grab_focus()
 
 
 func _rebuild() -> void:
@@ -53,6 +75,7 @@ func _rebuild() -> void:
 	_tab_system()
 	if keep >= 0 and keep < _tabs.get_tab_count():
 		_tabs.current_tab = keep
+	_focus_first.call_deferred()
 
 
 func _page(title: String) -> VBoxContainer:

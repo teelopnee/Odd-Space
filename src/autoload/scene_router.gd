@@ -11,6 +11,15 @@ const STAR_MAP := "res://scenes/ui/star_map.tscn"
 
 var params: Dictionary = {}
 var busy := false
+## Last input device used: "touch" | "keyboard" | "gamepad". Drives HUD prompts/touch UI.
+var input_device := "keyboard"
+
+const GLYPHS := {
+	"gamepad": {"interact": "Y", "melee": "X", "attack": "RT", "dodge": "A", "parry": "RB", "overclock": "B",
+		"target_cycle": "LB", "subsystem_next": "LT", "pause": "START", "log": "BACK"},
+	"keyboard": {"interact": "F", "melee": "J", "attack": "K", "dodge": "SPACE", "parry": "L", "overclock": "R",
+		"target_cycle": "TAB", "subsystem_next": "Q", "pause": "ESC", "log": "C"},
+}
 
 var _layer: CanvasLayer
 var _rect: ColorRect
@@ -18,6 +27,11 @@ var _rect: ColorRect
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
+		input_device = "touch"
+	if not Input.get_connected_joypads().is_empty():
+		input_device = "gamepad"
+	Input.joy_connection_changed.connect(_on_joy_changed)
 	_layer = CanvasLayer.new()
 	_layer.layer = 100
 	add_child(_layer)
@@ -26,6 +40,26 @@ func _ready() -> void:
 	_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_layer.add_child(_rect)
+
+
+func _input(event: InputEvent) -> void:
+	var dev := ""
+	if event is InputEventJoypadButton and event.pressed:
+		dev = "gamepad"
+	elif event is InputEventJoypadMotion and absf(event.axis_value) > 0.5:
+		dev = "gamepad"
+	elif event is InputEventScreenTouch and event.pressed:
+		dev = "touch"
+	elif event is InputEventKey and event.pressed:
+		dev = "keyboard"
+	if dev != "" and dev != input_device:
+		input_device = dev
+		EventBus.input_device_changed.emit(dev)
+
+
+## Button name for an action on the current device ("" on touch).
+func glyph(action: String) -> String:
+	return GLYPHS.get(input_device, {}).get(action, "")
 
 
 func goto(path: String, new_params: Dictionary = {}, fade: float = 0.35) -> void:
@@ -59,3 +93,13 @@ func continue_run() -> void:
 		goto(STATION)
 	else:
 		goto(STAR_MAP)
+
+
+func _on_joy_changed(_device: int, connected: bool) -> void:
+	if connected:
+		input_device = "gamepad"
+		EventBus.input_device_changed.emit("gamepad")
+		EventBus.toast.emit("Controller connected - ready to play!", Color(0.5, 1.0, 0.7))
+	elif Input.get_connected_joypads().is_empty() and (OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()):
+		input_device = "touch"
+		EventBus.input_device_changed.emit("touch")

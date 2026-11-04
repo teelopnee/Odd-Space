@@ -1,0 +1,74 @@
+{
+ "slash_h": {
+  "w": 64,
+  "h": 64,
+  "frames": 5,
+  "fps": 22
+ },
+ "slash_rise": {
+  "w": 64,
+  "h": 64,
+  "frames": 5,
+  "fps": 22
+ },
+ "slash_down": {
+  "w": 72,
+  "h": 72,
+  "frames": 6,
+  "fps": 22
+ },
+ "hit_spark": {
+  "w": 32,
+  "h": 32,
+  "frames": 5,
+  "fps": 24
+ },
+ "crit_spark": {
+  "w": 40,
+  "h": 40,
+  "frames": 5,
+  "fps": 24
+ },
+ "explosion": {
+  "w": 64,
+  "h": 64,
+  "frames": 9,
+  "fps": 16
+ },
+ "dust": {
+  "w": 24,
+  "h": 24,
+  "frames": 6,
+  "fps": 18
+ },
+ "break": {
+  "w": 64,
+  "h": 64,
+  "frames": 7,
+  "fps": 18
+ },
+ "muzzle": {
+  "w": 20,
+  "h": 20,
+  "frames": 3,
+  "fps": 30
+ },
+ "chip": {
+  "w": 10,
+  "h": 10,
+  "frames": 4,
+  "fps": 12
+ },
+ "telegraph": {
+  "w": 64,
+  "h": 64,
+  "frames": 6,
+  "fps": 12
+ },
+ "shield": {
+  "w": 16,
+  "h": 16,
+  "frames": 1,
+  "fps": 1
+ }
+}
