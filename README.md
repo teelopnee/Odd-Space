@@ -18,8 +18,8 @@
 
 ## ▶ เล่นได้ทันที (Android / Galaxy Tab)
 
-1. บนแท็บเล็ต เปิด **[หน้า Releases](https://github.com/teelopnee/Odd-Space/releases)** → ดาวน์โหลด `odd-space.apk`
-2. แตะไฟล์เพื่อติดตั้ง (ครั้งแรกให้อนุญาต *ติดตั้งแอปที่ไม่รู้จัก* ให้เบราว์เซอร์/ไฟล์)
+1. เอาไฟล์ `odd-space.apk` มาไว้บนแท็บเล็ต — จากไฟล์ที่ Claude ส่งให้ในแชท, หรือจาก **[หน้า Releases](https://github.com/teelopnee/Odd-Space/releases)** (เมื่อมีการอัปโหลด / เมื่อเปิด auto-build แล้ว)
+2. แตะไฟล์เพื่อติดตั้ง (ครั้งแรกให้อนุญาต *ติดตั้งแอปที่ไม่รู้จัก* ให้แอปที่ใช้เปิดไฟล์)
 3. เปิดเกม **ODD-SPACE** — ต่อจอย Bluetooth (Xbox / PlayStation / 8BitDo ฯลฯ) ได้เลย ปุ่มสัมผัสจะซ่อนเองเมื่อใช้จอย และกลับมาเมื่อแตะจอ
 
 > ต้องการให้ GitHub สร้าง APK ใหม่อัตโนมัติทุกครั้งที่ push? ดูหัวข้อ *Auto-build APK* ใน [docs/TABLET_WORKFLOW.md](docs/TABLET_WORKFLOW.md)
