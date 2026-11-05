@@ -89,6 +89,8 @@ static func vars(npc: Node = null, extra: Dictionary = {}) -> Dictionary:
 		v["job"] = npc.job
 		v["need"] = str(npc.need).to_lower()
 		v["their_faction"] = DataDB.faction_name(npc.faction) if npc.faction != "" else "nobody"
+		if "venue_sign" in npc and str(npc.venue_sign) != "":
+			v["sign"] = str(npc.venue_sign).capitalize()
 	v.merge(extra, true)
 	return v
 

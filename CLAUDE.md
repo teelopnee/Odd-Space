@@ -71,6 +71,15 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   fan, confront (before a grudge becomes a complaint), smitten); "follow" state for crushes / curious people. One approach
   per 25 s, never in combat or over an open dialogue. `Interactions.force_outcome` forces rolls for tests.
   Test: `tools/interact_back_test.gd` (every verb x outcome answers back + changes something; every counter choice played).
+- Shop owners: `LevelBuilder.venue_spots` (venue doors) -> `Level.spawn_keeper` puts an NPC with role "keeper" beside every
+  door (stands at `post_pos`, skips physics while idle; Talk disabled - the door is the way in, except mid-call). Same person
+  every visit: state saved in `Game.flags["keepers_<planet>"][<venue>|<sign>]` (`persist_keeper` on change + `_exit_tree`;
+  `{"dead": true}` -> the shop stays dark with its own scene). `Interactions.open_venue(..., door)` greets by memory /
+  mood / regular / fan / partner, shows personal prices (`price_mult`: attitude, regular, fear), adds 3 owner verbs, turns
+  away banned customers (`counters.venue.keeper_banned`). Every shop option maps to an act kind
+  (`reactions.json venue_option_kind`) -> `_keeper_reacts`: mood + reaction (`reactions.json keeper`: regular, grateful,
+  banned, robbed, fan, heckler, scared, grudge...) + afterword + counter `counters.venue.keeper_<kind>_<ok|fail>` (falls back
+  to the person counters). Test: `tools/keeper_test.gd` (all 14 shop types x outcomes, bans, death, return visit).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

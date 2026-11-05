@@ -354,5 +354,111 @@
 			"ok": "intrigued",
 			"fail": "spooked"
 		}
+	},
+	"venue_option_kind": {
+		"food:eat": "deal",
+		"food:treat_queue": "charity",
+		"food:ask_cook": "talk",
+		"food:leftovers": "beg",
+		"food:cook_together": "show",
+		"food:buy_stall": "deal",
+		"bar:drink": "deal",
+		"bar:round": "charity",
+		"bar:arm_wrestle": "show",
+		"bar:brawl": "fight",
+		"bar:recruit": "deal",
+		"bar:underage": "weird",
+		"bar:war_stories": "talk",
+		"bar:heir_tab": "threat",
+		"karaoke:sing": "show",
+		"karaoke:jingle": "show",
+		"karaoke:duet": "show",
+		"arcade:play": "show",
+		"arcade:rig": "theft",
+		"arcade:high_score": "show",
+		"clinic:treat": "deal",
+		"clinic:medkit": "deal",
+		"clinic:volunteer": "charity",
+		"clinic:cure": "talk",
+		"clinic:repair": "deal",
+		"pawn:browse": "deal",
+		"pawn:lift": "theft",
+		"motel:rest": "deal",
+		"motel:suite": "deal",
+		"motel:old_room": "talk",
+		"motel:sneak": "theft",
+		"loans:loan": "deal",
+		"loans:pay": "deal",
+		"loans:clause": "threat",
+		"loans:family": "threat",
+		"loans:rob": "fight",
+		"tapes:mixtape": "deal",
+		"tapes:own_hit": "show",
+		"tapes:sell_keytar": "deal",
+		"air:canister": "deal",
+		"air:expose": "threat",
+		"air:free_breath": "theft",
+		"fortune:read": "talk",
+		"fortune:weird": "weird",
+		"corp_store:browse": "deal",
+		"corp_store:job": "talk",
+		"corp_store:family_discount": "threat"
+	},
+	"keeper": {
+		"_doc": "How a shop owner takes what you did in their shop: <ok|fail> = NPC.react kind, <ok|fail>_attitude = mood change.",
+		"deal": {
+			"ok": "regular",
+			"ok_attitude": 2,
+			"fail": "",
+			"fail_attitude": -2
+		},
+		"charity": {
+			"ok": "grateful",
+			"ok_attitude": 10,
+			"fail": "",
+			"fail_attitude": 0
+		},
+		"fight": {
+			"ok": "banned",
+			"ok_attitude": -30,
+			"fail": "banned",
+			"fail_attitude": -20
+		},
+		"theft": {
+			"ok": "robbed",
+			"ok_attitude": 0,
+			"fail": "banned",
+			"fail_attitude": -30
+		},
+		"show": {
+			"ok": "fan",
+			"ok_attitude": 5,
+			"fail": "heckler",
+			"fail_attitude": -4
+		},
+		"talk": {
+			"ok": "warm",
+			"ok_attitude": 3,
+			"fail": "cold",
+			"fail_attitude": -2
+		},
+		"threat": {
+			"ok": "scared",
+			"ok_attitude": -10,
+			"fail": "grudge",
+			"fail_attitude": -12
+		},
+		"weird": {
+			"ok": "intrigued",
+			"ok_attitude": 2,
+			"fail": "spooked",
+			"fail_attitude": -4
+		},
+		"beg": {
+			"ok": "pity",
+			"ok_attitude": 2,
+			"fail": "cold",
+			"fail_attitude": -3
+		}
 	}
 }

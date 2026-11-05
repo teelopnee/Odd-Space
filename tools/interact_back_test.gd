@@ -147,6 +147,7 @@ func _approaches_start() -> void:
 	var player = get_first_node_in_group("player")
 	var kinds: Array = root.get_node("DataDB").counters.get("approach", {}).keys()
 	var npc = _fresh_npc()
+	_reset(npc)
 	player.global_position = npc.global_position + Vector3(4.0, 0, 0)
 	for e in get_nodes_in_group("enemy"):
 		e.hostile = false
@@ -159,7 +160,8 @@ func _approaches_start() -> void:
 func _approaches_check() -> void:
 	var npc = _approachers[0]
 	var got: bool = not _last.is_empty() and (_last[2] as Array).size() >= 2
-	_check(got, "an NPC walked up and started a conversation (%s)" % (_last[1].substr(0, 70) if got else "none"))
+	_check(got, "an NPC walked up and started a conversation (%s)" % (_last[1].substr(0, 70) if got else "none: state=%s kind=%s wait=%.2f d=%.1f" % [
+		npc.state, npc._approach_kind, npc._approach_wait, npc.global_position.distance_to(get_first_node_in_group("player").global_position)]))
 	_close()
 	# Play each approach scene directly too.
 	var inter = root.get_node("Interactions")

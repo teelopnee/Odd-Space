@@ -1,5 +1,5 @@
 {
-	"_doc": "NPCs answer back. counters.<kind>_<ok|fail>: shown after every interaction verb of that kind (data/reactions.json verb_kind); approach.<kind>: when an NPC walks up to you (thanks, pity, partner, fan, confront, smitten). Each template: ask (alternatives, copy grammar ok), choices [{text, reply, effects, chance?, chance_mods?, fail_reply?, fail_effects?, cost?, verb?}], optional leave/leave_effects. Extra effects: react, grudge now|clear, owes, unrob, unspook.",
+	"_doc": "NPCs answer back. counters.<kind>_<ok|fail>: shown after every interaction verb of that kind (data/reactions.json verb_kind); approach.<kind>: when an NPC walks up to you (thanks, pity, partner, fan, confront, smitten). Each template: ask (alternatives, copy grammar ok), choices [{text, reply, effects, chance?, chance_mods?, fail_reply?, fail_effects?, cost?, verb?}], optional leave/leave_effects. Extra effects: react, grudge now|clear, owes, unrob, unspook. venue.keeper_<kind>_<ok|fail> / keeper_banned: shop owners (Interactions._keeper_reacts); effect unban.",
 	"counters": {
 		"charity_ok": [
 			{
@@ -2433,6 +2433,704 @@
 						"effects": {
 							"attitude": -2,
 							"owes": false
+						}
+					}
+				]
+			}
+		]
+	},
+	"venue": {
+		"keeper_banned": [
+			{
+				"ask": [
+					"\"YOU. Out. You're banned from {sign}.\"",
+					"\"Nope. Not you. Not after last time.\"",
+					"\"Turn around. You're not welcome here any more.\""
+				],
+				"choices": [
+					{
+						"text": "Apologise",
+						"reply": [
+							"A long look. \"...One more chance. ONE.\""
+						],
+						"effects": {
+							"unban": true,
+							"grudge": "clear"
+						},
+						"chance": 0.45,
+						"chance_mods": {
+							"flag:honest": 0.25,
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"\"Sorry doesn't fix my shop.\""
+						],
+						"fail_effects": {
+							"attitude": -5
+						}
+					},
+					{
+						"text": "Pay the damages ({cost} cr)",
+						"reply": [
+							"They count it twice. \"Fine. You're back in. Behave.\""
+						],
+						"effects": {
+							"unban": true,
+							"grudge": "clear",
+							"attitude": 10
+						},
+						"cost": 40
+					},
+					{
+						"text": "Lean on them",
+						"reply": [
+							"They swallow hard and step aside."
+						],
+						"effects": {
+							"unban": true,
+							"react": "scared"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:ruthless": 0.2,
+							"flag:bouncer": 0.2
+						},
+						"fail_reply": [
+							"\"Threaten me in my own shop? I'm calling Paragon.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
+						},
+						"verb": "intimidate"
+					}
+				]
+			}
+		],
+		"keeper_deal_ok": [
+			{
+				"ask": [
+					"\"Good choice. Regulars get a card. Want one?\"",
+					"\"Come back soon. I mean it - most people don't.\"",
+					"\"Anything else? I like your money.\""
+				],
+				"choices": [
+					{
+						"text": "Take the loyalty card",
+						"reply": [
+							"A sticky card with a hole punched in it. \"Ten holes and you get a free... something.\""
+						],
+						"effects": {
+							"discount": 0.08,
+							"attitude": 4
+						}
+					},
+					{
+						"text": "\"What's under the counter?\"",
+						"reply": [
+							"They glance at the door, then lean in. \"For you? The good stuff. Later.\""
+						],
+						"effects": {
+							"react": "partner"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"attitude": 0.006,
+							"flag:smuggler": 0.2
+						},
+						"fail_reply": [
+							"\"Under the counter is where I keep my opinions about nosy customers.\""
+						],
+						"fail_effects": {
+							"attitude": -2
+						}
+					},
+					{
+						"text": "Tip them ({cost} cr)",
+						"reply": [
+							"\"A TIP? On {planet}?\" You've made their week."
+						],
+						"effects": {
+							"attitude": 10
+						},
+						"cost": 5
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"You've got taste. Most people here just buy the paste.\"",
+					"\"How's business out there? In here it's... business.\""
+				],
+				"choices": [
+					{
+						"text": "Ask about the neighbourhood",
+						"reply": [
+							"\"Want the real story? Pull up a stool.\""
+						],
+						"effects": {
+							"rumor": true,
+							"attitude": 2
+						}
+					},
+					{
+						"text": "Promise to send friends",
+						"reply": [
+							"\"Ha! You have friends? Kidding. Kidding. Thanks.\""
+						],
+						"effects": {
+							"attitude": 6
+						}
+					},
+					{
+						"text": "Ask about their life",
+						"reply": [
+							"\"#npc_life#\""
+						],
+						"effects": {
+							"attitude": 5
+						}
+					}
+				]
+			}
+		],
+		"keeper_deal_fail": [
+			{
+				"ask": [
+					"\"Card declined. Again.\"",
+					"\"That's not enough. Not even close.\""
+				],
+				"choices": [
+					{
+						"text": "Put it on a tab",
+						"reply": [
+							"\"Fine. A tab. I'll add interest. Halcyon-style.\""
+						],
+						"effects": {
+							"air_debt": 15,
+							"attitude": 2
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"attitude": 0.008
+						},
+						"fail_reply": [
+							"\"Tabs are for regulars.\""
+						],
+						"fail_effects": {
+							"attitude": -4,
+							"react": "cold"
+						}
+					},
+					{
+						"text": "Haggle",
+						"reply": [
+							"\"Fine. Ten percent. Don't tell anyone.\""
+						],
+						"effects": {
+							"discount": 0.1
+						},
+						"chance": 0.45,
+						"chance_mods": {
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"\"No.\""
+						],
+						"fail_effects": {
+							"attitude": -3
+						}
+					},
+					{
+						"text": "Leave, embarrassed",
+						"reply": [
+							"Everyone pretends not to see. Badly."
+						],
+						"effects": {}
+					}
+				]
+			}
+		],
+		"keeper_charity_ok": [
+			{
+				"ask": [
+					"\"You just made my whole week. Next one's on the house.\"",
+					"\"That's... generous. Suspiciously generous. I love it.\""
+				],
+				"choices": [
+					{
+						"text": "\"I'll hold you to that.\"",
+						"reply": [
+							"\"I'd expect nothing less.\""
+						],
+						"effects": {
+							"owes": true,
+							"attitude": 5
+						}
+					},
+					{
+						"text": "\"Give it to someone who needs it.\"",
+						"reply": [
+							"They nod at someone in the corner. Later, that person finds you to say thanks."
+						],
+						"effects": {
+							"followers": 1,
+							"attitude": 8
+						}
+					},
+					{
+						"text": "\"Just keep the lights on.\"",
+						"reply": [
+							"\"For you? Always.\""
+						],
+						"effects": {
+							"attitude": 10
+						}
+					}
+				]
+			}
+		],
+		"keeper_fight_ok": [
+			{
+				"ask": [
+					"\"My FURNITURE! Who's paying for this?\"",
+					"\"Look at this place! LOOK at it!\""
+				],
+				"choices": [
+					{
+						"text": "Pay for the damage ({cost} cr)",
+						"reply": [
+							"\"...Okay. Okay. That covers it. Just - not in here next time.\""
+						],
+						"effects": {
+							"unban": true,
+							"grudge": "clear",
+							"attitude": 25
+						},
+						"cost": 30
+					},
+					{
+						"text": "\"Send the bill to #faction#.\"",
+						"reply": [
+							"They actually laugh. \"You know what? I will.\""
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 5
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:charming": 0.2,
+							"flag:joker": 0.2
+						},
+						"fail_reply": [
+							"\"YOU are the bill.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Walk out over the wreckage",
+						"reply": [
+							"Glass crunches under your boots. Behind you, a phone is already ringing."
+						],
+						"effects": {
+							"grudge": "now"
+						}
+					}
+				]
+			}
+		],
+		"keeper_fight_fail": [
+			{
+				"ask": [
+					"\"My FURNITURE! Who's paying for this?\"",
+					"\"Look at this place! LOOK at it!\""
+				],
+				"choices": [
+					{
+						"text": "Pay for the damage ({cost} cr)",
+						"reply": [
+							"\"...Okay. Okay. That covers it. Just - not in here next time.\""
+						],
+						"effects": {
+							"unban": true,
+							"grudge": "clear",
+							"attitude": 25
+						},
+						"cost": 30
+					},
+					{
+						"text": "\"Send the bill to #faction#.\"",
+						"reply": [
+							"They actually laugh. \"You know what? I will.\""
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 5
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:charming": 0.2,
+							"flag:joker": 0.2
+						},
+						"fail_reply": [
+							"\"YOU are the bill.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Walk out over the wreckage",
+						"reply": [
+							"Glass crunches under your boots. Behind you, a phone is already ringing."
+						],
+						"effects": {
+							"grudge": "now"
+						}
+					}
+				]
+			}
+		],
+		"keeper_theft_ok": [
+			{
+				"ask": [
+					"\"Anything else? You've been very quiet.\"",
+					"\"Find everything you were looking for?\""
+				],
+				"choices": [
+					{
+						"text": "\"Just looking.\"",
+						"reply": [
+							"\"Look all you like. Looking's still free. For now.\""
+						],
+						"effects": {}
+					},
+					{
+						"text": "Put it back on the shelf",
+						"reply": [
+							"Back where it was. They'll never know. You'll know."
+						],
+						"effects": {
+							"unrob": true,
+							"attitude": 3
+						}
+					},
+					{
+						"text": "Buy something small to cover it ({cost} cr)",
+						"reply": [
+							"A pack of gum. A perfect alibi."
+						],
+						"effects": {
+							"attitude": 2
+						},
+						"cost": 5
+					}
+				]
+			}
+		],
+		"keeper_theft_fail": [
+			{
+				"ask": [
+					"\"I SAW that. Put it back. Now.\"",
+					"\"In MY shop? Really?\""
+				],
+				"choices": [
+					{
+						"text": "Put it back and apologise",
+						"reply": [
+							"\"...Don't let it happen again.\" They're watching you like a hawk now."
+						],
+						"effects": {
+							"attitude": 10,
+							"unban": true,
+							"grudge": "clear"
+						}
+					},
+					{
+						"text": "Pay double ({cost} cr)",
+						"reply": [
+							"\"Double. Fine. We'll call it a very expensive purchase.\""
+						],
+						"effects": {
+							"unban": true,
+							"grudge": "clear",
+							"npc": "silenced"
+						},
+						"cost": 25
+					},
+					{
+						"text": "Run for it",
+						"reply": [
+							"You bolt out the door. Behind you: \"THIEF! STOP THAT THIEF!\""
+						],
+						"effects": {
+							"grudge": "now"
+						},
+						"verb": "theft"
+					}
+				]
+			}
+		],
+		"keeper_show_ok": [
+			{
+				"ask": [
+					"\"You're good. Want a regular slot? Thursday nights.\"",
+					"\"The customers loved that. I loved that. Do it again sometime.\""
+				],
+				"choices": [
+					{
+						"text": "Take the gig",
+						"reply": [
+							"\"Thursday. Don't be late. Bring your own mic.\""
+						],
+						"effects": {
+							"credits": 25,
+							"fame": 1
+						}
+					},
+					{
+						"text": "\"I'm a free spirit.\"",
+						"reply": [
+							"\"Free spirits pay full price.\" They're smiling though."
+						],
+						"effects": {
+							"attitude": 3
+						}
+					},
+					{
+						"text": "Ask for a free drink instead",
+						"reply": [
+							"\"Done.\" It's watered down. It's the thought."
+						],
+						"effects": {
+							"hp": 5,
+							"attitude": 2
+						}
+					}
+				]
+			}
+		],
+		"keeper_show_fail": [
+			{
+				"ask": [
+					"\"Please never do that in my shop again.\"",
+					"\"You're scaring the customers.\""
+				],
+				"choices": [
+					{
+						"text": "Promise",
+						"reply": [
+							"\"I'm holding you to it.\""
+						],
+						"effects": {
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Do it again, louder",
+						"reply": [
+							"The whole shop groans. You're definitely banned."
+						],
+						"effects": {
+							"fame": 1,
+							"react": "banned"
+						}
+					},
+					{
+						"text": "Tip them for the trouble ({cost} cr)",
+						"reply": [
+							"\"...Apology accepted.\""
+						],
+						"effects": {
+							"attitude": 6
+						},
+						"cost": 5
+					}
+				]
+			}
+		],
+		"keeper_talk_ok": [
+			{
+				"ask": [
+					"\"Pull up a stool. Want to hear how this place started?\"",
+					"\"You're alright. Most customers just grunt at me.\""
+				],
+				"choices": [
+					{
+						"text": "Listen",
+						"reply": [
+							"Thirty years, two recessions, one fire and a lot of paste. It's a good story."
+						],
+						"effects": {
+							"attitude": 8,
+							"rumor": true
+						}
+					},
+					{
+						"text": "Ask about their family",
+						"reply": [
+							"\"#npc_life#\""
+						],
+						"effects": {
+							"attitude": 6
+						}
+					},
+					{
+						"text": "Ask what the shop needs",
+						"reply": [
+							"\"Honestly? {need}. Same as everyone.\""
+						],
+						"effects": {
+							"attitude": 4,
+							"need_hint": true
+						}
+					}
+				]
+			}
+		],
+		"keeper_talk_fail": [
+			{
+				"ask": [
+					"\"I'm working.\"",
+					"\"Buy something or move along.\""
+				],
+				"choices": [
+					{
+						"text": "Buy something to keep talking ({cost} cr)",
+						"reply": [
+							"\"Now we're talking.\""
+						],
+						"effects": {
+							"attitude": 6,
+							"rumor": true
+						},
+						"cost": 5
+					},
+					{
+						"text": "\"Fair enough.\"",
+						"reply": [
+							"\"Thanks.\""
+						],
+						"effects": {
+							"attitude": 2
+						}
+					},
+					{
+						"text": "Keep talking anyway",
+						"reply": [
+							"\"...Fine. You win. What?\""
+						],
+						"effects": {
+							"attitude": 4,
+							"rumor": true
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"\"OUT.\""
+						],
+						"fail_effects": {
+							"react": "cold"
+						}
+					}
+				]
+			}
+		],
+		"keeper_threat_ok": [
+			{
+				"ask": [
+					"\"Fine. FINE. Take it. Just don't come back.\"",
+					"\"You people always get your way, don't you?\""
+				],
+				"choices": [
+					{
+						"text": "\"Pleasure doing business.\"",
+						"reply": [
+							"They don't answer. They'll remember."
+						],
+						"effects": {
+							"react": "scared"
+						}
+					},
+					{
+						"text": "Leave something for their trouble ({cost} cr)",
+						"reply": [
+							"They blink. \"...Huh. Okay. That's - okay.\""
+						],
+						"effects": {
+							"attitude": 15
+						},
+						"cost": 15
+					},
+					{
+						"text": "\"Tell everyone who I am.\"",
+						"reply": [
+							"\"Oh, I will.\""
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": -5
+						}
+					}
+				]
+			}
+		],
+		"keeper_threat_fail": [
+			{
+				"ask": [
+					"\"Not in my shop, you don't.\"",
+					"\"I've had #faction# execs try that. Get out.\""
+				],
+				"choices": [
+					{
+						"text": "Back off",
+						"reply": [
+							"\"Smart.\""
+						],
+						"effects": {
+							"attitude": 3
+						}
+					},
+					{
+						"text": "Push harder",
+						"reply": [
+							"They fold. Barely."
+						],
+						"effects": {
+							"react": "scared"
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:ruthless": 0.25
+						},
+						"fail_reply": [
+							"\"That's it. You're banned.\""
+						],
+						"fail_effects": {
+							"react": "banned"
+						}
+					},
+					{
+						"text": "Laugh it off",
+						"reply": [
+							"\"...You're lucky you're funny.\""
+						],
+						"effects": {
+							"attitude": 6
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:joker": 0.3
+						},
+						"fail_reply": [
+							"\"I'm not laughing.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
 						}
 					}
 				]

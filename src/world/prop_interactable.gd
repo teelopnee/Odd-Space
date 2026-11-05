@@ -39,7 +39,7 @@ func _on_interact(player: Node) -> void:
 			Saga.on_item_taken(quest_tag)
 		"venue":
 			Audio.play_sfx("blip", 0.1, -4.0)
-			Interactions.open_venue(venue_id, venue_sign, owner_faction)
+			Interactions.open_venue(venue_id, venue_sign, owner_faction, self)
 
 
 func _owner_name() -> String:

@@ -9,7 +9,7 @@ const GRAVITY := 24.0
 
 @export var npc_name := "Scavenger"
 @export var faction := ""
-@export_enum("civilian", "merchant", "recruit") var role := "civilian"
+@export_enum("civilian", "merchant", "recruit", "keeper") var role := "civilian"
 @export var recruit_id := ""
 @export var traits: Array[String] = ["poor"]
 @export var sprite_name := "civilian_a"
@@ -77,6 +77,15 @@ var _approach_time := 0.0
 var _follow_time := 0.0
 var _follow_kind := ""
 static var _last_approach := -999.0
+## Shop owners ("keeper"): stand at their door, remember you across visits (Game.flags "keepers_<planet>").
+var keeper_key := ""
+var venue_id := ""
+var venue_sign := ""
+var post_pos := Vector3.ZERO
+var post_face := Vector3.BACK
+var banned := false
+var visits := 0
+var keeper_loc := ""  ## planet the shop is on (saved under Game.flags "keepers_<planet>")
 static var _act_seen := {}  # "frame:kind" -> how many bystanders already reacted out loud
 
 
@@ -144,7 +153,9 @@ func _physics_process(delta: float) -> void:
 	var move := Vector3.ZERO
 	match state:
 		"idle":
-			if role != "merchant" or activity == "kneel":
+			if role == "keeper" and activity == "":
+				move = _to_post()
+			elif role != "merchant" or activity == "kneel":
 				move = _activity(delta) if activity != "" else _wander()
 				if activity == "" and story_id == "" and persona_id == "":
 					_act_check -= delta
@@ -181,7 +192,9 @@ func _physics_process(delta: float) -> void:
 	velocity.x = move.x * speed
 	velocity.z = move.z * speed
 	velocity.y = -0.5 if is_on_floor() else velocity.y - GRAVITY * gravity_scale * delta
-	move_and_slide()
+	# Owners standing at their post don't need physics every frame (dozens of shops per city).
+	if not (role == "keeper" and state == "idle" and move == Vector3.ZERO and is_on_floor()):
+		move_and_slide()
 	if move.length() > 0.1:
 		sprite.set_facing(move)
 	elif activity != "" and _act_time > 0.0 and _act_face != Vector3.ZERO:
@@ -339,7 +352,8 @@ func _update_prompt() -> void:
 		talk.prompt = "Talk to %s" % npc_name
 	else:
 		talk.prompt = "Talk to %s" % npc_name
-	talk.enabled = state != "dead"
+	# Shop owners are talked to through their shop's door (Interactions.open_venue) - except mid-call.
+	talk.enabled = state != "dead" and (role != "keeper" or state == "reporting")
 
 
 # --- Damage -------------------------------------------------------------------------------
@@ -371,6 +385,8 @@ func receive_attack(info: Dictionary) -> String:
 
 func _die(by_player: bool) -> void:
 	state = "dead"
+	if role == "keeper":
+		_keeper_store({"dead": true, "name": npc_name})
 	remove_from_group("damageable")
 	collision_layer = 0
 	witness.silence("killed")
@@ -677,6 +693,10 @@ func relation_label() -> String:
 		return "YOUR INFORMANT"
 	if repossessed:
 		return "REPOSSESSED"
+	if role == "keeper" and is_banned():
+		return "YOU'RE BANNED"
+	if role == "keeper" and visits >= 3 and attitude >= 0:
+		return "YOU'RE A REGULAR"
 	if robbed_noticed:
 		return "JUST GOT ROBBED"
 	if is_scared():
@@ -695,9 +715,9 @@ func relation_label() -> String:
 		return "HECKLER"
 	if pity:
 		return "WORRIES ABOUT YOU"
-	if attitude >= 45:
-		return "DEVOTED TO YOU"
-	if owes_favour:
+	if attitude >= 45 and (not memories.is_empty() or loyal or visits > 0):
+		return "DEVOTED TO YOU"  # earned, not just "likes your kind"
+	if owes_favour or _approach_kind == "thanks":
 		return "OWES YOU ONE"
 	if attitude >= 15:
 		return "FRIENDLY"
@@ -714,6 +734,7 @@ const REL_COLORS := {"YOUR INFORMANT": Color(0.6, 0.9, 1.0), "REPOSSESSED": Colo
 	"JUST GOT ROBBED": Color(1.0, 0.5, 0.3), "SPOOKED": Color(0.7, 0.6, 1.0), "HAS A CRUSH ON YOU": Color(1.0, 0.55, 0.85),
 	"CURIOUS ABOUT YOU": Color(0.6, 0.95, 1.0), "BUSINESS PARTNER": Color(1.0, 0.85, 0.4), "YOUR FAN": Color(1.0, 0.6, 0.95),
 	"HECKLER": Color(1.0, 0.65, 0.4), "WORRIES ABOUT YOU": Color(0.6, 0.9, 0.8),
+	"YOU'RE BANNED": Color(1.0, 0.25, 0.25), "YOU'RE A REGULAR": Color(1.0, 0.85, 0.4),
 	"SCARED OF YOU": Color(0.75, 0.55, 1.0), "DEVOTED TO YOU": Color(1.0, 0.85, 0.3), "OWES YOU ONE": Color(0.5, 1.0, 0.6),
 	"FRIENDLY": Color(0.5, 1.0, 0.6), "FURIOUS": Color(1.0, 0.3, 0.3), "DISLIKES YOU": Color(1.0, 0.6, 0.45),
 	"KEEPS QUIET": Color(0.75, 0.85, 0.9)}
@@ -723,6 +744,9 @@ func refresh_label() -> void:
 	if name_label == null or story_id != "" or persona_id != "":
 		return
 	var base := npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
+	if role == "keeper":
+		base = "%s\n<%s>" % [npc_name, venue_sign]
+		persist_keeper()
 	var rel := relation_label()
 	if rel == "YOUR INFORMANT":
 		return
@@ -790,6 +814,15 @@ func react(kind: String) -> String:
 			owes_favour = true
 			_favour_wait = 30.0
 			return "They're blushing. Somebody has a crush - and they're following you."
+		"banned":
+			banned = true
+			attitude = mini(attitude, -45)
+			grudge = true
+			_grudge_wait = _rng.randf_range(6.0, 12.0)
+			return "You're banned from %s - and they're reaching for the phone." % (venue_sign if venue_sign != "" else "here")
+		"regular":
+			attitude = mini(100, attitude + 3)
+			return ""
 		"warm":
 			attitude = mini(100, attitude + 4)
 			_waved = false
@@ -894,6 +927,79 @@ func _end_follow() -> void:
 	refresh_label()
 
 
+# --- Shop owners ------------------------------------------------------------------------------
+
+func _exit_tree() -> void:
+	# Leaving the planet: the owner keeps whatever they now think of you.
+	if role == "keeper" and state != "dead":
+		persist_keeper()
+
+
+func is_banned() -> bool:
+	return banned or attitude <= -60
+
+
+## What they charge YOU: friends and regulars pay less, enemies more, the frightened give it away.
+func price_mult() -> float:
+	var m := 1.0 - float(attitude) / 250.0 - discount
+	if visits >= 3:
+		m -= 0.08
+	if is_scared():
+		m -= 0.15
+	return clampf(m, 0.55, 1.6)
+
+
+func _to_post() -> Vector3:
+	var to := (post_pos - global_position) * Vector3(1, 0, 1)
+	if to.length() > 0.45:
+		return to.normalized()
+	if _player and is_instance_valid(_player) and global_position.distance_to(_player.global_position) < 4.0:
+		_act_face = _player.global_position - global_position
+	else:
+		_act_face = post_face
+	sprite.set_facing(_act_face)
+	return Vector3.ZERO
+
+
+const KEEPER_FIELDS := ["attitude", "loyal", "owes_favour", "grudge", "fan", "heckler", "partner", "pity", "repossessed",
+	"banned", "visits", "discount", "robbed"]
+
+
+func persist_keeper() -> void:
+	if keeper_key == "" or state == "dead":
+		return
+	var d := {"name": npc_name, "look": look, "traits": Array(traits)}
+	for f in KEEPER_FIELDS:
+		d[f] = get(f)
+	var mem: Array = []
+	for m in memories.slice(0, 3):
+		mem.append({"kind": m.get("kind", ""), "stance": m.get("stance", ""), "target": m.get("target", "")})
+	d["memories"] = mem
+	_keeper_store(d)
+
+
+func _keeper_store(d: Dictionary) -> void:
+	if keeper_key == "":
+		return
+	var key := "keepers_" + (keeper_loc if keeper_loc != "" else Game.location_id)
+	var store: Dictionary = Game.flags.get(key, {})
+	store[keeper_key] = d
+	Game.flags[key] = store
+
+
+func restore_keeper(d: Dictionary) -> void:
+	for f in KEEPER_FIELDS:
+		if d.has(f):
+			set(f, d[f])
+	if robbed:
+		_robbed_wait = _rng.randf_range(6.0, 12.0)
+	for m in d.get("memories", []):
+		var mm: Dictionary = (m as Dictionary).duplicate()
+		mm["t"] = -999.0
+		memories.append(mm)
+	refresh_label()
+
+
 ## Spend the money you gave them: walk to the nearest food stall queue.
 func _go_spend() -> void:
 	var best: Node3D = null
@@ -978,6 +1084,8 @@ func _impact_tick(delta: float) -> void:
 						say(Copy.expand("#robbed_accuse#", _rng, {"name": Game.player_name}), 2.6))
 				grudge = true
 				_grudge_wait = 6.0
+				if role == "keeper":
+					banned = true
 				EventBus.toast.emit("%s noticed they've been robbed - and they're looking at YOU." % npc_name, Color(1.0, 0.6, 0.3))
 			else:
 				EventBus.toast.emit("%s just noticed they've been robbed. They have no idea who did it." % npc_name, Color(0.9, 0.8, 0.6))
@@ -1103,9 +1211,10 @@ func _life(delta: float) -> void:
 	_bark_timer -= delta
 	if _player != null and is_instance_valid(_player) and name_label:
 		# Only nearby or important people show their name - keeps crowds readable.
-		var important: bool = story_id != "" or persona_id != "" or role != "civilian" or state == "reporting" \
-			or name_label.text.contains("<")
-		name_label.visible = important or global_position.distance_squared_to(_player.global_position) < 30.0
+		var d2 := global_position.distance_squared_to(_player.global_position)
+		var important: bool = story_id != "" or persona_id != "" or role in ["merchant", "recruit"] or state == "reporting" \
+			or (name_label.text.contains("<") and role != "keeper")
+		name_label.visible = important or d2 < (70.0 if role == "keeper" else 30.0)
 	if not _waved and _player != null and state == "idle" and attitude >= 20 and activity in ["", "phone"] \
 			and global_position.distance_to(_player.global_position) < 5.0:
 		_waved = true

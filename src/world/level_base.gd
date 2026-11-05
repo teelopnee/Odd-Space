@@ -198,6 +198,71 @@ func _spawn_entities() -> void:
 				spawn_npc("recruit", pos, id)
 			else:
 				spawn_npc("civilian", pos)
+	_spawn_keepers()
+
+
+## Shop owners: one at every venue door, the same person every visit (saved per planet).
+const KEEPER_STYLE := {"arcade": "punk", "tattoo": "punk", "tapes": "punk", "clinic": "worker", "implants": "robot",
+	"loans": "corporate", "corp_store": "corporate", "fortune": "civilian", "bar": "worker", "karaoke": "punk"}
+const KEEPER_TRAITS := {"corp_store": "corporate", "loans": "corporate", "clinic": "worker", "arcade": "artsy", "tattoo": "artsy",
+	"tapes": "artsy", "fortune": "weird", "implants": "weird", "karaoke": "artsy"}
+
+
+func _spawn_keepers() -> void:
+	if builder == null:
+		return
+	for it in builder.venue_spots:
+		if is_instance_valid(it) and it.is_inside_tree():
+			spawn_keeper(it)
+
+
+func spawn_keeper(it: Node3D) -> NPC:
+	var vid := str(it.get("venue_id"))
+	var sign := str(it.get("venue_sign"))
+	var key := "%s|%s" % [vid, sign]
+	var saved: Dictionary = Game.flags.get("keepers_" + Game.location_id, {}).get(key, {})
+	if saved.get("dead", false):
+		return null  # the shop stays dark (Interactions.open_venue shows what's left)
+	var krng := RandomNumberGenerator.new()
+	krng.seed = hash(key + Game.location_id + str(Game.world_seed))
+	var n: NPC = NPC_SCENE.instantiate()
+	n.role = "keeper"
+	n.keeper_key = key
+	n.keeper_loc = Game.location_id
+	n.venue_id = vid
+	n.venue_sign = sign
+	var fac := str(it.get("owner_faction"))
+	n.faction = fac if fac != "" else owner_faction
+	if saved.is_empty():
+		var style: String = KEEPER_STYLE.get(vid, ["worker", "civilian", "worker", "punk"][krng.randi() % 4])
+		if style == "corporate":
+			style = "corporate:" + n.faction if n.faction != "" else "worker"
+		elif style == "robot" and krng.randf() < 0.5:
+			style = "worker"
+		n.look = CharacterLook.random_look(krng, style)
+		n.npc_name = Copy.make("robot_name" if style == "robot" else ("merchant_name" if krng.randf() < 0.4 else "npc_name"), krng)
+		var t1: String = KEEPER_TRAITS.get(vid, ["worker", "poor", "worker", "rebel"][krng.randi() % 4])
+		n.traits.assign([t1, ["poor", "worker", "artsy", "corporate", "rebel", "weird"][krng.randi() % 6]])
+	else:
+		n.look = saved.get("look", {})
+		n.npc_name = str(saved.get("name", "Owner"))
+		n.traits.assign(saved.get("traits", ["worker"]))
+	n.gravity_scale = gravity_scale
+	actors.add_child(n)
+	var fwd: Vector3 = it.global_transform.basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized() if fwd.length() > 0.01 else Vector3.BACK
+	var side := fwd.cross(Vector3.UP).normalized()
+	var p: Vector3 = it.global_position + fwd * 0.6 + side * 1.25
+	n.global_position = Vector3(p.x, 0.1, p.z)
+	n.post_pos = n.global_position
+	n.post_face = fwd
+	n.job = "owner of %s" % sign.capitalize()
+	if not saved.is_empty():
+		n.restore_keeper(saved)
+	it.set_meta("keeper", n)
+	n.refresh_label()
+	return n
 
 
 func spawn_enemy(type_id: String, pos: Vector3, extra: Dictionary = {}) -> Enemy:

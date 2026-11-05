@@ -648,6 +648,50 @@
 			"Okay, I've got to go. But listen - one thing.",
 			"Thanks for not being boring. Here's something for you.",
 			"You're the most interesting thing on {planet}. Take this tip."
+		],
+		"keeper_greet_warm": [
+			"{name}! Good to see you!",
+			"Look who's back! Best customer on {planet}.",
+			"For you? Anything. Within reason.",
+			"There's my favourite face.",
+			"Come in, come in! Mind the puddle."
+		],
+		"keeper_greet_neutral": [
+			"Welcome to {sign}. Don't touch anything you can't afford.",
+			"Yeah? What'll it be?",
+			"We're open. Barely.",
+			"Hi. Buy something. Please.",
+			"Welcome. Everything's for sale except me. Make me an offer."
+		],
+		"keeper_greet_cold": [
+			"Oh. You.",
+			"Cash up front. Especially you.",
+			"I'm watching you.",
+			"Make it quick.",
+			"Don't break anything this time."
+		],
+		"keeper_greet_afraid": [
+			"T-take whatever you want. Please.",
+			"N-no trouble, okay? No trouble.",
+			"Anything you want. On the house. Please don't...",
+			"I'll give you the good price. The very good price."
+		],
+		"keeper_regular": [
+			"The usual, {name}?",
+			"My regular! Your seat's still warm.",
+			"Regulars get the good stuff. You're a regular.",
+			"Ah, {name}. Same as last time?",
+			"I saved you the corner spot."
+		],
+		"keeper_fan": [
+			"{name}! In MY shop! Can I put your picture on the wall?",
+			"My favourite customer AND my favourite celebrity!",
+			"Everyone - it's {name}!"
+		],
+		"keeper_partner": [
+			"Partner. Back room's open, if you know what I mean.",
+			"Ah, my business associate. Discreetly, please.",
+			"Got something new under the counter. For you."
 		]
 	}
 }

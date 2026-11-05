@@ -48,6 +48,7 @@ var owner_faction := ""
 var grid: Array[String] = []
 var width := 0
 var height := 0
+var venue_spots: Array = []  ## PropInteractable venue doors (shop owners stand next to them)
 var result := {"spawns": {}, "entities": [], "dock": Vector3.ZERO, "has_dock": false, "size": Vector2.ZERO}
 
 var _mats: Dictionary = {}
@@ -1006,6 +1007,7 @@ func _add_venue(parent: Node3D, sign_text: String, faction: String, local_pos: V
 	it.prompt = "Enter %s" % sign_text if venue != "food" and venue != "air" and venue != "fortune" else "Visit %s" % sign_text
 	it.position = local_pos
 	parent.add_child(it)
+	venue_spots.append(it)  # Level spawns an owner at every door (Level.spawn_keeper)
 
 
 ## Sagging power/data cables with paper lanterns strung between nearby rooftops.

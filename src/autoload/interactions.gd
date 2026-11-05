@@ -402,6 +402,9 @@ func _apply_counter_effects(npc: Node, effects: Dictionary) -> String:
 		npc._favour_wait = _rng.randf_range(20.0, 40.0)
 	if effects.get("stay", false):
 		npc._leaving = false
+	if effects.get("unban", false):
+		npc.banned = false
+		npc.attitude = maxi(int(npc.attitude), -30)
 	if effects.get("unrob", false):
 		npc.robbed = false
 	if effects.get("unspook", false):
@@ -582,24 +585,113 @@ func venue_for_sign(sign_text: String) -> String:
 	return ""
 
 
-func open_venue(venue_id: String, sign_text: String, faction: String) -> void:
+func open_venue(venue_id: String, sign_text: String, faction: String, door: Node = null) -> void:
 	var v: Dictionary = DataDB.venues.get("venues", {}).get(venue_id, {})
 	if v.is_empty():
 		return
-	_venue_ctx = {"id": venue_id, "sign": sign_text, "faction": faction}
-	var greet: Array = v.get("greet", ["..."])
+	var keeper: Node = door.get_meta("keeper") if door and door.has_meta("keeper") else null
+	if keeper != null and (not is_instance_valid(keeper) or keeper.state == "dead"):
+		keeper = null
+	_venue_ctx = {"id": venue_id, "sign": sign_text, "faction": faction, "keeper": keeper}
 	var title := "%s  //  %s" % [sign_text, v.get("name", "")]
+	var greet: Array = v.get("greet", ["..."])
+	var scene := Copy.expand(str(greet[_rng.randi() % greet.size()]), _rng).split("\n")[0]
+	if keeper == null and _keeper_dead(venue_id, sign_text):
+		_closed_shop(sign_text)
+		return
+	if keeper != null:
+		title = "%s  //  %s" % [sign_text, keeper.npc_name]
+		if keeper.state == "reporting":
+			keeper._talk_witness()
+			return
+		if keeper.is_banned():
+			present_counter(keeper, "keeper_banned", scene, "venue")
+			return
+		keeper.visits += 1
+		keeper.refresh_label()
+	var mult := float(keeper.price_mult()) if keeper else 1.0
+	var text := scene + "\n" + (_keeper_opening(keeper, venue_id) if keeper else Copy.expand("#%s_keeper#" % venue_id, _rng))
+	if keeper and absf(mult - 1.0) >= 0.03:
+		var why := "they like you" if mult < 1.0 else "they don't like you"
+		if keeper.is_scared():
+			why = "they're scared of you"
+		elif keeper.visits >= 3 and mult < 1.0:
+			why = "you're a regular"
+		text += "\n[color=#ffd23e]> Your prices here: %+d%% (%s)[/color]" % [roundi((mult - 1.0) * 100.0), why]
 	var choices := []
 	for o in v.get("options", []):
 		if not Saga.choice_ok(o) or (o.get("once", false) and _venue_used(venue_id, str(o.id))):
 			continue
-		var text := str(o.get("text", o.id))
-		var cost := int(o.get("cost", 0))
+		var t := str(o.get("text", o.id))
+		var base := int(o.get("cost", 0))
+		var cost := _venue_cost(o)
+		if base > 0 and cost != base:
+			t = t.replace("%d cr" % base, "%d cr" % cost).replace("bet %d" % base, "bet %d" % cost)
 		if o.has("chance"):
-			text += "  [%d%%]" % roundi(chance_of(o, null) * 100.0)
-		choices.append({"id": o.id, "text": text, "disabled": cost > 0 and not Game.can_afford(cost)})
+			t += "  [%d%%]" % roundi(chance_of(o, keeper) * 100.0)
+		choices.append({"id": o.id, "text": t, "disabled": cost > 0 and not Game.can_afford(cost)})
+	if keeper:
+		# Deal with the owner themself: haggle, charm, lean on them, pull rank...
+		var verbs_here := choices_for(keeper, "merchant").filter(func(c): return not c.get("disabled", false))
+		for c in verbs_here.slice(0, 3):
+			c["text"] = "(%s) %s" % [keeper.npc_name, c["text"]]
+			choices.append(c)
 	choices.append({"id": "leave", "text": "Leave"})
-	EventBus.dialogue_requested.emit(title, Copy.expand(str(greet[_rng.randi() % greet.size()]), _rng), choices, _on_venue_choice)
+	EventBus.dialogue_requested.emit(title, text, choices, _on_venue_choice)
+
+
+## What the owner says when you walk in: what they saw you do, how they feel, whether you're a regular.
+func _keeper_opening(keeper: Node, venue_id: String) -> String:
+	if not keeper.memories.is_empty() and _rng.randf() < 0.6:
+		return NPCVoice.recall(keeper, keeper.memories[0], _rng)
+	var sym := "keeper_greet_" + NPCVoice.mood(keeper)
+	if keeper.fan:
+		sym = "keeper_fan"
+	elif keeper.partner:
+		sym = "keeper_partner"
+	elif keeper.visits >= 3 and keeper.attitude >= 0:
+		sym = "keeper_regular"
+	elif NPCVoice.mood(keeper) == "neutral" and _rng.randf() < 0.5 and Copy.has(venue_id + "_keeper"):
+		return NPCVoice.say("#%s_keeper#" % venue_id, keeper, {}, _rng)  # already written as a scene line
+	return "\"%s\"" % NPCVoice.say("#%s#" % sym, keeper, {}, _rng)
+
+
+func _venue_cost(o: Dictionary) -> int:
+	var base := int(o.get("cost", 0))
+	var keeper = _venue_ctx.get("keeper")
+	if base <= 0 or keeper == null or not is_instance_valid(keeper):
+		return base
+	return maxi(1, roundi(base * float(keeper.price_mult())))
+
+
+func _keeper_dead(venue_id: String, sign_text: String) -> bool:
+	var store: Dictionary = Game.flags.get("keepers_" + Game.location_id, {})
+	return store.get("%s|%s" % [venue_id, sign_text], {}).get("dead", false)
+
+
+## The owner is gone: the shop is dark, and what you do with that says something about you.
+func _closed_shop(sign_text: String) -> void:
+	var store: Dictionary = Game.flags.get("keepers_" + Game.location_id, {})
+	var who := str(store.get("%s|%s" % [_venue_ctx.id, sign_text], {}).get("name", "the owner"))
+	var text := "The shutters of %s are half down. Nobody's behind the counter any more. Someone has left flowers and a photo of %s by the door." % [sign_text, who]
+	var choices := [{"id": "loot", "text": "Empty the till"}, {"id": "flowers", "text": "Leave something for the family (10 cr)", "disabled": not Game.can_afford(10)},
+		{"id": "leave", "text": "Leave"}]
+	EventBus.dialogue_requested.emit(sign_text, text, choices, _on_closed_choice)
+
+
+func _on_closed_choice(choice: String) -> void:
+	var p := get_tree().get_first_node_in_group("player") as Node3D
+	match choice:
+		"loot":
+			var cr := _rng.randi_range(30, 90)
+			Game.add_credits(cr)
+			Causality.record("theft", {"target": str(_venue_ctx.sign), "position": p.global_position if p else Vector3.ZERO})
+			EventBus.dialogue_requested.emit(str(_venue_ctx.sign), "The till sticks, then gives. %d credits. The photo by the door watches you.\n[color=#ffd23e]+%d credits[/color]" % [cr, cr], [], Callable())
+		"flowers":
+			if Game.spend(10):
+				NPCVoice.add_street_memory("charity")
+				Saga.axes["mercy"] = float(Saga.axes.get("mercy", 0.0)) + 0.5
+				EventBus.dialogue_requested.emit(str(_venue_ctx.sign), "You leave credits under the photo. Later, someone on the street says your name kindly.\n[color=#9adfff]> The street will remember this.[/color]", [], Callable())
 
 
 func _venue_used(venue_id: String, opt: String) -> bool:
@@ -610,6 +702,13 @@ func _venue_used(venue_id: String, opt: String) -> bool:
 func _on_venue_choice(choice: String) -> void:
 	if choice == "leave" or _venue_ctx.is_empty():
 		return
+	var keeper = _venue_ctx.get("keeper")
+	if keeper != null and not is_instance_valid(keeper):
+		keeper = null
+	if choice.begins_with("act:"):
+		if keeper:
+			resolve(keeper, choice.substr(4))
+		return
 	var vid: String = _venue_ctx.id
 	var v: Dictionary = DataDB.venues.get("venues", {}).get(vid, {})
 	var o: Dictionary = {}
@@ -618,14 +717,16 @@ func _on_venue_choice(choice: String) -> void:
 			o = x
 	if o.is_empty():
 		return
-	var cost := int(o.get("cost", 0))
+	var cost := _venue_cost(o)
 	if cost > 0 and not Game.spend(cost):
 		return
 	if o.get("once", false):
 		var used: Dictionary = Game.flags.get("venue_once", {})
 		used["%s:%s:%s" % [Game.location_id, vid, choice]] = true
 		Game.flags["venue_once"] = used
-	var success := _rng.randf() < chance_of(o, null)
+	var success := _rng.randf() < chance_of(o, keeper)
+	if force_outcome != null and o.has("fail"):
+		success = bool(force_outcome)
 	var r: Dictionary = o.get("success" if success else "fail", o.get("success", {}))
 	var text := Saga.fill(str(r.get("text", "...")))
 	var lines := Encounters.apply_effects(r.get("effects", {}))
@@ -654,10 +755,48 @@ func _on_venue_choice(choice: String) -> void:
 		text += "\n[color=#7dff4a]Progress saved.[/color]"
 	EventBus.interaction_done.emit("venue:" + vid + ":" + choice, success, null)
 	if r.has("shop"):
-		Game.shop_discount = 0.0
+		Game.shop_discount = (1.0 - float(keeper.price_mult())) if keeper else 0.0
 		EventBus.shop_requested.emit(str(_venue_ctx.sign), str(_venue_ctx.faction), r.shop)
 		return
+	if keeper and keeper.state != "dead":
+		_keeper_reacts(keeper, vid, choice, success, text)
+		return
 	EventBus.dialogue_requested.emit(str(_venue_ctx.sign), text, [], Callable())
+
+
+## The owner was watching: their mood, prices, memory and next move all follow from what you just did.
+func _keeper_reacts(keeper: Node, vid: String, choice: String, success: bool, text: String) -> void:
+	var rx := NPCVoice.reactions()
+	var kind := str(rx.get("venue_option_kind", {}).get("%s:%s" % [vid, choice], "deal"))
+	var ok := "ok" if success else "fail"
+	var before_rel: String = keeper.relation_label()
+	var before_att: int = int(keeper.attitude)
+	var row: Dictionary = rx.get("keeper", {}).get(kind, {})
+	keeper.attitude = clampi(int(keeper.attitude) + int(row.get(ok + "_attitude", 0)), -100, 100)
+	keeper.witness_act(kind, "me", keeper)
+	var impact: Array[String] = []
+	var react_kind := str(row.get(ok, ""))
+	if react_kind != "":
+		var r := str(keeper.react(react_kind))
+		if r != "":
+			impact.append(r)
+	var after := NPCVoice.say("#after_%s_%s#" % [kind, ok], keeper, {}, _rng) if Copy.has("after_%s_%s" % [kind, ok]) else ""
+	if after != "":
+		text += "\n\"%s\"" % after
+	var change := str(keeper.after_interaction(before_rel, before_att))
+	if change != "":
+		impact.append(change)
+	var mult := float(keeper.price_mult())
+	if absf(mult - 1.0) >= 0.03:
+		impact.append("Your prices at %s: %+d%%" % [str(_venue_ctx.sign), roundi((mult - 1.0) * 100.0)])
+	if not impact.is_empty():
+		text += "\n\n" + _impact_block(impact)
+	var key := "keeper_%s_%s" % [kind, ok]
+	if present_counter(keeper, key, text, "venue"):
+		return
+	if present_counter(keeper, "%s_%s" % [kind, ok], text):
+		return
+	EventBus.dialogue_requested.emit(keeper.npc_name, text, [], Callable())
 
 
 ## Cryptic but true: hints about where the story goes and how it could end.
