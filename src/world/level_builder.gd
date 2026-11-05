@@ -365,6 +365,8 @@ func _build_floor_collision() -> void:
 # --- Walls ------------------------------------------------------------------------------------
 
 func _wall_is_low(x: int, z: int) -> bool:
+	if outdoor and (z >= height - 1 or cell(x, z - 1) == "~"):
+		return true  # the southern rim and banks never block the camera's view
 	return walkable(x, z - 1)
 
 
@@ -394,6 +396,11 @@ func _wall_run(x0: int, x1: int, z: int, low: bool) -> void:
 	if outdoor and not low:
 		h = WALL_H + rng.randf_range(-0.6, 1.2)
 	add_mesh(root, box(Vector3(length, h, TILE)), _mats["wall"], Vector3(cx, h * 0.5, cz))
+	if outdoor and not low:
+		# Plateau cap: moss / sand / crystal dust on top so cliffs aren't black slabs from above.
+		if not _mats.has("cliff_cap"):
+			_mats["cliff_cap"] = _textured(str(palette.get("ground_tex", "ground_rock")), pcolor("ground_alt", "#556070").lightened(0.15), 0.5, 0.9, 0.0, 1.4)
+		add_mesh(root, box(Vector3(length + 0.06, 0.12, TILE + 0.06)), _mats["cliff_cap"], Vector3(cx, h + 0.05, cz), 0.0, false)
 	# Collision is always full height so low walls still block movement.
 	add_box_collider(_walls_body, Vector3(length, WALL_H, TILE), Vector3(cx, WALL_H * 0.5, cz))
 	var faces_room := walkable(x0, z + 1) or walkable(x1, z + 1)
