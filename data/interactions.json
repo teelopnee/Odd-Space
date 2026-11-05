@@ -2219,6 +2219,755 @@
 					"attitude": -2
 				}
 			}
+		},
+		"one_on_one": {
+			"text": "Run a quick one-on-one with them",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"middle_manager"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"You ask about their goals. They cry a little. \"Nobody's ever asked. #after_talk_ok#\"",
+					"\"Strengths? Surviving. Weaknesses? Also surviving.\" You give them 'exceeds expectations'. They glow.",
+					"Ten minutes, one action item, zero layoffs. \"Best meeting I've ever had.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true
+				}
+			},
+			"chance": 0.65,
+			"chance_mods": {
+				"npc:worker": 0.15,
+				"npc:corporate": 0.1,
+				"npc:rebel": -0.3
+			},
+			"fail": {
+				"lines": [
+					"\"Is this a performance review? Am I being let go from the street?\"",
+					"\"Let's circle back. Never.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"gig_hacks": {
+			"text": "Swap gig-app hacks",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"gig_worker"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Accept, decline, accept - the algorithm thinks you're desperate and pays more.\" You trade a trick back. Both of you earn.",
+					"\"Never rate the customer below four. They rate you back.\" Solid. You split a surge bonus.",
+					"They show you a dead zone where the delivery app can't track tips. Free money. Sort of."
+				],
+				"effects": {
+					"credits": 15,
+					"attitude": 8
+				}
+			},
+			"chance": 0.7,
+			"chance_mods": {
+				"npc:worker": 0.2,
+				"npc:poor": 0.1,
+				"npc:corporate": -0.4
+			},
+			"fail": {
+				"lines": [
+					"\"My hacks are my pension. Get your own.\""
+				],
+				"effects": {}
+			}
+		},
+		"commiserate": {
+			"text": "Commiserate about the bills",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"working_poor",
+					"indebted"
+				],
+				"npc_trait": [
+					"poor",
+					"worker",
+					"rebel"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"You compare air bills. Theirs is worse. You both laugh until you cough. \"Same time next week?\"",
+					"\"#thing.cap# went up again.\" \"Mine too.\" A whole friendship, built on invoices.",
+					"They share a trick: breathe in the stairwell, it's billed at the residential rate."
+				],
+				"effects": {
+					"attitude": 12,
+					"rumor": true
+				}
+			}
+		},
+		"what_year": {
+			"text": "Ask what year it is (again)",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"cryo_debtor"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"It's the same year it was yesterday, friend. Cryo-brain?\" They explain #absurd_policy_lower# like it's normal. It is now.",
+					"They tell you the year. You do the maths. Your debt is older than they are.",
+					"\"You slept through #small_num# price hikes. Lucky.\""
+				],
+				"effects": {
+					"attitude": 6,
+					"rumor": true
+				}
+			}
+		},
+		"audit_contract": {
+			"text": "Audit their debt contract",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"ex_auditor"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Page #small_num#, clause 9: illegal. You circle it. They stare at you like you just handed them a planet.",
+					"\"You found WHAT in the small print?\" Halcyon owes THEM #small_num# credits. Technically. Legally. Hilariously.",
+					"You explain compound interest. They sit down on the kerb. Then they get angry. Good angry."
+				],
+				"effects": {
+					"attitude": 18,
+					"followers": 1
+				}
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:poor": 0.15,
+				"npc:corporate": -0.5
+			},
+			"fail": {
+				"lines": [
+					"The contract is a 400-page hologram that refuses to scroll."
+				],
+				"effects": {}
+			}
+		},
+		"show_crystal": {
+			"text": "Show them a real asteroid crystal",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"asteroid_miner"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"It catches the neon and throws it everywhere. \"Is that... real? Nothing here is real.\"",
+					"\"From the belt? You dug that out yourself?\" They hold it like a baby. They give it back. Barely.",
+					"A crowd of three forms. Then six. Rocks are rare when everything is plastic."
+				],
+				"effects": {
+					"attitude": 10,
+					"fame": 1
+				}
+			}
+		},
+		"ask_my_face": {
+			"text": "Ask if they've seen your face before",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"clone_reject"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Your face? Yeah - on a #brand# ad. Different hair. Happier.\"",
+					"\"There's a guy at the paste plant with your face. He's nicer.\"",
+					"They squint. \"#num# of you came through last month. You're the only one who asked.\""
+				],
+				"effects": {
+					"attitude": 5,
+					"rumor": true
+				}
+			}
+		},
+		"paste_truth": {
+			"text": "Tell them what's really in the paste",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"paste_worker"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"You tell them. They look at their lunch. They put down their lunch. \"...Thank you. I think.\"",
+					"\"Batch 88? THE Batch 88?\" Word will spread by dinner. If anyone still eats dinner.",
+					"You keep it vague. 'Protein.' 'Mostly.' 'Ethically sourced, legally speaking.' They get the idea."
+				],
+				"effects": {
+					"attitude": 8,
+					"fame": 1
+				}
+			},
+			"chance": 0.75,
+			"chance_mods": {
+				"npc:corporate": -0.5
+			},
+			"fail": {
+				"lines": [
+					"\"I don't want to know. I'm on a payment plan for my stomach.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_debt": {
+			"text": "Ask about cash-in-hand work",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "debt"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Unloading air trucks at #time#. No questions. No breaks. No lungs left after.\" You get a tip-off and a taste of pay.",
+					"\"Paste plant needs tasters. #small_num# credits a spoon.\" You do one shift on the spot.",
+					"They pay you to stand in their queue. An hour of standing: honest money."
+				],
+				"effects": {
+					"credits": 20
+				}
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_revolution": {
+			"text": "Recruit them for the cause",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "revolution"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Burn the Consortium? ...I've got matches. And a cousin with more matches.\"",
+					"They look at the nearest billboard for a long time. \"Count me in. Quietly.\"",
+					"\"Finally. I've been waiting for someone to say it out loud.\""
+				],
+				"effects": {
+					"followers": 1,
+					"attitude": 8
+				}
+			},
+			"chance": 0.45,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_fame": {
+			"text": "Ask them to film you",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "fame"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"They film. You perform. #small_num# views in a minute. \"You're going to be huge!\"",
+					"\"Say something quotable!\" You do. It's already a sticker by tonight.",
+					"The clip goes round the block before you've finished talking."
+				],
+				"effects": {
+					"fame": 2
+				}
+			},
+			"chance": 0.65,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_tycoon": {
+			"text": "Ask what they'd want from the owner of a planet",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "tycoon"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Free air. A window. A day off. In that order.\" You take notes. Real notes.",
+					"\"A planet where the ads ask permission.\" They're smiling. \"You'd do that?\"",
+					"\"Honestly? Just don't bill us for the sky.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true
+				}
+			}
+		},
+		"goal_revenge": {
+			"text": "Ask about the one you're hunting",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "revenge"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"They go quiet. Then they tell you everything they know.",
+					"\"Revenge, huh? Good. Somebody should.\" They lower their voice.",
+					"\"I didn't tell you this.\""
+				],
+				"effects": {
+					"rumor": true,
+					"rumor2": true
+				}
+			},
+			"chance": 0.7,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_cure": {
+			"text": "Ask about clinics and miracle cures",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "cure"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"The clinic on the corner waters down the good stuff. Ask for the back room.\" They press a blister pack into your hand.",
+					"\"My aunt swore by a fortune teller's tonic. My aunt also died.\" Still, they give you something for the pain.",
+					"\"Real medicine? On {planet}?\" But they know a guy. They always know a guy."
+				],
+				"effects": {
+					"items": {
+						"painkillers": 1
+					},
+					"attitude": 5
+				}
+			},
+			"chance": 0.55,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_family": {
+			"text": "Ask them to pass a message home",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "family"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"My cousin flies the freight run. Your message will get there.\" Something in your chest loosens.",
+					"They promise. You believe them. That's rare here.",
+					"\"Family first. Always.\" They write it on their hand."
+				],
+				"effects": {
+					"hp": 10,
+					"attitude": 6
+				}
+			}
+		},
+		"goal_ceo": {
+			"text": "Pitch them your business plan",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "ceo"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Thirty seconds, four buzzwords, one dream. \"I'd invest. If I had credits. Or a future.\"",
+					"\"Disrupt the air market? Ha!\" But they're listening. \"...Go on.\"",
+					"They ask for a job. You've got your first employee. Unpaid. Like a real CEO."
+				],
+				"effects": {
+					"attitude": 8,
+					"followers": 1
+				}
+			},
+			"chance": 0.5,
+			"chance_mods": {
+				"attitude": 0.004,
+				"npc:rebel": 0.1
+			},
+			"fail": {
+				"lines": [
+					"\"Not my business. Not yours either.\"",
+					"They shrug. \"Ask someone braver.\""
+				],
+				"effects": {}
+			}
+		},
+		"goal_escape": {
+			"text": "Ask about ships leaving {planet}",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "escape"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Freighters leave from the east docks at #time#. Stowaways ride free. Mostly.\"",
+					"\"Everybody wants out. Nobody gets out.\" But they tell you about a smuggler with a soft heart.",
+					"They point at the sky. \"That light? That's the way out. Follow the debt freighters.\""
+				],
+				"effects": {
+					"rumor": true
+				}
+			}
+		},
+		"goal_redemption": {
+			"text": "Do them a small kindness, no strings ({cost} cr)",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "redemption"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"You fix a strap, carry a bag, listen to a story. Small things. They remember small things.",
+					"You pay their noodle tab and walk away before they can thank you.",
+					"\"Why?\" Because. They don't get it. They'll remember it."
+				],
+				"effects": {
+					"attitude": 15
+				}
+			},
+			"verb": "charity",
+			"cost": 5
+		},
+		"alias_name": {
+			"text": "Give them your other name",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "has_alias"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Nice to meet you, uh... that.\" When Paragon asks, they'll describe someone else entirely.",
+					"Your other name rolls off your tongue like you were born with it. They'll never connect the two.",
+					"\"Funny, you don't look like a {name}.\" Exactly."
+				],
+				"effects": {
+					"witness_slow": 0.2,
+					"attitude": 3
+				}
+			}
+		},
+		"real_air": {
+			"text": "Ask where to breathe something real",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"synth_air_allergy"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Rooftop garden behind the karaoke place. Real plants. Real-ish air.\" Your sinuses weep with joy.",
+					"\"Stand by the hydroponics vent at #time#. Smells like rain did when I was a kid.\"",
+					"They hand you a hanky that smells of actual grass. You don't ask."
+				],
+				"effects": {
+					"hp": 8,
+					"attitude": 5
+				}
+			}
+		},
+		"tall_tale": {
+			"text": "Tell them an outrageous lie",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "liar"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"You tell them you once sold air back to OxyGenix. They believe every word. Half of it was even true.",
+					"Your story has a hijacked billboard, a duck and a duel. By the end they're cheering.",
+					"\"No WAY.\" Yes way. Well, no. But they'll tell it for years."
+				],
+				"effects": {
+					"attitude": 10,
+					"fame": 1
+				}
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:weird": 0.2,
+				"npc:corporate": -0.2
+			},
+			"fail": {
+				"lines": [
+					"\"Sure. And I'm the CEO of Lumen.\"",
+					"They've heard better lies from the billboards."
+				],
+				"effects": {
+					"attitude": -8
+				}
+			}
+		},
+		"sleeper_phrase": {
+			"text": "Recite the phrase that isn't yours",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "sleeper"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Their pupils go wide. They answer with the second half of the phrase. Neither of you knows who taught it to you.",
+					"\"...The paste is warm in winter.\" They answer: \"And colder in the vats.\" You both pretend that didn't happen. They'll protect you now."
+				],
+				"effects": {
+					"npc": "informant"
+				}
+			},
+			"chance": 0.15,
+			"chance_mods": {},
+			"fail": {
+				"lines": [
+					"They stare at you. \"Are you... okay?\"",
+					"\"Is that a jingle? I don't know that jingle.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"give_back": {
+			"text": "Give back the thing you 'found' in their pocket",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "klepto"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"My lucky charm! Where did you - you know what, I don't want to know. Thank you!\"",
+					"You hand back a lighter, a ration card and a photo. They didn't notice it was gone. They do notice it's back.",
+					"\"Huh. You're the most honest thief I've ever met.\""
+				],
+				"effects": {
+					"attitude": 15
+				}
+			}
+		},
+		"bloodline": {
+			"text": "Let your bloodline show",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "bloodline"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Something in the way you stand. They bow before they know why.",
+					"\"You're... related to somebody, aren't you? Somebody up there.\" They won't breathe a word.",
+					"Old blood has a voice. Yours speaks. They listen."
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": 5
+				}
+			},
+			"chance": 0.55,
+			"chance_mods": {
+				"npc:corporate": 0.2,
+				"npc:rebel": -0.3
+			},
+			"fail": {
+				"lines": [
+					"They squint. \"Nope. You're nobody. Same as me.\""
+				],
+				"effects": {}
+			}
+		},
+		"ask_the_dead": {
+			"text": "Ask if the dead ever leave them alone",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "killer"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"My dad visits in dreams. Still asks about his debt.\" You both stand in the quiet for a moment.",
+					"\"They don't. You learn to set a place for them.\" They don't ask who yours are.",
+					"\"On {planet}? The dead get billed too. They leave eventually.\""
+				],
+				"effects": {
+					"attitude": 6,
+					"rumor": true
+				}
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:weird": 0.3,
+				"npc:corporate": -0.3
+			},
+			"fail": {
+				"lines": [
+					"\"What kind of question is that?\" They back away."
+				],
+				"effects": {
+					"attitude": -8
+				}
+			}
+		},
+		"borrow_life": {
+			"text": "Borrow a few details of their life",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "identity_thief"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Birthday, first pet, mother's maiden name. All in casual chat. Your next identity is getting richer.",
+					"They tell you everything a security question would ask. You smile. You remember."
+				],
+				"effects": {
+					"credits": 12
+				}
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:corporate": -0.3
+			},
+			"fail": {
+				"lines": [
+					"\"Why do you want to know my first pet's name?\" They know that trick."
+				],
+				"effects": {
+					"attitude": -10
+				}
+			},
+			"verb": "theft",
+			"record_on": "fail"
 		}
 	},
 	"npc": {

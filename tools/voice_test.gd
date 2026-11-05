@@ -79,4 +79,20 @@ func _run() -> void:
 	print("  afterword: ", _voice.afterword(a, "give_credits", true, rng))
 	print("  afterword: ", _voice.afterword(a, "threaten", false, rng))
 	root.get_node("Interactions").resolve(a, "explain_yourself")
+	# Every verb once (requirements ignored) so no outcome line or effect can crash at runtime.
+	var inter = root.get_node("Interactions")
+	root.get_node("Game").credits = 99999
+	var texts: Array = []
+	root.get_node("EventBus").dialogue_requested.connect(func(_s, t, _c, _cb): texts.append(t))
+	var n := 0
+	for id in inter.verbs():
+		var who = npcs[n % npcs.size()]
+		if is_instance_valid(who):
+			inter.resolve(who, id)
+		n += 1
+	print("resolved %d verbs" % n)
+	var re := RegEx.create_from_string("\\{[a-z_]+\\}|#[a-z_]+#")
+	for t in texts:
+		if re.search(str(t)):
+			print("  UNFILLED: ", str(t).replace("\n", " | "))
 	print("\nVOICE TEST DONE")
