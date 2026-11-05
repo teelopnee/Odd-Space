@@ -12,7 +12,8 @@
 | | |
 |---|---|
 | ![Intro](docs/screenshots/intro.jpg) | ![Combat](docs/screenshots/combat.jpg) |
-| ![Swamp](docs/screenshots/planet_swamp.jpg) | ![Desert](docs/screenshots/planet_desert.jpg) |
+| ![Neon city](docs/screenshots/planet_city.jpg) | ![Swamp](docs/screenshots/planet_swamp.jpg) |
+| ![Desert](docs/screenshots/planet_desert.jpg) | ![Canyon](docs/screenshots/planet_canyon.jpg) |
 | ![Character creation](docs/screenshots/character_creation.jpg) | ![Landing](docs/screenshots/planet_landing.jpg) |
 
 ---
