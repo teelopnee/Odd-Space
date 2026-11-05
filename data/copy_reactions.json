@@ -573,6 +573,81 @@
 			"For what you did before. Don't argue.",
 			"Here. It's not much, but it's yours.",
 			"You helped me. Now I help you. That's how it should work."
+		],
+		"robbed_notice": [
+			"Wait. Where's my... MY WALLET!",
+			"Huh? My pockets - they're EMPTY!",
+			"Someone took my credits! SOMEONE TOOK MY CREDITS!",
+			"No no no - my ration card! Gone!",
+			"I've been robbed! On #day#! Who robs on #day#?",
+			"My pocket's lighter. Why is my pocket lighter?"
+		],
+		"robbed_accuse": [
+			"YOU! You were standing right next to me!",
+			"It was you, wasn't it, {name}?",
+			"Thief! That one! THAT ONE!",
+			"I knew you were too friendly.",
+			"Everyone! That's the pickpocket!"
+		],
+		"fan_bark": [
+			"{name}! I LOVE YOU!",
+			"That's {name}! I know them! Sort of!",
+			"Go, {name}!",
+			"Everyone look! It's {name}!",
+			"Still telling everyone about you, {name}!",
+			"Can't wait to see what you do next!",
+			"#judge_approve#"
+		],
+		"heckle_bark": [
+			"Oh look, it's the one who flopped earlier!",
+			"Hey! Do the thing again! The bad thing!",
+			"There goes {planet}'s worst performer!",
+			"Hey {name}! Tough crowd, huh?",
+			"I've seen better from a vending machine.",
+			"Boo! Still boo!"
+		],
+		"heckle_laugh": [
+			"Ha!",
+			"Oof. Harsh.",
+			"Heh. True though.",
+			"Stop, I can't breathe. And breathing's expensive.",
+			"Savage."
+		],
+		"cold_bark": [
+			"Hmph.",
+			"We're done talking.",
+			"Not you again.",
+			"...",
+			"Go bother someone else."
+		],
+		"spooked_bark": [
+			"Stay back, weirdo!",
+			"Don't do the thing!",
+			"I'm not looking at you. I'm NOT looking.",
+			"Keep that energy away from me!"
+		],
+		"intrigued_bark": [
+			"So where are you from? Really from?",
+			"Is it true what they say about you?",
+			"Can you teach me that?",
+			"What's your secret?",
+			"How old are you, really?",
+			"Do you have a ship? You have a ship, don't you?",
+			"What's it like out there? Off-world?",
+			"Why {planet}? Nobody comes to {planet}."
+		],
+		"smitten_bark": [
+			"You've got really nice... posture.",
+			"So. Hi. Again.",
+			"I'm not following you. We're just going the same way.",
+			"Do you like noodles? I like noodles.",
+			"*nervous laughter*",
+			"Wow. Okay. Hi."
+		],
+		"intrigued_bye": [
+			"Okay, I've got to go. But listen - one thing.",
+			"Thanks for not being boring. Here's something for you.",
+			"You're the most interesting thing on {planet}. Take this tip."
 		]
 	}
 }

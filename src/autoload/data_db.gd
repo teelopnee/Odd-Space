@@ -19,6 +19,7 @@ var items: Dictionary = {}
 var interactions: Dictionary = {}
 var stories: Dictionary = {}
 var venues: Dictionary = {}
+var counters: Dictionary = {}  ## NPC counter-moves + approaches (data/counters.json)
 
 
 func _ready() -> void:
@@ -40,6 +41,7 @@ func reload() -> void:
 	interactions = _load("interactions.json")
 	stories = _load("stories.json")
 	venues = _load("venues.json")
+	counters = _load("counters.json")
 
 
 func faction_ids() -> Array:

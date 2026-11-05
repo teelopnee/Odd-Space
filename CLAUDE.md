@@ -63,6 +63,14 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   other witnessed acts become public at once. `WitnessComponent.can_see` (memory) vs `can_witness` (will report).
   A silenced witness MUST go back to normal life (`on_report_finished`) - it used to stay "reporting" forever.
   Test: `tools/impact_test.gd` (exit code = failures).
+- NPCs always answer back: after every verb `Interactions.present_counter` shows a counter-move from `data/counters.json`
+  (`counters.<kind>_<ok|fail>`, `served` after the family lawyer) with choices (reply / effects / chance / cost / verb).
+  Outcomes with no `react` get `reactions.json` `default_react[kind]` (talk->warm/cold, charity->grateful, threat->scared/grudge,
+  theft->robbed (they notice later and may accuse you), show->fan/heckler, beg->pity, deal->partner, weird->intrigued/spooked).
+  NPCs also come to YOU (`NPC._schedule_approach` -> state "approach" -> `counters.approach.<kind>`: thanks, pity, partner,
+  fan, confront (before a grudge becomes a complaint), smitten); "follow" state for crushes / curious people. One approach
+  per 25 s, never in combat or over an open dialogue. `Interactions.force_outcome` forces rolls for tests.
+  Test: `tools/interact_back_test.gd` (every verb x outcome answers back + changes something; every counter choice played).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

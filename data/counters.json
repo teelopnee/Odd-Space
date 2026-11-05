@@ -1,0 +1,2442 @@
+{
+	"_doc": "NPCs answer back. counters.<kind>_<ok|fail>: shown after every interaction verb of that kind (data/reactions.json verb_kind); approach.<kind>: when an NPC walks up to you (thanks, pity, partner, fan, confront, smitten). Each template: ask (alternatives, copy grammar ok), choices [{text, reply, effects, chance?, chance_mods?, fail_reply?, fail_effects?, cost?, verb?}], optional leave/leave_effects. Extra effects: react, grudge now|clear, owes, unrob, unspook.",
+	"counters": {
+		"charity_ok": [
+			{
+				"ask": [
+					"\"Why are you helping me? Nobody helps anybody on {planet}.\"",
+					"\"What's the catch? There's always a catch.\"",
+					"\"I... don't know what to say. Why me?\"",
+					"\"Is this a Lumen prank? Where's the camera?\""
+				],
+				"choices": [
+					{
+						"text": "\"Because I can.\"",
+						"reply": [
+							"\"Because you can.\" They say it like a prayer. #after_charity_ok#",
+							"They laugh, then stop laughing. \"Nobody's ever said that to me.\""
+						],
+						"effects": {
+							"attitude": 8,
+							"fame": 1
+						}
+					},
+					{
+						"text": "\"I want something in return.\"",
+						"reply": [
+							"\"Of course you do.\" But they tell you what they know anyway.",
+							"\"Knew it.\" They sigh, and talk."
+						],
+						"effects": {
+							"attitude": -6,
+							"rumor": true
+						}
+					},
+					{
+						"text": "\"Pay it forward.\"",
+						"reply": [
+							"They look at the next person in the queue. Then they buy them a noodle. It's spreading.",
+							"\"Pay it forward... yeah. Yeah, I can do that.\""
+						],
+						"effects": {
+							"attitude": 10,
+							"followers": 1
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Let me give you something back. I haven't got much, but...\"",
+					"\"Wait! Take this. I insist. It's all I've got.\""
+				],
+				"choices": [
+					{
+						"text": "Take it",
+						"reply": [
+							"They press a ration into your hand. It's warm. It's the good kind.",
+							"A crumpled ration bar and a grin. \"Don't tell my landlord.\""
+						],
+						"effects": {
+							"items": {
+								"paste_ration": 1
+							},
+							"attitude": 3
+						}
+					},
+					{
+						"text": "\"Keep it. You need it more.\"",
+						"reply": [
+							"Their eyes go wet. \"I won't forget you. I mean it.\"",
+							"\"You're impossible.\" They're smiling."
+						],
+						"effects": {
+							"attitude": 12,
+							"owes": true
+						}
+					},
+					{
+						"text": "\"Tell me a secret instead.\"",
+						"reply": [
+							"They lean in close.",
+							"\"A secret? Okay. But you didn't hear it from me.\""
+						],
+						"effects": {
+							"rumor": true,
+							"rumor2": true
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"My #kin# is going to eat tonight because of you.\"",
+					"\"You don't know what this means. My #kin# has been sick for weeks.\""
+				],
+				"choices": [
+					{
+						"text": "Meet the family",
+						"reply": [
+							"A tiny flat, six people, one window. They feed you first. You don't argue."
+						],
+						"effects": {
+							"attitude": 10,
+							"hp": 5,
+							"rumor": true
+						}
+					},
+					{
+						"text": "Ask what else they need",
+						"reply": [
+							"\"Honestly? {need}.\" They say it like a confession."
+						],
+						"effects": {
+							"attitude": 5,
+							"need_hint": true
+						}
+					},
+					{
+						"text": "\"Don't mention it. Really.\"",
+						"reply": [
+							"\"I'm going to mention it to EVERYONE.\""
+						],
+						"effects": {
+							"attitude": 6,
+							"fame": 1
+						}
+					}
+				]
+			}
+		],
+		"charity_fail": [
+			{
+				"ask": [
+					"\"I don't need your pity.\"",
+					"\"Keep it. I've got my pride, even if I haven't got lungs.\"",
+					"\"Charity from someone like YOU? No thanks.\""
+				],
+				"choices": [
+					{
+						"text": "Insist, gently",
+						"reply": [
+							"\"...Fine. Thank you. Don't make it weird.\""
+						],
+						"effects": {
+							"attitude": 10,
+							"react": "grateful"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:charming": 0.2,
+							"flag:honest": 0.15
+						},
+						"fail_reply": [
+							"\"I said no.\" They mean it."
+						],
+						"fail_effects": {
+							"attitude": -5
+						}
+					},
+					{
+						"text": "\"I respect that.\"",
+						"reply": [
+							"They nod. Something in their face softens. \"You're alright.\""
+						],
+						"effects": {
+							"attitude": 6
+						}
+					},
+					{
+						"text": "\"Suit yourself.\"",
+						"reply": [
+							"\"I will.\""
+						],
+						"effects": {
+							"attitude": -3
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Is this a Halcyon trick? Charity now, interest later?\"",
+					"\"Nothing's free. What's the contract?\""
+				],
+				"choices": [
+					{
+						"text": "Show them there's no contract",
+						"reply": [
+							"They check your hands, your sleeves, your eyes. \"...Huh. Okay. Thank you.\""
+						],
+						"effects": {
+							"attitude": 12,
+							"react": "grateful"
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"flag:honest": 0.25
+						},
+						"fail_reply": [
+							"\"That's exactly what a contract would say.\""
+						],
+						"fail_effects": {
+							"attitude": -4
+						}
+					},
+					{
+						"text": "\"Fine. Interest later.\"",
+						"reply": [
+							"\"I KNEW it.\""
+						],
+						"effects": {
+							"attitude": -6
+						}
+					},
+					{
+						"text": "Leave it on the kerb and walk away",
+						"reply": [
+							"You don't look back. When you do, it's gone - and so is their frown."
+						],
+						"effects": {
+							"attitude": 8
+						}
+					}
+				]
+			}
+		],
+		"threat_ok": [
+			{
+				"ask": [
+					"\"Okay! Okay! Take my credits, just leave me alone!\"",
+					"\"Please - I've got #kin.a#. Here, take this.\"",
+					"\"Whatever you want. Just - please.\""
+				],
+				"choices": [
+					{
+						"text": "Take the money",
+						"reply": [
+							"They empty their pockets. Not much. Everything they have.",
+							"A handful of crumpled credits, trembling."
+						],
+						"effects": {
+							"credits": 15,
+							"attitude": -10
+						}
+					},
+					{
+						"text": "Let them keep it",
+						"reply": [
+							"They stare. Then nod, very slowly. \"...Thank you.\"",
+							"\"You're... letting me go?\" They don't wait to find out."
+						],
+						"effects": {
+							"attitude": 18,
+							"forget": [
+								"threat"
+							]
+						}
+					},
+					{
+						"text": "Make an example of them",
+						"reply": [
+							"You make sure the whole street hears it. Nobody on this block will cross you now.",
+							"Loud. Public. Effective. People look at the ground when you pass."
+						],
+						"effects": {
+							"attitude": -15,
+							"fame": 1,
+							"witness_slow": 0.15
+						},
+						"verb": "intimidate"
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"What do you WANT from me?\"",
+					"\"I'll do anything. What do you need?\""
+				],
+				"choices": [
+					{
+						"text": "Information",
+						"reply": [
+							"They talk fast. Very fast.",
+							"Everything they know comes tumbling out."
+						],
+						"effects": {
+							"rumor": true,
+							"rumor2": true,
+							"attitude": -5
+						}
+					},
+					{
+						"text": "Your silence",
+						"reply": [
+							"\"I never saw you. I don't even know what you look like.\""
+						],
+						"effects": {
+							"npc": "silenced"
+						}
+					},
+					{
+						"text": "\"Just remember my face.\"",
+						"reply": [
+							"\"I will. I'll see it in my sleep.\""
+						],
+						"effects": {
+							"fame": 1
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Wait! I can be useful. I know things. I know PEOPLE.\"",
+					"\"Don't! I can help you! Anything you need on {planet}!\""
+				],
+				"choices": [
+					{
+						"text": "Make them your informant",
+						"reply": [
+							"\"Eyes and ears. Yours. Whatever you say.\""
+						],
+						"effects": {
+							"npc": "informant"
+						}
+					},
+					{
+						"text": "\"Then start talking.\"",
+						"reply": [
+							"Names, places, prices. They don't stop for breath."
+						],
+						"effects": {
+							"rumor": true,
+							"rumor2": true
+						}
+					},
+					{
+						"text": "\"I don't need you.\"",
+						"reply": [
+							"They scramble away and don't look back."
+						],
+						"effects": {
+							"react": "scared"
+						}
+					}
+				]
+			}
+		],
+		"threat_fail": [
+			{
+				"ask": [
+					"\"You think you scare me? I've been threatened by #faction#. Try harder.\"",
+					"\"Go on then. Do something.\"",
+					"\"Ha! Is that your scary voice?\""
+				],
+				"choices": [
+					{
+						"text": "Back down",
+						"reply": [
+							"You step back. They smirk. The street saw.",
+							"\"Thought so.\" Somebody whistles."
+						],
+						"effects": {
+							"attitude": 5,
+							"react": "heckler"
+						}
+					},
+					{
+						"text": "Throw a punch",
+						"reply": [
+							"One hit. They go down. Nobody's laughing now."
+						],
+						"effects": {
+							"attitude": -20,
+							"react": "scared",
+							"hp": -4
+						},
+						"chance": 0.55,
+						"chance_mods": {
+							"flag:hothead": 0.15,
+							"flag:bouncer": 0.25,
+							"age:elder": -0.2
+						},
+						"fail_reply": [
+							"They duck. You don't. Your jaw files a complaint."
+						],
+						"fail_effects": {
+							"hp": -12,
+							"attitude": -10,
+							"grudge": "now"
+						},
+						"verb": "assault"
+					},
+					{
+						"text": "Laugh it off",
+						"reply": [
+							"You laugh. They laugh. Somehow you're friends now?",
+							"\"Okay, okay - you're funny.\" The tension pops like a paste bubble."
+						],
+						"effects": {
+							"attitude": 15
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:charming": 0.25,
+							"flag:joker": 0.25
+						},
+						"fail_reply": [
+							"They don't laugh. Not even a little."
+						],
+						"fail_effects": {
+							"attitude": -8,
+							"grudge": "now"
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Hey! HEY! Everyone, this one's threatening me!\"",
+					"\"You hear that, people? We've got a tough guy!\""
+				],
+				"choices": [
+					{
+						"text": "Stand your ground",
+						"reply": [
+							"You don't flinch. The crowd decides you're not worth it. They go quiet."
+						],
+						"effects": {
+							"fame": 1,
+							"react": "scared"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:ruthless": 0.2,
+							"flag:bouncer": 0.2
+						},
+						"fail_reply": [
+							"The crowd laughs. At you. Loudly."
+						],
+						"fail_effects": {
+							"react": "heckler",
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Walk it back",
+						"reply": [
+							"\"Okay, okay, misunderstanding.\" The crowd groans, disappointed."
+						],
+						"effects": {
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Pay the crowd to scatter ({cost} cr)",
+						"reply": [
+							"Credits in the air. The crowd scatters. So does your reputation for being cheap."
+						],
+						"effects": {
+							"npc": "silenced",
+							"witness_slow": 0.15
+						},
+						"cost": 20
+					}
+				]
+			}
+		],
+		"theft_ok": [
+			{
+				"ask": [
+					"\"...Why are you standing so close?\"",
+					"\"Is something wrong? You're smiling funny.\"",
+					"\"Did you need something?\""
+				],
+				"choices": [
+					{
+						"text": "\"Nothing. Nice coat.\"",
+						"reply": [
+							"\"Oh! Thanks. It's rented.\" They have no idea."
+						],
+						"effects": {
+							"attitude": 3
+						}
+					},
+					{
+						"text": "Slip it back into their pocket",
+						"reply": [
+							"Back where it belongs. They'll never know how close it was.",
+							"A quick hand, a pat on the shoulder. Returned."
+						],
+						"effects": {
+							"credits": -15,
+							"unrob": true,
+							"attitude": 4
+						}
+					},
+					{
+						"text": "Walk away whistling",
+						"reply": [
+							"You whistle the #brand# jingle. Nobody suspects the jingle."
+						],
+						"effects": {}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Hey, you look lost. Need directions?\"",
+					"\"You new around here? Watch your pockets - thieves everywhere.\""
+				],
+				"choices": [
+					{
+						"text": "Accept their help",
+						"reply": [
+							"They walk you halfway down the block, chatting. Your pocket feels heavy with their credits."
+						],
+						"effects": {
+							"rumor": true,
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Give it all back and confess",
+						"reply": [
+							"\"You WHAT?\" A long pause. \"...Nobody's ever given it back.\""
+						],
+						"effects": {
+							"unrob": true,
+							"credits": -15,
+							"attitude": 15,
+							"react": "warm"
+						}
+					},
+					{
+						"text": "\"No thanks. Just browsing.\"",
+						"reply": [
+							"\"Browsing the street?\" They shrug."
+						],
+						"effects": {}
+					}
+				]
+			}
+		],
+		"theft_fail": [
+			{
+				"ask": [
+					"\"THIEF! Give it back!\"",
+					"\"Hands where I can see them!\"",
+					"\"Oh, you've got some nerve.\""
+				],
+				"choices": [
+					{
+						"text": "Give it back and apologise",
+						"reply": [
+							"They snatch it back. \"Don't let me see you again.\" But they don't call anyone.",
+							"\"...Fine. Just go.\""
+						],
+						"effects": {
+							"attitude": 10,
+							"grudge": "clear"
+						}
+					},
+					{
+						"text": "Pay them to forget it ({cost} cr)",
+						"reply": [
+							"The credits vanish into their coat. \"I saw nothing. You were never here.\""
+						],
+						"effects": {
+							"npc": "silenced",
+							"grudge": "clear"
+						},
+						"cost": 20
+					},
+					{
+						"text": "Run for it",
+						"reply": [
+							"You run. They shout. Every head on the street turns.",
+							"You bolt. Behind you: \"STOP THAT THIEF!\""
+						],
+						"effects": {
+							"grudge": "now"
+						},
+						"verb": "theft"
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I should call Paragon. Give me one reason not to.\"",
+					"\"One good reason. Go.\""
+				],
+				"choices": [
+					{
+						"text": "\"I'm starving.\"",
+						"reply": [
+							"A long look. \"...Here. Now get out of here.\" They give you a ration."
+						],
+						"effects": {
+							"attitude": 8,
+							"grudge": "clear",
+							"items": {
+								"paste_ration": 1
+							}
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"npc:poor": 0.25,
+							"npc:corporate": -0.4
+						},
+						"fail_reply": [
+							"\"So is everyone.\" They start dialling."
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "\"Because I know where you live.\"",
+						"reply": [
+							"They go very pale. No call."
+						],
+						"effects": {
+							"react": "scared",
+							"grudge": "clear"
+						},
+						"chance": 0.45,
+						"chance_mods": {
+							"flag:ruthless": 0.2
+						},
+						"fail_reply": [
+							"\"Then Paragon will know where YOU live.\""
+						],
+						"fail_effects": {
+							"grudge": "now",
+							"attitude": -10
+						},
+						"verb": "intimidate"
+					},
+					{
+						"text": "Hand over double ({cost} cr)",
+						"reply": [
+							"\"Double? ...Fine. We never met.\""
+						],
+						"effects": {
+							"npc": "silenced",
+							"grudge": "clear"
+						},
+						"cost": 30
+					}
+				]
+			}
+		],
+		"fight_ok": [
+			{
+				"ask": [
+					"\"Okay! You win! What do you want?\"",
+					"\"Enough! ENOUGH! I yield!\""
+				],
+				"choices": [
+					{
+						"text": "Help them up",
+						"reply": [
+							"You offer a hand. They take it. \"...Good fight.\" Weirdly, it was.",
+							"\"No hard feelings?\" None. Mostly."
+						],
+						"effects": {
+							"attitude": 20,
+							"react": "warm",
+							"forget": [
+								"fight"
+							]
+						}
+					},
+					{
+						"text": "Take their credits",
+						"reply": [
+							"They hand them over, wincing."
+						],
+						"effects": {
+							"credits": 20,
+							"attitude": -20
+						},
+						"verb": "theft"
+					},
+					{
+						"text": "Walk off",
+						"reply": [
+							"You don't look back. The street watches you go."
+						],
+						"effects": {
+							"fame": 1
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Who's NEXT?\" someone in the crowd shouts. A circle has formed.",
+					"A crowd has gathered. Someone's taking bets on the rematch."
+				],
+				"choices": [
+					{
+						"text": "Take a bow",
+						"reply": [
+							"The crowd roars. Somebody films it. You're a story now."
+						],
+						"effects": {
+							"fame": 2
+						}
+					},
+					{
+						"text": "Buy the loser a drink ({cost} cr)",
+						"reply": [
+							"Two drinks, one bruise each. \"Same time next week?\" Weirdly - yes."
+						],
+						"effects": {
+							"attitude": 25,
+							"react": "warm"
+						},
+						"cost": 10
+					},
+					{
+						"text": "Leave before Paragon shows up",
+						"reply": [
+							"You melt into the crowd. Smart."
+						],
+						"effects": {
+							"witness_slow": 0.1
+						}
+					}
+				]
+			}
+		],
+		"fight_fail": [
+			{
+				"ask": [
+					"\"Had enough? Pay up and we're square.\"",
+					"\"Stay down. Or go again. Your call.\""
+				],
+				"choices": [
+					{
+						"text": "Pay {cost} cr",
+						"reply": [
+							"\"Pleasure.\" They pocket it and help you up."
+						],
+						"effects": {
+							"attitude": 10,
+							"grudge": "clear"
+						},
+						"cost": 15
+					},
+					{
+						"text": "Go again",
+						"reply": [
+							"Second round's yours. They tap out."
+						],
+						"effects": {
+							"attitude": -10,
+							"fame": 2,
+							"react": "scared"
+						},
+						"chance": 0.45,
+						"chance_mods": {
+							"flag:hothead": 0.1,
+							"flag:bouncer": 0.2
+						},
+						"fail_reply": [
+							"Second round's theirs too. The pavement is very familiar now."
+						],
+						"fail_effects": {
+							"hp": -15,
+							"react": "heckler"
+						}
+					},
+					{
+						"text": "Limp away",
+						"reply": [
+							"Every step hurts. Every step is watched."
+						],
+						"effects": {
+							"react": "heckler"
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Not bad. You want to learn to fight properly?\"",
+					"\"You've got heart. No technique. Heart, though.\""
+				],
+				"choices": [
+					{
+						"text": "Take a lesson ({cost} cr)",
+						"reply": [
+							"Twenty painful minutes. You learn more than you lose."
+						],
+						"effects": {
+							"skill_points": 1,
+							"attitude": 10
+						},
+						"cost": 15
+					},
+					{
+						"text": "\"Next time.\"",
+						"reply": [
+							"\"There's always a next time on {planet}.\""
+						],
+						"effects": {
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Spit and walk",
+						"reply": [
+							"The crowd jeers as you go."
+						],
+						"effects": {
+							"react": "heckler"
+						}
+					}
+				]
+			}
+		],
+		"show_ok": [
+			{
+				"ask": [
+					"\"Do that again! Can I film it?\"",
+					"\"You should be on #media_product#!\"",
+					"\"Who ARE you? Seriously?\"",
+					"\"My cousin needs to see this.\""
+				],
+				"choices": [
+					{
+						"text": "Sign something for them",
+						"reply": [
+							"You sign their sleeve. They'll never wash it.",
+							"Your autograph on their ration card. Priceless. Literally - it's void now."
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Recruit them to your cause",
+						"reply": [
+							"\"I'm in. Whatever it is, I'm in.\""
+						],
+						"effects": {
+							"followers": 1,
+							"attitude": 5
+						},
+						"chance": 0.55,
+						"chance_mods": {
+							"npc:rebel": 0.3,
+							"npc:artsy": 0.15,
+							"npc:corporate": -0.4
+						},
+						"fail_reply": [
+							"\"Whoa, slow down. I just wanted a selfie.\""
+						],
+						"fail_effects": {
+							"attitude": -3
+						}
+					},
+					{
+						"text": "Ask them to spread the word",
+						"reply": [
+							"\"Leave it to me. By tonight, the whole block.\""
+						],
+						"effects": {
+							"fame": 2
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Can you do my kid's birthday? Please?\"",
+					"\"Would you do that at my bar? I'll pay! Sort of!\""
+				],
+				"choices": [
+					{
+						"text": "\"For you? Free.\"",
+						"reply": [
+							"\"FREE? On {planet}?\" They hug you. Hard."
+						],
+						"effects": {
+							"attitude": 15,
+							"followers": 1
+						}
+					},
+					{
+						"text": "\"It'll cost you.\"",
+						"reply": [
+							"They pay. Gladly."
+						],
+						"effects": {
+							"credits": 30
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"npc:corporate": 0.3,
+							"npc:poor": -0.3
+						},
+						"fail_reply": [
+							"\"Oh. Never mind.\""
+						],
+						"fail_effects": {
+							"attitude": -5
+						}
+					},
+					{
+						"text": "\"I don't do parties.\"",
+						"reply": [
+							"\"Your loss. There's cake. Paste cake.\""
+						],
+						"effects": {
+							"attitude": -3
+						}
+					}
+				]
+			}
+		],
+		"show_fail": [
+			{
+				"ask": [
+					"\"Was that supposed to be impressive?\"",
+					"\"Boo! BOOOO.\"",
+					"\"Don't quit your day job. Do you have a day job?\""
+				],
+				"choices": [
+					{
+						"text": "Witty comeback",
+						"reply": [
+							"Your comeback lands. They laugh despite themselves. \"Okay. OKAY. That was good.\""
+						],
+						"effects": {
+							"attitude": 12,
+							"react": "fan"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:joker": 0.3,
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"Your comeback does not land. It doesn't even take off."
+						],
+						"fail_effects": {
+							"attitude": -6
+						}
+					},
+					{
+						"text": "Take a bow anyway",
+						"reply": [
+							"You bow. A drone applauds. One drone. It counts."
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 3
+						}
+					},
+					{
+						"text": "Storm off",
+						"reply": [
+							"You storm off. It's the most dramatic thing they've seen all week."
+						],
+						"effects": {
+							"react": "heckler"
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"Someone throws a paste cup. It's a tough block.",
+					"A single slow clap. It's sarcastic."
+				],
+				"choices": [
+					{
+						"text": "Catch it and eat it",
+						"reply": [
+							"You catch it one-handed and eat it. The crowd erupts. You're a legend."
+						],
+						"effects": {
+							"fame": 2,
+							"react": "fan"
+						},
+						"chance": 0.5,
+						"chance_mods": {},
+						"fail_reply": [
+							"It hits you in the face. The crowd erupts. Not in a good way."
+						],
+						"fail_effects": {
+							"hp": -2,
+							"react": "heckler"
+						}
+					},
+					{
+						"text": "Throw something back",
+						"reply": [
+							"It escalates. Of course it escalates."
+						],
+						"effects": {
+							"attitude": -10,
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Laugh at yourself",
+						"reply": [
+							"You laugh first. It takes the sting out. A few people laugh WITH you."
+						],
+						"effects": {
+							"attitude": 8
+						}
+					}
+				]
+			}
+		],
+		"beg_ok": [
+			{
+				"ask": [
+					"\"What happened to you? You look like you used to be someone.\"",
+					"\"Do you have somewhere to sleep tonight?\"",
+					"\"How did you end up like this?\""
+				],
+				"choices": [
+					{
+						"text": "Tell them the truth",
+						"reply": [
+							"They listen to all of it. Then they hug you. Nobody hugs on {planet}."
+						],
+						"effects": {
+							"attitude": 12,
+							"react": "pity"
+						}
+					},
+					{
+						"text": "Spin a sob story",
+						"reply": [
+							"Tears, a sick nan, a repossessed dog. They give you more."
+						],
+						"effects": {
+							"credits": 10,
+							"attitude": 2
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"flag:liar": 0.2,
+							"flag:charming": 0.15
+						},
+						"fail_reply": [
+							"\"That's the plot of #media_product#.\" They take their credits back."
+						],
+						"fail_effects": {
+							"attitude": -15,
+							"react": "cold",
+							"credits": -5
+						}
+					},
+					{
+						"text": "Thank them and go",
+						"reply": [
+							"\"Look after yourself.\" They mean it."
+						],
+						"effects": {
+							"attitude": 5
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"There's a shelter on the corner. I can walk you there.\"",
+					"\"Do you need a place to stay? My couch is... technically a couch.\""
+				],
+				"choices": [
+					{
+						"text": "Go with them",
+						"reply": [
+							"Warm soup, a dry floor, a long sleep. You wake up stronger."
+						],
+						"effects": {
+							"hp": 10,
+							"attitude": 8
+						}
+					},
+					{
+						"text": "Ask for work instead",
+						"reply": [
+							"\"Work? I know a guy.\" An hour of hauling, real credits."
+						],
+						"effects": {
+							"credits": 15
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"npc:worker": 0.2
+						},
+						"fail_reply": [
+							"\"Nobody's hiring. Nobody's ever hiring.\""
+						],
+						"fail_effects": {}
+					},
+					{
+						"text": "\"I'll manage.\"",
+						"reply": [
+							"\"Come find me if you don't.\""
+						],
+						"effects": {
+							"attitude": 3
+						}
+					}
+				]
+			}
+		],
+		"beg_fail": [
+			{
+				"ask": [
+					"\"Get a job.\"",
+					"\"Everyone's begging. Why should I help YOU?\"",
+					"\"I'm two payments from begging myself.\""
+				],
+				"choices": [
+					{
+						"text": "Offer to work for it",
+						"reply": [
+							"They hand you a broom. Twenty minutes later: credits, and a grudging nod."
+						],
+						"effects": {
+							"credits": 12,
+							"attitude": 8
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"npc:worker": 0.2
+						},
+						"fail_reply": [
+							"\"I can't even pay myself.\""
+						],
+						"fail_effects": {
+							"attitude": -2
+						}
+					},
+					{
+						"text": "Guilt them",
+						"reply": [
+							"It works. They hate that it works."
+						],
+						"effects": {
+							"credits": 8,
+							"attitude": -5
+						},
+						"chance": 0.4,
+						"chance_mods": {},
+						"fail_reply": [
+							"\"Nice try.\" They walk off."
+						],
+						"fail_effects": {
+							"attitude": -10,
+							"react": "cold"
+						}
+					},
+					{
+						"text": "Walk away with dignity",
+						"reply": [
+							"You walk away. Head high. Stomach empty."
+						],
+						"effects": {
+							"attitude": 4
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Begging's illegal after #time# on {planet}, you know.\"",
+					"\"Do you have a begging licence? They check now.\""
+				],
+				"choices": [
+					{
+						"text": "\"So is breathing without a payment plan.\"",
+						"reply": [
+							"They snort. Then they laugh. Then they give you something."
+						],
+						"effects": {
+							"attitude": 10,
+							"credits": 5
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:joker": 0.3
+						},
+						"fail_reply": [
+							"They don't laugh."
+						],
+						"fail_effects": {
+							"attitude": -5
+						}
+					},
+					{
+						"text": "Ask where it IS legal",
+						"reply": [
+							"\"The ad-bridge. Paragon doesn't patrol under the ads.\""
+						],
+						"effects": {
+							"rumor": true
+						}
+					},
+					{
+						"text": "Leave",
+						"reply": [
+							"You leave. The billboard behind you sells begging licences."
+						],
+						"effects": {}
+					}
+				]
+			}
+		],
+		"deal_ok": [
+			{
+				"ask": [
+					"\"Pleasure doing business. I might have more work for you.\"",
+					"\"You've got a head for this. Want in on something bigger?\"",
+					"\"Same time next week?\""
+				],
+				"choices": [
+					{
+						"text": "\"Count me in.\"",
+						"reply": [
+							"\"I'll find you.\" They will."
+						],
+						"effects": {
+							"react": "partner"
+						}
+					},
+					{
+						"text": "Ask for a better rate next time",
+						"reply": [
+							"\"For you? Fine. Ten percent.\""
+						],
+						"effects": {
+							"discount": 0.1,
+							"attitude": 3
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"\"Don't push it.\""
+						],
+						"fail_effects": {
+							"attitude": -3
+						}
+					},
+					{
+						"text": "\"One-time thing.\"",
+						"reply": [
+							"\"Your loss.\""
+						],
+						"effects": {}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Tell no one. #faction# takes a cut of everything on {planet}.\"",
+					"\"Keep this quiet. The walls have ads.\""
+				],
+				"choices": [
+					{
+						"text": "\"Our secret.\"",
+						"reply": [
+							"\"I like you. We'll do more of this.\""
+						],
+						"effects": {
+							"attitude": 8,
+							"react": "partner"
+						}
+					},
+					{
+						"text": "Threaten to tell",
+						"reply": [
+							"\"...How much?\" They pay you to keep quiet about paying you."
+						],
+						"effects": {
+							"credits": 20,
+							"react": "scared"
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:ruthless": 0.2
+						},
+						"fail_reply": [
+							"\"Tell them. I'll tell them about YOU.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "\"Already forgot.\"",
+						"reply": [
+							"\"Good.\""
+						],
+						"effects": {
+							"attitude": 4
+						}
+					}
+				]
+			}
+		],
+		"deal_fail": [
+			{
+				"ask": [
+					"\"No deal. Unless...\"",
+					"\"You can't afford me. But I could afford you.\"",
+					"\"Come back with better numbers.\""
+				],
+				"choices": [
+					{
+						"text": "Counter-offer ({cost} cr)",
+						"reply": [
+							"\"Now we're talking.\""
+						],
+						"effects": {
+							"discount": 0.15,
+							"attitude": 6,
+							"react": "partner"
+						},
+						"cost": 15
+					},
+					{
+						"text": "Threaten to go to #faction#",
+						"reply": [
+							"They go pale. \"Okay, okay. Special price.\""
+						],
+						"effects": {
+							"discount": 0.2,
+							"react": "scared"
+						},
+						"chance": 0.45,
+						"chance_mods": {
+							"flag:ruthless": 0.2
+						},
+						"fail_reply": [
+							"\"Go ahead. I'll call them first.\""
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Walk away",
+						"reply": [
+							"\"Your loss.\""
+						],
+						"effects": {
+							"attitude": -2
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I don't deal with people from your... bracket.\"",
+					"\"Credit check failed. Sorry. Not sorry.\""
+				],
+				"choices": [
+					{
+						"text": "Flash your credits",
+						"reply": [
+							"Their eyes go wide. \"Oh! OH. Let's start again.\""
+						],
+						"effects": {
+							"discount": 0.1,
+							"react": "partner"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:rich": 0.3
+						},
+						"fail_reply": [
+							"\"Is that all?\""
+						],
+						"fail_effects": {
+							"attitude": -5
+						}
+					},
+					{
+						"text": "\"Your loss.\"",
+						"reply": [
+							"\"Is it though?\""
+						],
+						"effects": {
+							"attitude": -2
+						}
+					},
+					{
+						"text": "Ask who WILL deal with you",
+						"reply": [
+							"\"Try the noodle stall. They'll deal with anyone.\""
+						],
+						"effects": {
+							"rumor": true
+						}
+					}
+				]
+			}
+		],
+		"weird_ok": [
+			{
+				"ask": [
+					"\"What ARE you?\"",
+					"\"Do that again. No - don't. Actually, do.\"",
+					"\"I have so many questions.\""
+				],
+				"choices": [
+					{
+						"text": "Tell them everything",
+						"reply": [
+							"You tell them. All of it. Their eyes get very wide."
+						],
+						"effects": {
+							"attitude": 8,
+							"react": "intrigued",
+							"fame": 1
+						}
+					},
+					{
+						"text": "Stay mysterious",
+						"reply": [
+							"You smile and say nothing. It drives them wild."
+						],
+						"effects": {
+							"react": "intrigued"
+						}
+					},
+					{
+						"text": "\"Forget this ever happened.\"",
+						"reply": [
+							"\"Forget WHAT?\" Good."
+						],
+						"effects": {
+							"forget": "all",
+							"attitude": -2
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Are you... from the future? You can tell me.\"",
+					"\"Is this a Lumen experiment? Am I in one?\""
+				],
+				"choices": [
+					{
+						"text": "\"Yes.\"",
+						"reply": [
+							"\"I KNEW it.\" They'll tell this story forever."
+						],
+						"effects": {
+							"fame": 1,
+							"react": "intrigued"
+						}
+					},
+					{
+						"text": "\"No. From the past.\"",
+						"reply": [
+							"\"The past! What was it like? Was air free?\""
+						],
+						"effects": {
+							"attitude": 6,
+							"rumor": true
+						}
+					},
+					{
+						"text": "\"I'm from the Odd Duck.\"",
+						"reply": [
+							"\"The ship? THE ship? Oh, that explains everything.\""
+						],
+						"effects": {
+							"attitude": 4,
+							"fame": 1
+						}
+					}
+				]
+			}
+		],
+		"weird_fail": [
+			{
+				"ask": [
+					"\"Get away from me, freak.\"",
+					"\"I'm calling someone. I don't know who. SOMEONE.\"",
+					"\"What is WRONG with you?\""
+				],
+				"choices": [
+					{
+						"text": "Calm them down",
+						"reply": [
+							"\"...Okay. Okay. Sorry. It's been a long shift.\""
+						],
+						"effects": {
+							"attitude": 10,
+							"unspook": true
+						},
+						"chance": 0.55,
+						"chance_mods": {
+							"flag:charming": 0.2,
+							"flag:honest": 0.15
+						},
+						"fail_reply": [
+							"They back away faster."
+						],
+						"fail_effects": {
+							"react": "spooked"
+						}
+					},
+					{
+						"text": "Lean into it",
+						"reply": [
+							"You go full weird. They run. Somebody films it."
+						],
+						"effects": {
+							"react": "spooked",
+							"fame": 1
+						}
+					},
+					{
+						"text": "Leave quietly",
+						"reply": [
+							"You leave. They watch you all the way down the street."
+						],
+						"effects": {}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"That's it, I'm telling my nan about you.\"",
+					"\"Are you on something? Can I have some?\""
+				],
+				"choices": [
+					{
+						"text": "\"Tell her I said hi.\"",
+						"reply": [
+							"\"...She'd actually like you. That's the worst part.\""
+						],
+						"effects": {
+							"attitude": 4
+						}
+					},
+					{
+						"text": "Apologise for being strange",
+						"reply": [
+							"\"No, no - I'm sorry. It's the smog. Makes everyone jumpy.\""
+						],
+						"effects": {
+							"attitude": 8,
+							"unspook": true
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"flag:honest": 0.2
+						},
+						"fail_reply": [
+							"\"Too late. You're weird forever now.\""
+						],
+						"fail_effects": {
+							"react": "spooked"
+						}
+					},
+					{
+						"text": "Do something even weirder",
+						"reply": [
+							"Nobody on {planet} will forget it. Nobody will be able to explain it either."
+						],
+						"effects": {
+							"fame": 1,
+							"react": "spooked"
+						}
+					}
+				]
+			}
+		],
+		"talk_ok": [
+			{
+				"ask": [
+					"\"You know, you're alright. Can I tell you something?\"",
+					"\"Got a minute? I don't get to talk to many people.\"",
+					"\"You're easy to talk to. That's rare here.\""
+				],
+				"choices": [
+					{
+						"text": "Listen",
+						"reply": [
+							"They tell you. It's a lot. It matters.",
+							"They talk, and talk, and you just let them."
+						],
+						"effects": {
+							"attitude": 8,
+							"rumor": true
+						}
+					},
+					{
+						"text": "Ask about their life",
+						"reply": [
+							"\"#npc_life#\"",
+							"\"#npc_life#\" They smile. \"Thanks for asking.\""
+						],
+						"effects": {
+							"attitude": 6,
+							"need_hint": true
+						}
+					},
+					{
+						"text": "Ask about {planet}",
+						"reply": [
+							"\"#pc_planet#\"",
+							"\"#pc_saga#\""
+						],
+						"effects": {
+							"attitude": 3
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Want to know a secret about this street?\"",
+					"\"Can I ask you something? Why did you come to {planet}?\""
+				],
+				"choices": [
+					{
+						"text": "\"Always.\"",
+						"reply": [
+							"They lower their voice."
+						],
+						"effects": {
+							"rumor": true,
+							"rumor2": true
+						}
+					},
+					{
+						"text": "Tell them about your journey",
+						"reply": [
+							"You tell them about the Odd Duck, the debt, the stars. They listen like it's a show."
+						],
+						"effects": {
+							"attitude": 10,
+							"fame": 1
+						}
+					},
+					{
+						"text": "\"Tell me about yourself instead.\"",
+						"reply": [
+							"\"#npc_life#\""
+						],
+						"effects": {
+							"attitude": 8
+						}
+					}
+				]
+			}
+		],
+		"talk_fail": [
+			{
+				"ask": [
+					"\"I don't really want to talk.\"",
+					"\"Not now.\"",
+					"\"Do I know you?\""
+				],
+				"choices": [
+					{
+						"text": "\"Fair enough.\"",
+						"reply": [
+							"They nod. A little warmer than before."
+						],
+						"effects": {
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Push it",
+						"reply": [
+							"\"...Fine. You're persistent. I'll give you that.\""
+						],
+						"effects": {
+							"attitude": 6,
+							"rumor": true
+						},
+						"chance": 0.4,
+						"chance_mods": {
+							"flag:charming": 0.2
+						},
+						"fail_reply": [
+							"\"I SAID not now.\""
+						],
+						"fail_effects": {
+							"attitude": -8,
+							"react": "cold"
+						}
+					},
+					{
+						"text": "Make them laugh",
+						"reply": [
+							"A snort. A giggle. A real laugh. \"Okay, okay.\""
+						],
+						"effects": {
+							"attitude": 10
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:joker": 0.3
+						},
+						"fail_reply": [
+							"Nothing. Not even a smile."
+						],
+						"fail_effects": {
+							"attitude": -3
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"They're staring at a billboard instead of you.",
+					"They've got earbuds in. Ad-sponsored earbuds."
+				],
+				"choices": [
+					{
+						"text": "Wait patiently",
+						"reply": [
+							"Eventually they notice you. \"Oh! Sorry. The ads hypnotise you after a while.\""
+						],
+						"effects": {
+							"attitude": 4
+						}
+					},
+					{
+						"text": "Wave a hand in front of their face",
+						"reply": [
+							"\"Whoa - hi! Sorry!\""
+						],
+						"effects": {
+							"attitude": 6
+						},
+						"chance": 0.5,
+						"chance_mods": {},
+						"fail_reply": [
+							"\"Do you MIND?\""
+						],
+						"fail_effects": {
+							"react": "cold"
+						}
+					},
+					{
+						"text": "Talk to the billboard instead",
+						"reply": [
+							"The billboard offers you a loan. A passer-by films it. You're briefly famous."
+						],
+						"effects": {
+							"fame": 1
+						}
+					}
+				]
+			}
+		],
+		"served": [
+			{
+				"ask": [
+					"They stare at the papers. \"You can't do this. I've lived on this street my whole life.\"",
+					"\"Evicted? From the STREET? You can be evicted from a street?\"",
+					"Their hands shake. \"Where am I supposed to go?\""
+				],
+				"choices": [
+					{
+						"text": "Watch them go",
+						"reply": [
+							"They gather what little they own and walk. Nobody on the block looks at you the same way."
+						],
+						"effects": {
+							"fame": 1
+						}
+					},
+					{
+						"text": "Offer a settlement ({cost} cr)",
+						"reply": [
+							"\"...You'd do that?\" They tear up the papers with you. They stay - and they won't forget it."
+						],
+						"effects": {
+							"stay": true,
+							"attitude": 40,
+							"react": "grateful"
+						},
+						"cost": 25
+					},
+					{
+						"text": "Twist the knife",
+						"reply": [
+							"\"And tell your friends.\" They do. Everyone on {planet} hears what your family's lawyers can do."
+						],
+						"effects": {
+							"fame": 2,
+							"witness_slow": 0.2
+						}
+					}
+				]
+			}
+		]
+	},
+	"approach": {
+		"thanks": [
+			{
+				"ask": [
+					"\"Hey! {name}! I've been looking for you. I owe you - what do you want?\"",
+					"\"There you are! I told everyone about you. And I've got something for you.\""
+				],
+				"choices": [
+					{
+						"text": "The gift",
+						"reply": [
+							"They hand you a medkit wrapped in a #brand# flyer. \"Stay alive, okay?\""
+						],
+						"effects": {
+							"items": {
+								"medkit": 1
+							},
+							"attitude": 3
+						}
+					},
+					{
+						"text": "A secret",
+						"reply": [
+							"They pull you into a doorway and whisper."
+						],
+						"effects": {
+							"rumor": true,
+							"rumor2": true
+						}
+					},
+					{
+						"text": "\"Pay it forward instead.\"",
+						"reply": [
+							"\"Then I'll help the next one. And they'll help the next.\" A follower is born."
+						],
+						"effects": {
+							"followers": 1,
+							"attitude": 10
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I couldn't let you leave without paying you back. Close your eyes. Okay, open.\""
+				],
+				"choices": [
+					{
+						"text": "Open your eyes",
+						"reply": [
+							"Credits. A whole roll of them, saved up a coin at a time."
+						],
+						"effects": {
+							"credits": 25,
+							"attitude": 3
+						}
+					},
+					{
+						"text": "\"Keep it. Buy your #kin# something.\"",
+						"reply": [
+							"They can't speak. They just nod."
+						],
+						"effects": {
+							"attitude": 20,
+							"followers": 1
+						}
+					},
+					{
+						"text": "\"Tell people I'm not so bad.\"",
+						"reply": [
+							"\"I already have. Everyone.\""
+						],
+						"effects": {
+							"fame": 2
+						}
+					}
+				]
+			}
+		],
+		"pity": [
+			{
+				"ask": [
+					"\"I've been worried about you. Have you eaten?\"",
+					"\"You looked rough earlier. I brought you something.\""
+				],
+				"choices": [
+					{
+						"text": "Accept the food",
+						"reply": [
+							"Hot paste and something green. You feel almost human."
+						],
+						"effects": {
+							"hp": 15,
+							"attitude": 5,
+							"owes": false
+						}
+					},
+					{
+						"text": "Share it with them",
+						"reply": [
+							"You split it. You both laugh with your mouths full."
+						],
+						"effects": {
+							"hp": 8,
+							"attitude": 15,
+							"owes": false
+						}
+					},
+					{
+						"text": "\"I'm fine. Really.\"",
+						"reply": [
+							"\"You're not. But okay.\""
+						],
+						"effects": {
+							"attitude": 3,
+							"owes": false
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"You're bleeding again. Sit. Let me look at that.\"",
+					"\"I asked around. The clinic owes me a favour. Want it?\""
+				],
+				"choices": [
+					{
+						"text": "Let them patch you up",
+						"reply": [
+							"Clumsy hands, kind eyes. It helps more than you expected."
+						],
+						"effects": {
+							"hp": 20,
+							"attitude": 6,
+							"owes": false
+						}
+					},
+					{
+						"text": "Take the clinic favour",
+						"reply": [
+							"\"Tell them I sent you.\" A free check-up. Painkillers too."
+						],
+						"effects": {
+							"items": {
+								"painkillers": 1
+							},
+							"owes": false
+						}
+					},
+					{
+						"text": "\"Save it for someone who needs it.\"",
+						"reply": [
+							"\"YOU need it.\" But they respect it."
+						],
+						"effects": {
+							"attitude": 8,
+							"owes": false
+						}
+					}
+				]
+			}
+		],
+		"partner": [
+			{
+				"ask": [
+					"\"Psst. {name}. Air canisters that fell off a truck. Two for twenty?\"",
+					"\"Got some canisters. Mountain Fresh. Mostly. Twenty for two?\""
+				],
+				"choices": [
+					{
+						"text": "Buy two ({cost} cr)",
+						"reply": [
+							"\"Pleasure. Don't sniff them in public.\""
+						],
+						"effects": {
+							"items": {
+								"air_canister": 2
+							},
+							"attitude": 3
+						},
+						"cost": 20
+					},
+					{
+						"text": "Haggle",
+						"reply": [
+							"\"Fine. Ten. You're killing me.\""
+						],
+						"effects": {
+							"items": {
+								"air_canister": 2
+							},
+							"credits": -10,
+							"attitude": 1
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:gambler": 0.2
+						},
+						"fail_reply": [
+							"\"Twenty or nothing.\""
+						],
+						"fail_effects": {
+							"attitude": -4
+						}
+					},
+					{
+						"text": "\"Not interested.\"",
+						"reply": [
+							"\"Your lungs.\""
+						],
+						"effects": {
+							"attitude": -2
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"Hold this package for me. Don't open it. I'll pay you now.\"",
+					"\"Quick job: carry this across the block. Thirty-five credits.\""
+				],
+				"choices": [
+					{
+						"text": "Take the job",
+						"reply": [
+							"Easy money. Probably legal. Definitely money."
+						],
+						"effects": {
+							"credits": 35,
+							"attitude": 5
+						},
+						"chance": 0.7,
+						"chance_mods": {},
+						"fail_reply": [
+							"Paragon scanners ping. The package was not what they said.",
+							"A drone flags the package. You drop it and run - but it got your face."
+						],
+						"fail_effects": {
+							"credits": 35,
+							"bounty": {
+								"paragon": 20
+							}
+						}
+					},
+					{
+						"text": "Open it first",
+						"reply": [
+							"Inside: #found_item#. You hand it back. They're annoyed, but they respect it."
+						],
+						"effects": {
+							"attitude": -3,
+							"rumor": true
+						}
+					},
+					{
+						"text": "\"No thanks.\"",
+						"reply": [
+							"\"Suit yourself. More for me.\""
+						],
+						"effects": {}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I know where a #faction# courier drops off. Fifty-fifty?\"",
+					"\"Got a tip worth real credits. Fifteen to hear it.\""
+				],
+				"choices": [
+					{
+						"text": "Pay for the tip ({cost} cr)",
+						"reply": [
+							"The tip is good. Very good."
+						],
+						"effects": {
+							"credits": 30,
+							"rumor": true
+						},
+						"chance": 0.6,
+						"chance_mods": {},
+						"fail_reply": [
+							"The tip was stale. The drop moved yesterday."
+						],
+						"fail_effects": {
+							"attitude": -5
+						},
+						"cost": 15
+					},
+					{
+						"text": "Report them to Paragon",
+						"reply": [
+							"You make a call. Paragon thanks you. Your partner will never speak to you again."
+						],
+						"effects": {
+							"rep": {
+								"paragon": 3
+							},
+							"attitude": -40,
+							"react": "scared"
+						}
+					},
+					{
+						"text": "Pass",
+						"reply": [
+							"\"Your loss, partner.\""
+						],
+						"effects": {}
+					}
+				]
+			}
+		],
+		"fan": [
+			{
+				"ask": [
+					"\"OH MY GOD it's {name}! Can I get a selfie? Please?\"",
+					"\"I've told EVERYONE about you. Will you sign my air canister?\"",
+					"\"Are you THE {name}?\""
+				],
+				"choices": [
+					{
+						"text": "Pose for the selfie",
+						"reply": [
+							"Flash. It's already online. #small_num# likes and climbing."
+						],
+						"effects": {
+							"fame": 2,
+							"attitude": 5
+						}
+					},
+					{
+						"text": "Sign it with a flourish",
+						"reply": [
+							"They clutch it to their chest like a newborn."
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 8
+						}
+					},
+					{
+						"text": "Ask them to join your cause",
+						"reply": [
+							"\"Yes. YES. What do I do?\""
+						],
+						"effects": {
+							"followers": 1,
+							"attitude": 5
+						},
+						"chance": 0.6,
+						"chance_mods": {
+							"npc:rebel": 0.2,
+							"npc:corporate": -0.3
+						},
+						"fail_reply": [
+							"\"Oh - I just wanted the selfie.\""
+						],
+						"fail_effects": {
+							"attitude": -3
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I started a fan club! It's just me. And my cousin. Will you come to the first meeting?\""
+				],
+				"choices": [
+					{
+						"text": "Go to the meeting",
+						"reply": [
+							"Three people, one cake, a banner with your face spelled wrong. You've never been prouder."
+						],
+						"effects": {
+							"fame": 2,
+							"followers": 1,
+							"hp": 5
+						}
+					},
+					{
+						"text": "Send a signed photo instead",
+						"reply": [
+							"They frame it. In a real frame."
+						],
+						"effects": {
+							"fame": 1,
+							"attitude": 5
+						}
+					},
+					{
+						"text": "\"Please don't.\"",
+						"reply": [
+							"\"Too late. We have badges.\""
+						],
+						"effects": {
+							"attitude": -2,
+							"fame": 1
+						}
+					}
+				]
+			}
+		],
+		"confront": [
+			{
+				"ask": [
+					"\"You! Thirty credits for what you did, or I'm calling Paragon.\"",
+					"\"I know what you did. Pay up, or I make the call. Right now.\"",
+					"\"Don't walk away from me. We need to settle this.\""
+				],
+				"choices": [
+					{
+						"text": "Pay them off ({cost} cr)",
+						"reply": [
+							"They count it twice. \"We're done. For now.\""
+						],
+						"effects": {
+							"grudge": "clear",
+							"attitude": 15,
+							"npc": "silenced"
+						},
+						"cost": 30
+					},
+					{
+						"text": "Apologise, properly",
+						"reply": [
+							"\"...Okay. Okay. I believe you. Don't make me regret it.\""
+						],
+						"effects": {
+							"grudge": "clear",
+							"attitude": 12
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:honest": 0.25,
+							"flag:charming": 0.15
+						},
+						"fail_reply": [
+							"\"Sorry doesn't pay for anything.\" They pull out their wristpad."
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Threaten them",
+						"reply": [
+							"They go white and back away. No call."
+						],
+						"effects": {
+							"grudge": "clear",
+							"react": "scared"
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:ruthless": 0.2
+						},
+						"fail_reply": [
+							"\"You just made it worse.\" They're dialling."
+						],
+						"fail_effects": {
+							"grudge": "now",
+							"attitude": -15
+						},
+						"verb": "intimidate"
+					}
+				],
+				"leave": [
+					"\"Go ahead. Call.\"",
+					"Walk away"
+				],
+				"leave_effects": {
+					"grudge": "now"
+				}
+			},
+			{
+				"ask": [
+					"\"Remember me? I remember YOU. We're settling this, here and now.\"",
+					"\"You thought I'd forget? On {planet}, we never forget.\""
+				],
+				"choices": [
+					{
+						"text": "Settle it with credits ({cost} cr)",
+						"reply": [
+							"\"Fair.\" They pocket it. The anger goes with it."
+						],
+						"effects": {
+							"grudge": "clear",
+							"attitude": 15
+						},
+						"cost": 25
+					},
+					{
+						"text": "Make it right another way",
+						"reply": [
+							"You hear them out. You agree to help. Somehow, that's enough."
+						],
+						"effects": {
+							"grudge": "clear",
+							"attitude": 10,
+							"need_hint": true
+						},
+						"chance": 0.55,
+						"chance_mods": {
+							"flag:charming": 0.2,
+							"flag:honest": 0.2
+						},
+						"fail_reply": [
+							"\"Words. Always words.\" The wristpad comes out."
+						],
+						"fail_effects": {
+							"grudge": "now"
+						}
+					},
+					{
+						"text": "Laugh in their face",
+						"reply": [
+							"\"Laugh all you like. Paragon's laughing too - on line two.\""
+						],
+						"effects": {
+							"grudge": "now",
+							"attitude": -10
+						}
+					}
+				],
+				"leave": [
+					"Walk away"
+				],
+				"leave_effects": {
+					"grudge": "now"
+				}
+			}
+		],
+		"smitten": [
+			{
+				"ask": [
+					"\"Hi... I, um, made you this.\"",
+					"\"So... are you seeing anyone? Asking for a friend. The friend is me.\""
+				],
+				"choices": [
+					{
+						"text": "Accept the gift",
+						"reply": [
+							"A tiny hand-painted charm. It's terrible. You love it."
+						],
+						"effects": {
+							"items": {
+								"painkillers": 1
+							},
+							"attitude": 10,
+							"owes": false
+						}
+					},
+					{
+						"text": "Take them out for noodles ({cost} cr)",
+						"reply": [
+							"Two bowls, one rainy window, a whole evening. Your wounds hurt less."
+						],
+						"effects": {
+							"hp": 10,
+							"attitude": 25,
+							"owes": false
+						},
+						"cost": 10
+					},
+					{
+						"text": "Let them down gently",
+						"reply": [
+							"\"Oh. Okay. No, that's - okay.\" They'll be fine. Eventually."
+						],
+						"effects": {
+							"attitude": -5,
+							"owes": false
+						}
+					}
+				]
+			},
+			{
+				"ask": [
+					"\"I wrote you a poem. It's bad. Do you want to hear it?\""
+				],
+				"choices": [
+					{
+						"text": "\"I'd love to.\"",
+						"reply": [
+							"It rhymes 'breath' with 'debt'. It's terrible. It's the nicest thing anyone's said to you in years."
+						],
+						"effects": {
+							"attitude": 20,
+							"hp": 5,
+							"owes": false
+						}
+					},
+					{
+						"text": "Write one back",
+						"reply": [
+							"You write two lines on a noodle napkin. They keep it forever."
+						],
+						"effects": {
+							"attitude": 25,
+							"owes": false
+						},
+						"chance": 0.5,
+						"chance_mods": {
+							"flag:charming": 0.3
+						},
+						"fail_reply": [
+							"Your poem is worse than theirs. You both laugh until it hurts."
+						],
+						"fail_effects": {
+							"attitude": 10,
+							"owes": false
+						}
+					},
+					{
+						"text": "\"Maybe later.\"",
+						"reply": [
+							"\"Later. Okay. I'll... be here. Later.\""
+						],
+						"effects": {
+							"attitude": -2,
+							"owes": false
+						}
+					}
+				]
+			}
+		]
+	}
+}

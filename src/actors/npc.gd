@@ -62,6 +62,21 @@ var _favour_wait := 0.0
 var _grudge_wait := 0.0
 var _mood_bark := 0.0
 var _leaving := false
+var fan := false
+var heckler := false
+var partner := false
+var robbed := false        ## you lifted something and they haven't noticed yet
+var robbed_noticed := false
+var cold_until := 0.0
+var spooked_until := 0.0
+var pity := false
+var _robbed_wait := 0.0
+var _approach_kind := ""   ## they'll come over to you: "partner", "fan", "pity", "confront", "thanks", "smitten"
+var _approach_wait := 0.0
+var _approach_time := 0.0
+var _follow_time := 0.0
+var _follow_kind := ""
+static var _last_approach := -999.0
 static var _act_seen := {}  # "frame:kind" -> how many bystanders already reacted out loud
 
 
@@ -143,7 +158,26 @@ func _physics_process(delta: float) -> void:
 			if _timer <= 0.0:
 				state = "idle"
 				_home = global_position
-	var speed := 4.2 if state == "flee" else 1.4
+		"approach":
+			_approach_time -= delta
+			if _player == null or not is_instance_valid(_player) or _approach_time <= 0.0:
+				state = "idle"
+				_approach_kind = ""
+			else:
+				var to := (_player.global_position - global_position) * Vector3(1, 0, 1)
+				if to.length() > 1.8:
+					move = to.normalized()
+				else:
+					_arrive_and_talk()
+		"follow":
+			_follow_time -= delta
+			if _player == null or not is_instance_valid(_player) or _follow_time <= 0.0:
+				_end_follow()
+			else:
+				var to2 := (_player.global_position - global_position) * Vector3(1, 0, 1)
+				if to2.length() > 2.6:
+					move = to2.normalized()
+	var speed := 4.2 if state == "flee" else (2.8 if state in ["approach", "follow"] else 1.4)
 	velocity.x = move.x * speed
 	velocity.z = move.z * speed
 	velocity.y = -0.5 if is_on_floor() else velocity.y - GRAVITY * gravity_scale * delta
@@ -643,8 +677,24 @@ func relation_label() -> String:
 		return "YOUR INFORMANT"
 	if repossessed:
 		return "REPOSSESSED"
+	if robbed_noticed:
+		return "JUST GOT ROBBED"
 	if is_scared():
 		return "SCARED OF YOU"
+	if spooked_until > Game.play_time:
+		return "SPOOKED"
+	if _follow_kind == "smitten" and _follow_time > 0.0:
+		return "HAS A CRUSH ON YOU"
+	if _follow_kind == "intrigued" and _follow_time > 0.0:
+		return "CURIOUS ABOUT YOU"
+	if partner:
+		return "BUSINESS PARTNER"
+	if fan:
+		return "YOUR FAN"
+	if heckler:
+		return "HECKLER"
+	if pity:
+		return "WORRIES ABOUT YOU"
 	if attitude >= 45:
 		return "DEVOTED TO YOU"
 	if owes_favour:
@@ -661,6 +711,9 @@ func relation_label() -> String:
 
 
 const REL_COLORS := {"YOUR INFORMANT": Color(0.6, 0.9, 1.0), "REPOSSESSED": Color(0.7, 0.7, 0.75),
+	"JUST GOT ROBBED": Color(1.0, 0.5, 0.3), "SPOOKED": Color(0.7, 0.6, 1.0), "HAS A CRUSH ON YOU": Color(1.0, 0.55, 0.85),
+	"CURIOUS ABOUT YOU": Color(0.6, 0.95, 1.0), "BUSINESS PARTNER": Color(1.0, 0.85, 0.4), "YOUR FAN": Color(1.0, 0.6, 0.95),
+	"HECKLER": Color(1.0, 0.65, 0.4), "WORRIES ABOUT YOU": Color(0.6, 0.9, 0.8),
 	"SCARED OF YOU": Color(0.75, 0.55, 1.0), "DEVOTED TO YOU": Color(1.0, 0.85, 0.3), "OWES YOU ONE": Color(0.5, 1.0, 0.6),
 	"FRIENDLY": Color(0.5, 1.0, 0.6), "FURIOUS": Color(1.0, 0.3, 0.3), "DISLIKES YOU": Color(1.0, 0.6, 0.45),
 	"KEEPS QUIET": Color(0.75, 0.85, 0.9)}
@@ -700,6 +753,9 @@ func react(kind: String) -> String:
 			owes_favour = true
 			_favour_wait = _rng.randf_range(15.0, 35.0)
 			react_cheer()
+			if _rng.randf() < 0.45:
+				owes_favour = false
+				_schedule_approach("thanks", _rng.randf_range(18.0, 35.0))
 			if (traits as Array).has("poor") and _rng.randf() < 0.7:
 				_go_spend()
 				return "They head straight for the food stall. First real meal in a while. They owe you one."
@@ -724,12 +780,94 @@ func react(kind: String) -> String:
 			return "Repossessed. They're left with nothing - and they look like they're about to call Paragon."
 		"grudge":
 			grudge = true
-			_grudge_wait = _rng.randf_range(5.0, 10.0)
-			return "They're furious. Looks like they're about to file a complaint about you."
+			_grudge_wait = _rng.randf_range(9.0, 15.0)
+			if _rng.randf() < 0.5:
+				_schedule_approach("confront", _rng.randf_range(3.0, 7.0))
+			return "They're furious. They're going to confront you - or go straight to Paragon."
 		"smitten":
 			react_cheer()
-			return "They're blushing. Somebody has a crush."
+			_start_follow("smitten", 22.0)
+			owes_favour = true
+			_favour_wait = 30.0
+			return "They're blushing. Somebody has a crush - and they're following you."
+		"warm":
+			attitude = mini(100, attitude + 4)
+			_waved = false
+			return "They'll remember your name. In a good way."
+		"cold":
+			cold_until = Game.play_time + 60.0
+			attitude = maxi(-100, attitude - 4)
+			return "They turn away. Conversation over."
+		"robbed":
+			robbed = true
+			_robbed_wait = _rng.randf_range(6.0, 14.0)
+			return "They haven't noticed. Yet."
+		"fan":
+			fan = true
+			if _rng.randf() < 0.6:
+				_schedule_approach("fan", _rng.randf_range(18.0, 40.0))
+			return "You've got a fan. They'll cheer whenever you pass - and they'll tell people."
+		"heckler":
+			heckler = true
+			return "That didn't land. They'll be telling this one at your expense."
+		"pity":
+			pity = true
+			owes_favour = true
+			_favour_wait = _rng.randf_range(25.0, 45.0)
+			if _rng.randf() < 0.5:
+				_schedule_approach("pity", _rng.randf_range(20.0, 40.0))
+			return "They look at you with real worry. They'll check on you."
+		"partner":
+			partner = true
+			_schedule_approach("partner", _rng.randf_range(25.0, 50.0))
+			return "They've got more business for you. They'll find you."
+		"intrigued":
+			_start_follow("intrigued", 18.0)
+			return "They can't stop staring. They tag along, full of questions."
+		"spooked":
+			spooked_until = Game.play_time + 90.0
+			NPCVoice.add_street_memory("weird")
+			flee_from_player()
+			return "You've spooked them. They'll be telling the weirdest story on the block."
 	return ""
+
+
+func _schedule_approach(kind: String, delay: float) -> void:
+	_approach_kind = kind
+	_approach_wait = delay
+
+
+func _start_follow(kind: String, t: float) -> void:
+	end_activity()
+	_follow_kind = kind
+	_follow_time = t
+	state = "follow"
+
+
+## Walk up and start a conversation yourself (partner deals, fans, confrontations...).
+func _approach_ready() -> bool:
+	if Game.play_time - _last_approach < 25.0 or state != "idle" or loyal and _approach_kind == "confront":
+		return false
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud and hud.get("_dialogue_open"):
+		return false
+	if global_position.distance_to(_player.global_position) > 14.0:
+		return false
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if e.get("hostile") and (e as Node3D).global_position.distance_to(_player.global_position) < 16.0:
+			return false
+	return true
+
+
+func _arrive_and_talk() -> void:
+	state = "idle"
+	_last_approach = Game.play_time
+	sprite.set_facing(_player.global_position - global_position)
+	var kind := _approach_kind
+	_approach_kind = ""
+	if kind == "confront":
+		grudge = false  # they're telling you first instead of calling straight away
+	Interactions.present_counter(self, kind, "", "approach")
 
 
 func _kneel(t: float) -> void:
@@ -739,6 +877,21 @@ func _kneel(t: float) -> void:
 	_act_target = global_position
 	_act_time = t
 	_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1) if _player and is_instance_valid(_player) else Vector3.BACK
+
+
+func _end_follow() -> void:
+	state = "idle"
+	_home = global_position
+	_wander_target = _home
+	var kind := _follow_kind
+	_follow_kind = ""
+	_follow_time = 0.0
+	if kind == "intrigued":
+		# All those questions, and they leave you something in return.
+		say(Copy.expand("#intrigued_bye#", _rng), 2.6)
+		EventBus.toast.emit("%s whispers: %s" % [npc_name, Interactions.rumor(self)], Color(0.6, 0.95, 1.0))
+		attitude = mini(100, attitude + 6)
+	refresh_label()
 
 
 ## Spend the money you gave them: walk to the nearest food stall queue.
@@ -791,11 +944,64 @@ func _impact_tick(delta: float) -> void:
 		_grudge_wait -= delta
 		if _grudge_wait <= 0.0 and state == "idle":
 			grudge = false
+			if _approach_kind == "confront":
+				_approach_kind = ""
 			if attitude <= -15:
 				say(Copy.expand("#grudge_call#", _rng), 2.6)
 				EventBus.toast.emit("%s is filing a complaint about you with Paragon!" % npc_name, Color(1.0, 0.6, 0.3))
 				witness.active = true
 				Causality.record("complaint", {"target": npc_name, "target_faction": "paragon", "position": global_position})
+	# Tagging along: questions, compliments, commentary.
+	if state == "follow" and _mood_bark <= 0.0:
+		_mood_bark = _rng.randf_range(4.5, 7.0)
+		say(Copy.expand("#%s_bark#" % _follow_kind, _rng, {"name": Game.player_name}), 2.6)
+	# They come to you.
+	if _approach_kind != "" and state == "idle":
+		_approach_wait -= delta
+		if _approach_wait <= 0.0 and _approach_ready():
+			state = "approach"
+			_approach_time = 9.0
+	# Pockets feel light...
+	if robbed:
+		_robbed_wait -= delta
+		if _robbed_wait <= 0.0 and state == "idle":
+			robbed = false
+			robbed_noticed = true
+			say(Copy.expand("#robbed_notice#", _rng), 2.4)
+			NPCVoice.add_street_memory("theft")
+			if d < 9.0 and witness.can_see(_player.global_position) and _rng.randf() < 0.55:
+				attitude = mini(attitude, -45)
+				_mood_bark = 6.0
+				var t := get_tree().create_timer(2.6)
+				t.timeout.connect(func():
+					if is_instance_valid(self) and state != "dead":
+						say(Copy.expand("#robbed_accuse#", _rng, {"name": Game.player_name}), 2.6))
+				grudge = true
+				_grudge_wait = 6.0
+				EventBus.toast.emit("%s noticed they've been robbed - and they're looking at YOU." % npc_name, Color(1.0, 0.6, 0.3))
+			else:
+				EventBus.toast.emit("%s just noticed they've been robbed. They have no idea who did it." % npc_name, Color(0.9, 0.8, 0.6))
+			refresh_label()
+	# Fans cheer you on; hecklers make sure everyone hears about your worst moment.
+	if fan and d < 7.0 and state == "idle" and _mood_bark <= 0.0 and _rng.randf() < 0.01:
+		_mood_bark = 20.0
+		react_cheer()
+		say(Copy.expand("#fan_bark#", _rng, {"name": Game.player_name}), 2.4)
+	elif heckler and d < 7.0 and state == "idle" and _mood_bark <= 0.0 and _rng.randf() < 0.01:
+		_mood_bark = 22.0
+		say(Copy.expand("#heckle_bark#", _rng, {"name": Game.player_name}), 2.6)
+		for o in get_tree().get_nodes_in_group("npc"):
+			if o != self and o.state == "idle" and o.global_position.distance_to(global_position) < 6.0:
+				o.reply_later(1.4, Copy.expand("#heckle_laugh#", _rng))
+				break
+	elif cold_until > Game.play_time and d < 3.0 and _mood_bark <= 0.0:
+		_mood_bark = 12.0
+		_act_face = (global_position - _player.global_position) * Vector3(1, 0, 1)
+		say(Copy.expand("#cold_bark#", _rng), 1.8)
+	elif spooked_until > Game.play_time and d < 3.5 and state == "idle" and _mood_bark <= 0.0:
+		_mood_bark = 9.0
+		say(Copy.expand("#spooked_bark#", _rng), 2.0)
+		flee_from_player()
 	# Fear and fury show in how they act around you.
 	if is_scared() and d < 3.2 and state == "idle" and _talking <= 0.0 and _mood_bark <= 0.0:
 		_mood_bark = 8.0

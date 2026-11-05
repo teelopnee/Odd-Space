@@ -10,6 +10,7 @@ extends Node
 const MAX_CHOICES := 7
 
 var _rng := RandomNumberGenerator.new()
+var force_outcome = null  ## tests: true / false forces a verb's success roll (null = roll normally)
 
 
 func _ready() -> void:
@@ -245,6 +246,8 @@ func resolve(npc: Node, verb_id: String) -> bool:
 	var before_rel: String = npc.relation_label() if npc.has_method("relation_label") else ""
 	var before_att: int = int(npc.attitude)
 	var success := _rng.randf() < chance_of(d, npc)
+	if force_outcome != null and d.has("fail"):
+		success = bool(force_outcome)
 	var outcome: Dictionary = d.get("success" if success else "fail", d.get("success", {}))
 	var lines: Array = outcome.get("lines", ["..."])
 	var text := fill(str(lines[_rng.randi() % lines.size()]), npc)
@@ -268,9 +271,12 @@ func resolve(npc: Node, verb_id: String) -> bool:
 	if was_reporting and is_instance_valid(npc):
 		impact.append(_witness_outcome(npc, verb_id, success))
 	EventBus.interaction_done.emit(verb_id, success, npc)  # bystanders see it now
+	var kind := str(NPCVoice.reactions().get("verb_kind", {}).get(verb_id, "talk"))
 	if is_instance_valid(npc):
-		if npc.has_method("react") and effects.has("react") and (success or d.has("fail")):
-			var r := str(npc.react(str(effects["react"])))
+		# Every outcome leaves a mark: the verb's own reaction, or the default for its kind.
+		var react_kind := str(effects.get("react", default_react(kind, success)))
+		if npc.has_method("react") and react_kind != "":
+			var r := str(npc.react(react_kind))
 			if r != "":
 				impact.append(r)
 		if npc.has_method("after_interaction"):
@@ -283,9 +289,124 @@ func resolve(npc: Node, verb_id: String) -> bool:
 		if was_reporting or not success:
 			impact.append_array(_other_callers(npc))
 	if not impact.is_empty():
-		text += "\n\n[color=#9adfff]" + "\n".join(PackedStringArray(impact.map(func(l): return "> " + l))) + "[/color]"
+		text += "\n\n" + _impact_block(impact)
+	# ...and they always answer back: a counter-move you can respond to.
+	if is_instance_valid(npc) and npc.state != "dead":
+		var key := "served" if npc.get("_leaving") else "%s_%s" % [kind, "ok" if success else "fail"]
+		if present_counter(npc, key, text):
+			return success
 	EventBus.dialogue_requested.emit(npc.npc_name, text, [], Callable())
 	return success
+
+
+func _impact_block(impact: Array) -> String:
+	return "[color=#9adfff]" + "\n".join(PackedStringArray(impact.map(func(l): return "> " + str(l)))) + "[/color]"
+
+
+## Lasting reaction when the verb data doesn't name one (data/reactions.json "default_react").
+func default_react(kind: String, success: bool) -> String:
+	var row: Dictionary = NPCVoice.reactions().get("default_react", {}).get(kind, {})
+	return str(row.get("ok" if success else "fail", ""))
+
+
+# --- Counter-moves: the NPC answers back ----------------------------------------------------
+
+func counters() -> Dictionary:
+	return DataDB.counters
+
+
+func _pick_text(v, npc: Node) -> String:
+	var t: String = str(v[_rng.randi() % v.size()]) if v is Array else str(v)
+	return fill(t, npc)
+
+
+## Shows `header` plus the NPC's counter-move from data/counters.json (`table` = "counters" or
+## "approach"), with choices. Returns false if there is no counter for this key.
+func present_counter(npc: Node, key: String, header: String = "", table: String = "counters") -> bool:
+	var pool: Array = counters().get(table, {}).get(key, [])
+	if pool.is_empty():
+		return false
+	var tpl: Dictionary = pool[_rng.randi() % pool.size()]
+	var ask := _pick_text(tpl.get("ask", "..."), npc)
+	var text := (header + "\n\n" if header != "" else "") + "[color=#ffe9a8]" + NPCVoice.say(ask, npc, {}, _rng) + "[/color]"
+	var choices := []
+	var i := 0
+	for c in tpl.get("choices", []):
+		var cost := int(c.get("cost", 0))
+		var ct := _pick_text(c.get("text", "..."), npc).replace("{cost}", str(cost))
+		if c.has("chance"):
+			ct += "  [%d%%]" % roundi(chance_of(c, npc) * 100.0)
+		var ok := Saga.choice_ok(c) if c.has("requires") else true
+		if ok:
+			choices.append({"id": "c%d" % i, "text": ct, "disabled": cost > 0 and not Game.can_afford(cost)})
+		i += 1
+	choices.append({"id": "leave", "text": _pick_text(tpl.get("leave", ["Walk away", "Leave it there", "Say nothing and go"]), npc)})
+	EventBus.dialogue_requested.emit(npc.npc_name, text, choices, _on_counter_choice.bind(npc, tpl))
+	return true
+
+
+func _on_counter_choice(choice_id: String, npc: Node, tpl: Dictionary) -> void:
+	if not is_instance_valid(npc) or not choice_id.begins_with("c"):
+		if is_instance_valid(npc) and tpl.has("leave_effects"):
+			_apply_counter_effects(npc, tpl["leave_effects"])
+		return
+	var list: Array = tpl.get("choices", [])
+	var idx := int(choice_id.substr(1))
+	if idx < 0 or idx >= list.size():
+		return
+	var c: Dictionary = list[idx]
+	var cost := int(c.get("cost", 0))
+	if cost > 0 and not Game.spend(cost):
+		return
+	var before_rel: String = npc.relation_label()
+	var before_att: int = int(npc.attitude)
+	var success := _rng.randf() < chance_of(c, npc) if c.has("chance") else true
+	if force_outcome != null and c.has("chance"):
+		success = bool(force_outcome)
+	var reply = c.get("reply", ["..."]) if success else c.get("fail_reply", c.get("reply", ["..."]))
+	var effects: Dictionary = c.get("effects", {}) if success else c.get("fail_effects", {})
+	var text := NPCVoice.say(_pick_text(reply, npc), npc, {}, _rng)
+	var result_lines := Encounters.apply_effects(_dsl_only(effects))
+	text += _apply_counter_effects(npc, effects)
+	if c.has("verb") and success:
+		Causality.record(str(c["verb"]), {"target": npc.npc_name, "target_faction": npc.faction, "position": (npc as Node3D).global_position})
+	if not result_lines.is_empty():
+		text += "\n[color=#ffd23e]" + "  ".join(PackedStringArray(result_lines)) + "[/color]"
+	var impact: Array[String] = []
+	if is_instance_valid(npc):
+		if effects.has("react"):
+			var r := str(npc.react(str(effects["react"])))
+			if r != "":
+				impact.append(r)
+		var change := str(npc.after_interaction(before_rel, before_att))
+		if change != "":
+			impact.append(change)
+	if not impact.is_empty():
+		text += "\n\n" + _impact_block(impact)
+	EventBus.interaction_done.emit("counter", success, npc)
+	EventBus.dialogue_requested.emit(npc.npc_name, text, [], Callable())
+
+
+## NPC-side effects shared by counters and approaches (plus "grudge": "now"/"clear").
+func _apply_counter_effects(npc: Node, effects: Dictionary) -> String:
+	var extra := _apply_npc_effects(npc, effects)
+	match str(effects.get("grudge", "")):
+		"now":
+			npc.grudge = true
+			npc._grudge_wait = 0.5
+			npc.attitude = mini(int(npc.attitude), -20)
+		"clear":
+			npc.grudge = false
+	if effects.has("owes"):
+		npc.owes_favour = bool(effects["owes"])
+		npc._favour_wait = _rng.randf_range(20.0, 40.0)
+	if effects.get("stay", false):
+		npc._leaving = false
+	if effects.get("unrob", false):
+		npc.robbed = false
+	if effects.get("unspook", false):
+		npc.spooked_until = 0.0
+	return extra
 
 
 ## A verb tried on someone who is on the phone to Paragon: win them over and the call dies,

@@ -62,7 +62,33 @@ def main() -> None:
     gossip = count_sym("gossip_open") * sum(count_sym(k) * sum(judge(k[4:], s) for s in stances) for k in kinds)
     aside = count_sym("aside_open") * sum(count_sym(k) * sum(judge(k[4:], s) for s in stances) for k in kinds)
     after = sum(count_sym(k) for k in RULES if k.startswith("after_")) * (1 + closes)
+    # Whole exchanges: verb outcome line x afterword x the NPC's counter-move x your reply.
+    verbs = json.loads((ROOT / "data/interactions.json").read_text())["verbs"]
+    counters = json.loads((ROOT / "data/counters.json").read_text())
+    vkind = react["verb_kind"]
+
+    def tpl_paths(tpls):
+        total = 0
+        for t in tpls:
+            asks = sum(count_text(a) for a in t["ask"])
+            replies = sum(sum(count_text(r) for r in c.get("reply", [])) + sum(count_text(r) for r in c.get("fail_reply", []))
+                          for c in t["choices"])
+            total += asks * replies
+        return total
+
+    exchanges = 0
+    for vid, v in verbs.items():
+        kind = vkind.get(vid, "talk")
+        for outcome, key in (("success", "ok"), ("fail", "fail")):
+            if outcome not in v:
+                continue
+            lines = sum(count_text(l) for l in v[outcome].get("lines", ["..."]))
+            aft = 1 + count_sym(f"after_{kind}_{key}") if f"after_{kind}_{key}" in RULES else 1
+            exchanges += lines * aft * max(1, tpl_paths(counters["counters"].get(f"{kind}_{key}", [])))
+    approaches = sum(tpl_paths(v) for v in counters["approach"].values())
     rows = [
+        ("interaction exchanges", exchanges),
+        ("NPCs coming to you", approaches),
         ("NPC remarks about you", remarks),
         ("bystander reactions (seen)", now),
         ("memories brought up later", recall),

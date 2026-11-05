@@ -315,5 +315,44 @@
 			"dance": "approve",
 			"hurt": "approve"
 		}
+	},
+	"default_react": {
+		"_doc": "Lasting reaction for a verb outcome when the verb itself names none (NPC.react).",
+		"talk": {
+			"ok": "warm",
+			"fail": "cold"
+		},
+		"charity": {
+			"ok": "grateful",
+			"fail": "cold"
+		},
+		"threat": {
+			"ok": "scared",
+			"fail": "grudge"
+		},
+		"theft": {
+			"ok": "robbed",
+			"fail": "grudge"
+		},
+		"fight": {
+			"ok": "scared",
+			"fail": "grudge"
+		},
+		"show": {
+			"ok": "fan",
+			"fail": "heckler"
+		},
+		"beg": {
+			"ok": "pity",
+			"fail": "cold"
+		},
+		"deal": {
+			"ok": "partner",
+			"fail": "cold"
+		},
+		"weird": {
+			"ok": "intrigued",
+			"fail": "spooked"
+		}
 	}
 }
