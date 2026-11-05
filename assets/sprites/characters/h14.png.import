@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwjcf4uyuuv3q"
-path="res://.godot/imported/h14.png-d63abf5012491f767937bf35b587e743.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://assets/sprites/characters/h14.png"
-dest_files=["res://.godot/imported/h14.png-d63abf5012491f767937bf35b587e743.ctex"]
 
 [params]
 

@@ -179,6 +179,78 @@
     "NE": 63,
     "N": 64
    }
+  },
+  "sit": {
+   "fps": 5,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 65,
+    "SE": 66,
+    "E": 67,
+    "NE": 68,
+    "N": 69
+   }
+  },
+  "phone": {
+   "fps": 6,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 70,
+    "SE": 71,
+    "E": 72,
+    "NE": 73,
+    "N": 74
+   }
+  },
+  "dance": {
+   "fps": 10,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 75,
+    "SE": 76,
+    "E": 77,
+    "NE": 78,
+    "N": 79
+   }
+  },
+  "cheer": {
+   "fps": 9,
+   "loop": true,
+   "frames": 6,
+   "rows": {
+    "S": 80,
+    "SE": 81,
+    "E": 82,
+    "NE": 83,
+    "N": 84
+   }
+  },
+  "wave": {
+   "fps": 9,
+   "loop": true,
+   "frames": 6,
+   "rows": {
+    "S": 85,
+    "SE": 86,
+    "E": 87,
+    "NE": 88,
+    "N": 89
+   }
+  },
+  "surrender": {
+   "fps": 6,
+   "loop": true,
+   "frames": 6,
+   "rows": {
+    "S": 90,
+    "SE": 91,
+    "E": 92,
+    "NE": 93,
+    "N": 94
+   }
   }
  }
 }
