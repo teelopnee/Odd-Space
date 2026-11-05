@@ -15,7 +15,7 @@
 			"sun": "#9a7dff",
 			"sun_energy": 0.45,
 			"ambient": "#4a3a80",
-			"ambient_energy": 1.1,
+			"ambient_energy": 1.3,
 			"neon": [
 				"#ff3ec8",
 				"#3ee6ff",
@@ -51,7 +51,8 @@
 			"building_h": [
 				5.0,
 				11.0
-			]
+			],
+			"exposure": 1.4
 		},
 		{
 			"id": "toxic_swamp",

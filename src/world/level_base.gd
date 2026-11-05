@@ -104,7 +104,7 @@ func _build_environment() -> void:
 	environment.ambient_light_color = pcolor("ambient", "#4a3a80")
 	environment.ambient_light_energy = float(palette.get("ambient_energy", 0.7))
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
-	environment.tonemap_exposure = 1.1
+	environment.tonemap_exposure = float(palette.get("exposure", 1.1))
 	environment.tonemap_white = 6.0
 	# Dreamy HD-2D bloom: wide, soft halos around every light and neon strip.
 	environment.glow_enabled = true

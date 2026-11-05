@@ -165,7 +165,7 @@ func _make_materials() -> void:
 	_city = outdoor and float(hr[1]) >= 9.0
 	var floor_tex: String = palette.get("ground_tex", "ground_rock") if outdoor else "floor_metal"
 	var wet: bool = outdoor and str(palette.get("weather", "")) == "rain"
-	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, (0.5 if wet else 0.85) if outdoor else 0.38, (0.15 if wet else 0.1) if outdoor else 0.45, 0.8 if wet else 1.4)
+	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, (0.68 if wet else 0.85) if outdoor else 0.38, 0.1 if outdoor else 0.45, 0.7 if wet else 1.4)
 	floor_mat.vertex_color_use_as_albedo = true
 	_mats["floor"] = floor_mat
 	for kind in [["grate", "floor_grate", 0.5, 0.6], ["tile", "floor_tile", 0.5, 0.2], ["hazard", "hazard", 0.5, 0.5]]:
@@ -173,7 +173,7 @@ func _make_materials() -> void:
 		m.vertex_color_use_as_albedo = true
 		_mats["floor_" + kind[0]] = m
 	var path_tex: String = palette.get("path_tex", "floor_grate")
-	var path := _textured(path_tex, Color.WHITE, 0.5, (0.38 if wet else 0.5) if path_tex == "asphalt" else 0.7, 0.2, 0.7 if wet else 1.3)
+	var path := _textured(path_tex, Color.WHITE, 0.5, (0.6 if wet else 0.65) if path_tex == "asphalt" else 0.7, 0.12, 0.6 if wet else 1.3)
 	path.vertex_color_use_as_albedo = true
 	_mats["floor_path"] = path
 	var water := ShaderMaterial.new()
@@ -1628,6 +1628,44 @@ func _dock(p: Vector3) -> void:
 	it.radius = 2.4
 	it.position = p + Vector3(0, 0.8, 1.6)
 	root.add_child(it)
+	if outdoor:
+		_landing_markings(p)
+
+
+## Painted landing bay: hazard frame, corner beacons and a very Consortium floor message.
+func _landing_markings(p: Vector3) -> void:
+	var half := TILE * 1.75
+	var stripes: Array[Transform3D] = []
+	var cols: Array = []
+	var n := 14
+	for i in n:
+		var t := -half + (i + 0.5) * (2.0 * half / n)
+		for edge in [Vector3(t, 0.03, -half), Vector3(t, 0.03, half), Vector3(-half, 0.03, t), Vector3(half, 0.03, t)]:
+			var rot := 0.0 if absf(edge.z) > half - 0.01 else PI * 0.5
+			stripes.append(Transform3D(Basis(Vector3.UP, rot + 0.6), p + edge))
+			cols.append(Color(1.0, 0.8, 0.15) if i % 2 == 0 else Color(0.08, 0.08, 0.1))
+	_paint_multimesh(stripes, Vector2(0.18, 0.5), Color.WHITE, 0.0, cols)
+	for cx in [-1.0, 1.0]:
+		for cz in [-1.0, 1.0]:
+			var b := add_mesh(root, cylinder(0.12, 0.25, 8), emissive(Color(1.0, 0.25, 0.2), 6.0), p + Vector3(cx * half, 0.13, cz * half), 0.0, false)
+			var tw := b.create_tween().set_loops()
+			tw.tween_interval(0.5 + (cx + cz) * 0.12)
+			tw.tween_callback(b.set_visible.bind(false))
+			tw.tween_interval(0.45)
+			tw.tween_callback(b.set_visible.bind(true))
+	var msgs := ["LANDING BAY 7  //  PARKING 40 CR/MIN", "NO LOITERING  //  BREATHING SURCHARGE APPLIES", "WELCOME, VALUED VISITOR  //  YOU ARE BEING BILLED",
+		"STAND HERE TO BE SCANNED", "SMILE: CONSORTIUM CAMERAS ACTIVE"]
+	var lbl := Label3D.new()
+	lbl.text = msgs[rng.randi() % msgs.size()]
+	lbl.font_size = 72
+	lbl.pixel_size = 0.012
+	lbl.modulate = Color(1.0, 0.82, 0.25, 0.8)
+	lbl.outline_size = 0
+	lbl.shaded = true
+	lbl.rotation_degrees.x = -90.0
+	lbl.position = p + Vector3(0, 0.035, half + 1.1)
+	root.add_child(lbl)
+	_glow_spots.append([p + Vector3(0, 0, half), Color(1.0, 0.75, 0.2), 1.3])
 
 
 ## The Odd Duck: a second-hand, duck-shaped freighter built from primitives.
