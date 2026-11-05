@@ -13,8 +13,12 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
 
 ## Layout
 - `src/autoload/` singletons (order matters, see `project.godot`): `EventBus`, `DataDB`, `Game`,
-  `Factions`, `Causality`, `Origin`, `Crew`, `FlawPerk`, `Encounters`, `Saga`, `ShipAI`, `Audio`, `Router`.
-  `Saga` = procedural story per universe seed (`data/saga.json`): cast, 7 beats, twist, endings, side jobs.
+  `Factions`, `Causality`, `Origin`, `Crew`, `FlawPerk`, `Encounters`, `Saga`, `Stories`, `Interactions`, `ShipAI`, `Audio`, `Router`.
+  `Origin` = 6 tag categories (class incl. 5 Consortium heirs .. beggar, age + exact years, background, personality,
+  motivation, secret; `data/tags.json`). `Saga` = branching procedural main story (`data/saga.json`: approaches per beat,
+  surrender choices, twist, 15+ finales, composed endings, early motivation endings). `Stories` = per-planet local arcs
+  + street events (`data/stories.json`). `Interactions` = character-dependent verbs on NPCs (`data/interactions.json`).
+  Story/interaction choices share one requirement grammar (flag/any_flag/tag/age/min_wealth/... see the `_doc` keys).
   Systems communicate via `EventBus` signals. Persistent systems implement `reset()/to_save()/from_save()`
   and are registered in `Game._systems()` + `Game.save_game()/load_game()`.
 - `src/actors/` Player / Enemy (data-driven subsystems) / NPC (witness, dialogue) / Projectile.
@@ -35,9 +39,10 @@ Download Godot once (Linux x86_64) into your scratchpad:
 ```bash
 godot --headless --path . --import                                  # (re)generate .godot cache, *.uid, *.import
 godot --headless --path . --script res://tools/check_project.gd     # compiles all scripts + scenes, exit code = failures
-godot --headless --path . --script res://tools/smoke_test.gd        # plays station -> ship -> all planets -> save/load
+godot --headless --path . --script res://tools/smoke_test.gd        # station -> ship -> planets -> saga -> 6 random lives to endings
 ```
-`grep "SCRIPT ERROR"` on the smoke-test output must be empty.
+`grep "SCRIPT ERROR"` on the smoke-test output must be empty. `tools/count_endings.gd` prints the ending space;
+`tools/print_world.gd -- <biome|all> <seed>` prints generated maps.
 Screenshots (software Vulkan): `apt-get install mesa-vulkan-drivers xvfb`, then
 `VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --resolution 1280x800 --script res://tools/capture_screens.gd -- <out_dir>`
 

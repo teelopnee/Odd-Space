@@ -15,6 +15,12 @@ const GRAVITY := 24.0
 @export var sprite_name := "civilian_a"
 var look: Dictionary = {}
 var persona_id := ""
+var story_id := ""     ## planet-story / street-event character (Stories autoload)
+var job := ""
+var need := ""
+var attitude := 0      ## -100..100, how much they like the player (Interactions)
+var discount := 0.0    ## merchant price discount earned through interactions
+var loyal := false     ## won't report you any more
 
 @onready var sprite: BillboardSprite = $Sprite
 @onready var witness: WitnessComponent = $Witness
@@ -73,6 +79,8 @@ func _ready() -> void:
 	add_child(_bubble)
 	EventBus.enemy_killed.connect(func(_e, _i): _on_combat_nearby())
 	EventBus.subsystem_broken.connect(func(_e, _s, _f): _on_combat_nearby())
+	if role != "recruit":
+		Interactions.setup_npc(self, _rng)
 	name_label.text = npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
 	_update_prompt()
 
@@ -206,6 +214,10 @@ func _die(by_player: bool) -> void:
 # --- Dialogue -------------------------------------------------------------------------------
 
 func _on_talk(_player: Node) -> void:
+	if story_id != "" and state != "reporting":
+		_talking = 3.0
+		Stories.on_npc_talk(self)
+		return
 	if persona_id != "" and state != "reporting":
 		_talking = 3.0
 		Saga.on_persona_talk(persona_id)
@@ -233,8 +245,9 @@ func _talk_witness() -> void:
 		{"id": "bribe", "text": "Bribe them (%d cr)" % cost, "disabled": not Game.can_afford(cost)},
 		{"id": "voucher", "text": "Hand over a Bribe Voucher", "disabled": Game.item_count("bribe_voucher") <= 0},
 		{"id": "threaten", "text": "Threaten them (%d%% chance)" % roundi(_threaten_chance() * 100)},
-		{"id": "leave", "text": "Let them finish the call"},
 	]
+	choices.append_array(Interactions.choices_for(self, "witness").slice(0, 4))
+	choices.append({"id": "leave", "text": "Let them finish the call"})
 	EventBus.dialogue_requested.emit(npc_name, "\"Stay back! I'm on with %s right now. They're putting me through to a supervisor!\"" % witness.calls_faction.capitalize(), choices, _on_witness_choice)
 
 
@@ -247,6 +260,10 @@ func _threaten_chance() -> float:
 
 
 func _on_witness_choice(choice: String) -> void:
+	if choice.begins_with("act:"):
+		Interactions.resolve(self, choice.substr(4))
+		_update_prompt()
+		return
 	match choice:
 		"bribe":
 			if Game.spend(bribe_cost()):
@@ -280,7 +297,23 @@ func _talk_merchant() -> void:
 	if not Factions.will_trade(faction):
 		EventBus.dialogue_requested.emit(npc_name, "\"%s policy: I don't serve your kind. 'Your kind' being people with your credit rating.\"" % DataDB.faction_name(faction), [], Callable())
 		return
-	EventBus.shop_requested.emit(npc_name, faction, ["medkit", "air_canister", "antihistamine", "bribe_voucher", "lockpick"])
+	var choices := [{"id": "shop", "text": "Browse the goods%s" % ("  (-%d%%)" % roundi(discount * 100) if discount > 0.01 else ("  (+%d%%)" % roundi(-discount * 100) if discount < -0.01 else ""))}]
+	choices.append_array(Interactions.choices_for(self, "merchant"))
+	choices.append({"id": "leave", "text": "Leave"})
+	EventBus.dialogue_requested.emit(npc_name, Interactions.greeting(self) + "\n\"Buying, selling, or wasting my billable time?\"", choices, _on_merchant_choice)
+
+
+func _on_merchant_choice(choice: String) -> void:
+	if choice.begins_with("act:"):
+		Interactions.resolve(self, choice.substr(4))
+		return
+	if choice == "shop":
+		open_shop()
+
+
+func open_shop() -> void:
+	Game.shop_discount = discount
+	EventBus.shop_requested.emit(npc_name, faction, ["medkit", "air_canister", "antihistamine", "bribe_voucher", "lockpick", "painkillers", "paste_ration", "cyberdeck", "loaded_dice"])
 
 
 func _talk_recruit() -> void:
@@ -310,44 +343,62 @@ func _on_recruit_choice(choice: String) -> void:
 func _talk_civilian() -> void:
 	var lines: Array[String] = []
 	var known := Causality.known_crimes_at(Game.location_id, faction)
-	var attitude := Origin.npc_reaction(faction, traits)
-	if faction != "":
-		attitude += roundi(Factions.get_rep(faction) * 0.3)
 	if not known.is_empty():
 		var worst: Dictionary = known[0]
 		for n in known:
 			if int(n.severity) > int(worst.severity):
 				worst = n
 		lines.append("\"Wait... you're the one from the news! The %s at %s!\"" % [str(worst.label).to_lower(), worst.location_name])
-		attitude -= 15 * known.size()
-	elif attitude >= 15:
-		lines.append(_pick(["\"Hey, you look like one of us. Rough century, huh?\"", "\"Finally, someone who doesn't smell like a shareholder.\""]))
-	elif attitude <= -15:
-		lines.append(_pick(["\"I know your type. Keep walking.\"", "\"Don't stand so close, you'll lower my credit score.\""]))
+		attitude -= 10
 	else:
-		lines.append(_pick(["\"Breathe quietly, friend. They bill by the decibel now.\"", "\"Got any spare air? No? Yeah. Nobody does.\"", "\"Don't look at the ads too long. They look back.\""]))
+		lines.append(Interactions.greeting(self))
+	if job != "":
+		lines.append("[i](%s - %s, %s)[/i]" % [npc_name, job, "friendly" if attitude >= 15 else ("hostile" if attitude <= -15 else "wary")])
 	var crisis := PlanetGenerator.layer(Game.current_planet, "crises") if not Game.current_planet.is_empty() else {}
-	if not crisis.is_empty():
+	if not crisis.is_empty() and _rng.randf() < 0.35:
 		lines.append("\"And with this %s going on... %s\"" % [str(crisis.get("name", "")).to_lower(), crisis.get("desc", "")])
-	var choices := [
-		{"id": "give", "text": "Give them 10 credits", "disabled": not Game.can_afford(10)},
-		{"id": "rumor", "text": "Ask what people are saying"},
-		{"id": "leave", "text": "Leave"},
-	]
+	var choices := Interactions.choices_for(self, "civilian")
+	choices.append({"id": "rumor", "text": "Ask what people are saying"})
+	choices.append({"id": "leave", "text": "Leave"})
 	EventBus.dialogue_requested.emit(npc_name, "\n".join(lines), choices, _on_civilian_choice)
 
 
 func _on_civilian_choice(choice: String) -> void:
-	match choice:
-		"give":
-			if Game.spend(10):
-				Causality.record("charity", {"target": npc_name, "target_faction": faction, "position": global_position})
-				EventBus.dialogue_requested.emit(npc_name, "\"...Really? No catch? Is this a prank show?\" They look at you like you're an alien. Kindness is rare out here.", [], Callable())
-		"rumor":
-			var heads := Causality.latest_headlines(2)
-			var text := "\"Lumen's been running the same story all week: '%s'\"" % heads[0] if not heads.is_empty() \
-				else "\"Nothing ever happens here. Except the bills. The bills always happen.\""
-			EventBus.dialogue_requested.emit(npc_name, text, [], Callable())
+	if choice.begins_with("act:"):
+		Interactions.resolve(self, choice.substr(4))
+		return
+	if choice == "rumor":
+		var text := Interactions.rumor(self) if attitude > -25 else "\"Rumours cost extra for people like you.\""
+		EventBus.dialogue_requested.emit(npc_name, text, [], Callable())
+
+
+## Bought, charmed or scared into loyalty: they stop reporting you.
+func make_loyal() -> void:
+	loyal = true
+	if witness.is_reporting():
+		witness.silence("talked")
+	witness.active = false
+	_update_prompt()
+
+
+## A story/street character's part is over: drop the marker and go back to normal life.
+func story_left(sid: String) -> void:
+	if story_id != sid:
+		return
+	story_id = ""
+	var m := get_node_or_null("QuestMarker")
+	if m:
+		m.queue_free()
+	for c in get_children():
+		if c is MeshInstance3D and c.mesh is QuadMesh:
+			c.queue_free()  # the marker's light beam
+	_update_prompt()
+
+
+func flee_from_player() -> void:
+	state = "flee"
+	_timer = 4.0
+	_flee_from = _player.global_position if _player != null and is_instance_valid(_player) else global_position
 
 
 func _pick(options: Array) -> String:

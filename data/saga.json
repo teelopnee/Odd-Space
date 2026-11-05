@@ -1,11 +1,107 @@
 {
-	"_doc": "Procedural saga templates. Every run Saga (src/autoload/saga.gd) rolls a unique antagonist, ally, MacGuffin, scheme, personal thread (from your Motivation tag) and twist (from your Secret tag), then lays 7 story beats across random planets. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {faction} {macguffin} {scheme} {personal} {lieutenant} {planet} {clue}.",
+	"_doc": "Procedural saga templates. Every run Saga (src/autoload/saga.gd) rolls a unique antagonist, ally, MacGuffin, scheme, personal thread (from your Motivation tag) and twist (from your Secret tag), then lays 7 story beats across random planets. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {faction} {macguffin} {scheme} {personal} {lieutenant} {planet} {clue}. v2: approaches (choices at every beat, gated like data/interactions.json), surrender (choices when an elite gives up), twist_choices, finale (MacGuffin fate), slides + legacy + codas compose the ending (see tools/count_endings.gd), early = motivation endings reachable before the finale.",
 	"names": {
-		"first": ["Juno", "Rex", "Marla", "Kaz", "Priya", "Otto", "Wen", "Lula", "Dex", "Ivo", "Sol", "Tam", "Bex", "Nova", "Ash", "Zara", "Mika", "Ezra", "Lena", "Taro", "Ines", "Kofi", "Anya", "Bram", "Cleo", "Dmitri", "Fen", "Gaia", "Hiro", "Odette", "Pasha", "Quinn", "Rosa", "Teo", "Uma", "Vik", "Yara", "Zeb"],
-		"last": ["Okafor", "Vance", "Duarte", "Ng", "Kowalski", "Mbeki", "Lindqvist", "Castellanos", "Haddad", "Tanaka", "Reyes", "O'Hara", "Petrov", "Achebe", "Moreau", "Sato", "Quill", "Nakamura", "Oyelaran", "Brightwater", "Kessler", "Abara", "Fontaine", "Szabo"],
-		"nick": ["Static", "Two-Bit", "Ledger", "Halo", "Rust", "Gutter", "Chrome", "Saint", "Ghost", "Vapor", "Quarterly", "Glitch", "Tin", "Neon", "Dividend", "Overdraft", "Patch", "Lucky"]
+		"first": [
+			"Juno",
+			"Rex",
+			"Marla",
+			"Kaz",
+			"Priya",
+			"Otto",
+			"Wen",
+			"Lula",
+			"Dex",
+			"Ivo",
+			"Sol",
+			"Tam",
+			"Bex",
+			"Nova",
+			"Ash",
+			"Zara",
+			"Mika",
+			"Ezra",
+			"Lena",
+			"Taro",
+			"Ines",
+			"Kofi",
+			"Anya",
+			"Bram",
+			"Cleo",
+			"Dmitri",
+			"Fen",
+			"Gaia",
+			"Hiro",
+			"Odette",
+			"Pasha",
+			"Quinn",
+			"Rosa",
+			"Teo",
+			"Uma",
+			"Vik",
+			"Yara",
+			"Zeb"
+		],
+		"last": [
+			"Okafor",
+			"Vance",
+			"Duarte",
+			"Ng",
+			"Kowalski",
+			"Mbeki",
+			"Lindqvist",
+			"Castellanos",
+			"Haddad",
+			"Tanaka",
+			"Reyes",
+			"O'Hara",
+			"Petrov",
+			"Achebe",
+			"Moreau",
+			"Sato",
+			"Quill",
+			"Nakamura",
+			"Oyelaran",
+			"Brightwater",
+			"Kessler",
+			"Abara",
+			"Fontaine",
+			"Szabo"
+		],
+		"nick": [
+			"Static",
+			"Two-Bit",
+			"Ledger",
+			"Halo",
+			"Rust",
+			"Gutter",
+			"Chrome",
+			"Saint",
+			"Ghost",
+			"Vapor",
+			"Quarterly",
+			"Glitch",
+			"Tin",
+			"Neon",
+			"Dividend",
+			"Overdraft",
+			"Patch",
+			"Lucky"
+		]
 	},
-	"traits": ["paranoid", "flamboyant", "gentle", "greedy", "poetic", "blunt", "nervous", "cheerfully nihilistic", "devoutly brand-loyal", "conspiracy-minded", "romantic", "exhausted"],
+	"traits": [
+		"paranoid",
+		"flamboyant",
+		"gentle",
+		"greedy",
+		"poetic",
+		"blunt",
+		"nervous",
+		"cheerfully nihilistic",
+		"devoutly brand-loyal",
+		"conspiracy-minded",
+		"romantic",
+		"exhausted"
+	],
 	"quirks": [
 		"ends every sentence with 'per my last transmission'",
 		"hums ad jingles when nervous",
@@ -15,78 +111,1794 @@
 		"speaks only in questions when lying",
 		"keeps a pet cactus named Collateral",
 		"quotes their own Lumen reviews",
-		"apologises to vending machines"
+		"apologises to vending machines",
+		"narrates their own life in the third person, past tense",
+		"tips everyone, including doors",
+		"refuses to say any brand name out loud",
+		"keeps score of every favour, in a notebook, in pencil",
+		"only drinks tea brewed from pre-war leaves",
+		"sings when lying",
+		"calls you 'kid' regardless of your age",
+		"can't stop apologising to drones",
+		"wears sunglasses at night, indoors, in space"
 	],
-	"jobs": ["air sommelier", "debt counsellor", "paste taster", "ad-dream editor", "repo pilot", "union organiser", "clone tailor", "smuggler", "street medic", "holo-preacher", "junk oracle", "retired jingle writer", "rogue auditor", "cryo-thief", "billboard hacker", "noodle-stand philosopher"],
-	"antagonist_titles": ["VP of Breathing Experience", "Chief Collateral Officer", "Director of Narrative Compliance", "Head of Synergy Enforcement", "SVP of Emotional Monetisation", "Regional Overlord of Customer Delight"],
+	"jobs": [
+		"air sommelier",
+		"debt counsellor",
+		"paste taster",
+		"ad-dream editor",
+		"repo pilot",
+		"union organiser",
+		"clone tailor",
+		"smuggler",
+		"street medic",
+		"holo-preacher",
+		"junk oracle",
+		"retired jingle writer",
+		"rogue auditor",
+		"cryo-thief",
+		"billboard hacker",
+		"noodle-stand philosopher",
+		"cryo-vault night guard",
+		"loyalty-points bookie",
+		"drone whisperer",
+		"ex-Lumen anchor",
+		"paste sommelier",
+		"black-market surgeon",
+		"retired pirate queen",
+		"jingle exorcist",
+		"data smuggler",
+		"rooftop farmer",
+		"billboard repairman with a grudge",
+		"anti-ad monk"
+	],
+	"antagonist_titles": [
+		"VP of Breathing Experience",
+		"Chief Collateral Officer",
+		"Director of Narrative Compliance",
+		"Head of Synergy Enforcement",
+		"SVP of Emotional Monetisation",
+		"Regional Overlord of Customer Delight",
+		"Chief Air Officer",
+		"Head of Human Capital (Literal)",
+		"VP of Forever",
+		"Director of Inevitable Outcomes",
+		"Executive Shepherd of Debt",
+		"Chief Smile Officer",
+		"Global Head of Consequences",
+		"SVP of Narrative Ownership"
+	],
 	"schemes": [
 		"patent breathing in the outer colonies",
 		"repossess an entire planet's population as collateral",
 		"replace every news feed with one sponsored feeling",
 		"turn the Sprawl's dreams into ad inventory",
 		"privatise gravity and bill everyone for falling",
-		"sell the last natural sunrise to the highest bidder"
+		"sell the last natural sunrise to the highest bidder",
+		"auction off the colonies' oxygen reserves as 'experiences'",
+		"mandate a subscription for having a name",
+		"freeze every debtor in the Sprawl and sell the cryo-pods as real estate",
+		"replace every elected council with a loyalty-points leaderboard",
+		"buy the last free moon and bill its sunlight",
+		"make children legally co-signers of their parents' loans",
+		"patent the colour blue",
+		"turn the Lumen news into a betting market on people's lives",
+		"flood the Sprawl with addictive 'Premium Paste+'",
+		"rewrite the Consortium Charter so the founders can never die or pay tax"
 	],
 	"macguffins": [
-		{"name": "the Ledger of Everyone", "desc": "a data-core listing every debt ever owed, including the Consortium's own"},
-		{"name": "a Founder's Cryo-Key", "desc": "the master key to every cryo-vault in the Sprawl"},
-		{"name": "the Gravity Patent", "desc": "the original filing that made falling a billable event"},
-		{"name": "the Last Free Breath", "desc": "a sealed canister of 21st-century air, unowned by anyone"},
-		{"name": "Clause 9", "desc": "the missing page of the Consortium Charter that limits their power"},
-		{"name": "the Source Jingle", "desc": "the master recording behind every ad - and every sleeper trigger"}
+		{
+			"name": "the Ledger of Everyone",
+			"desc": "a data-core listing every debt ever owed, including the Consortium's own"
+		},
+		{
+			"name": "a Founder's Cryo-Key",
+			"desc": "the master key to every cryo-vault in the Sprawl"
+		},
+		{
+			"name": "the Gravity Patent",
+			"desc": "the original filing that made falling a billable event"
+		},
+		{
+			"name": "the Last Free Breath",
+			"desc": "a sealed canister of 21st-century air, unowned by anyone"
+		},
+		{
+			"name": "Clause 9",
+			"desc": "the missing page of the Consortium Charter that limits their power"
+		},
+		{
+			"name": "the Source Jingle",
+			"desc": "the master recording behind every ad - and every sleeper trigger"
+		},
+		{
+			"name": "the Founders' Contract",
+			"desc": "the original deal the five megacorps signed - including the clause they buried"
+		},
+		{
+			"name": "the Sprawl Master Key",
+			"desc": "an override code for every vending machine, door and drone in Consortium space"
+		},
+		{
+			"name": "the Breathing Algorithm",
+			"desc": "the pricing AI that decides what every breath costs, and who gets to stop"
+		},
+		{
+			"name": "a Cryo-Vault Registry",
+			"desc": "the list of every person frozen as collateral - and who owns them"
+		},
+		{
+			"name": "the Paste Genome",
+			"desc": "the living culture all Gristle paste grows from. It is, technically, someone"
+		},
+		{
+			"name": "the Lumen Raw Archive",
+			"desc": "every unedited broadcast Lumen ever buried, including the true ones"
+		},
+		{
+			"name": "the Gate Codes",
+			"desc": "jump coordinates out of Consortium space - a door nobody is supposed to know exists"
+		},
+		{
+			"name": "the Last Election",
+			"desc": "the sealed ballots of the vote that was 'postponed' 200 years ago"
+		}
 	],
-	"clues": ["a corrupted data shard", "a blood-stained expense report", "a cryo-pod manifest", "a Lumen raw feed nobody aired", "a key-card shaped like a smile"],
+	"clues": [
+		"a corrupted data shard",
+		"a blood-stained expense report",
+		"a cryo-pod manifest",
+		"a Lumen raw feed nobody aired",
+		"a key-card shaped like a smile",
+		"a burnt cryo-ticket",
+		"a smuggler's ledger page",
+		"a Paragon interrogation tape",
+		"an OxyGenix price-forecast leak",
+		"a child's drawing with coordinates on it"
+	],
 	"personal": {
-		"find_sibling": {"label": "your sibling", "role": "sibling", "intro": "A cryo-manifest lists a pod sold the same day as yours. The name is {personal}. Last seen on {planet}.", "met": "{personal} stares at you for a long time. \"They told me you were collateral. They told me you were dead.\" They hand you a tracking code: \"{antagonist} bought both our pods.\""},
-		"pay_debt": {"label": "your debt", "role": "banker", "intro": "Your Halcyon debt file was transferred to a private collector: {personal}, operating out of {planet}.", "met": "{personal} slides your debt file across the table. \"I'll erase it. All of it. If you bring me {macguffin}. {antagonist} owes me more than you do.\""},
-		"burn_consortium": {"label": "the resistance", "role": "rebel", "intro": "A pirate broadcast keeps repeating one name: {personal}, a resistance cell leader on {planet}.", "met": "{personal} doesn't trust you. Then they see your record on the Causality feed and laugh. \"Fine. You're chaotic enough. {antagonist} is moving {macguffin} - help us take it.\""},
-		"get_famous": {"label": "your rival", "role": "rival", "intro": "Lumen's hottest new star, {personal}, is filming on {planet} - and they're telling YOUR story, badly.", "met": "{personal} rolls their eyes. \"You're the real one? Ugh. Fine. The story's bigger than both of us: {antagonist} wants {macguffin}. Whoever exposes it gets prime time.\""},
-		"buy_a_planet": {"label": "the land deed", "role": "broker", "intro": "A planet deed auction is rigged by {antagonist}. The only honest broker left is {personal}, on {planet}.", "met": "{personal} taps a deed tablet. \"Bring down {antagonist} and the auction goes public. Then any idiot can buy a planet. Even you.\""}
+		"find_sibling": {
+			"label": "your sibling",
+			"role": "sibling",
+			"intro": "A cryo-manifest lists a pod sold the same day as yours. The name is {personal}. Last seen on {planet}.",
+			"met": "{personal} stares at you for a long time. \"They told me you were collateral. They told me you were dead.\" They hand you a tracking code: \"{antagonist} bought both our pods.\""
+		},
+		"pay_debt": {
+			"label": "your debt",
+			"role": "banker",
+			"intro": "Your Halcyon debt file was transferred to a private collector: {personal}, operating out of {planet}.",
+			"met": "{personal} slides your debt file across the table. \"I'll erase it. All of it. If you bring me {macguffin}. {antagonist} owes me more than you do.\""
+		},
+		"burn_consortium": {
+			"label": "the resistance",
+			"role": "rebel",
+			"intro": "A pirate broadcast keeps repeating one name: {personal}, a resistance cell leader on {planet}.",
+			"met": "{personal} doesn't trust you. Then they see your record on the Causality feed and laugh. \"Fine. You're chaotic enough. {antagonist} is moving {macguffin} - help us take it.\""
+		},
+		"get_famous": {
+			"label": "your rival",
+			"role": "rival",
+			"intro": "Lumen's hottest new star, {personal}, is filming on {planet} - and they're telling YOUR story, badly.",
+			"met": "{personal} rolls their eyes. \"You're the real one? Ugh. Fine. The story's bigger than both of us: {antagonist} wants {macguffin}. Whoever exposes it gets prime time.\""
+		},
+		"buy_a_planet": {
+			"label": "the land deed",
+			"role": "broker",
+			"intro": "A planet deed auction is rigged by {antagonist}. The only honest broker left is {personal}, on {planet}.",
+			"met": "{personal} taps a deed tablet. \"Bring down {antagonist} and the auction goes public. Then any idiot can buy a planet. Even you.\""
+		},
+		"revenge": {
+			"label": "the name on your list",
+			"role": "informant",
+			"intro": "The person who knows where your enemy sleeps is {personal}, hiding on {planet}.",
+			"met": "{personal} slides a photo across the table. \"The one who ruined you? Works for {antagonist} now. Kill the scheme and you kill their career. Or, you know. Just kill them.\""
+		},
+		"find_cure": {
+			"label": "the cure",
+			"role": "doctor",
+			"intro": "A disgraced Halcyon doctor, {personal}, claims the cure for your condition is real - and hidden on {planet}.",
+			"met": "{personal} checks your eyes and winces. \"The cure's real. The patent belongs to {antagonist}. They'd rather you die than set a price precedent.\""
+		},
+		"protect_family": {
+			"label": "your family",
+			"role": "debt broker",
+			"intro": "Your family's collateral contract was resold to {personal}, a broker on {planet}.",
+			"met": "{personal} taps your family's file. \"Lovely people. Terrible credit. {antagonist} is buying up contracts like theirs by the planet. Stop that and I'll tear this one up.\""
+		},
+		"become_ceo": {
+			"label": "the board seat",
+			"role": "kingmaker",
+			"intro": "A retired board member, {personal}, can get you into the Consortium boardroom. They're on {planet}, bored.",
+			"met": "{personal} laughs. \"You want a seat at the table? Then bring down {antagonist}. Nothing opens a chair like a scandal.\""
+		},
+		"escape_sprawl": {
+			"label": "the way out",
+			"role": "gatekeeper",
+			"intro": "A gate-pilot named {personal} has flown past the edge of the Sprawl. They're grounded on {planet}.",
+			"met": "{personal} draws a map on a napkin, then eats it. \"The gate codes exist. {antagonist} wants them locked forever. Get them first and I'll fly you through.\""
+		},
+		"find_love": {
+			"label": "your lost love",
+			"role": "witness",
+			"intro": "Someone on {planet}, {personal}, saw the cryo-pod that held the one you lost.",
+			"met": "{personal} looks at your ring. \"They woke up before you. They searched for a year. Then {antagonist}'s people signed them to a 'loyalty contract'. They're still out there.\""
+		},
+		"redemption": {
+			"label": "the ones you wronged",
+			"role": "survivor",
+			"intro": "A survivor of what you did, {personal}, lives on {planet}. They know your face.",
+			"met": "{personal} doesn't shout. That's worse. \"If you want forgiveness, earn it. {antagonist} is about to do to millions what you did to us. Stop them.\""
+		}
 	},
 	"twists": {
 		"wanted_alias": "The bounty on your old name was posted by {ally}. They needed you desperate enough to work for them.",
 		"synth_air_allergy": "Your 'allergy' was designed: {antagonist}'s air formula rejects unregistered lungs. You were the prototype.",
 		"compulsive_liar": "The wild story you tell about your past? It's true. You and {antagonist} built this scheme together, before the cryo.",
 		"sleeper_agent": "Your sleeper trigger is {antagonist}'s company jingle. {ally} has been humming it to steer you all along.",
-		"kleptomaniac": "You already stole {macguffin} once, before the freeze. {ally} knew - that's why they 'found' you."
+		"kleptomaniac": "You already stole {macguffin} once, before the freeze. {ally} knew - that's why they 'found' you.",
+		"secret_heir": "Your bloodline is {antagonist}'s - you are the heir they had erased. The scheme was always about removing you.",
+		"terminal_illness": "Your illness isn't natural: {antagonist}'s product made you sick. {ally} has known the whole time.",
+		"ai_in_head": "The ghost in your head is a backup of {antagonist}'s own mind. It's been steering you to {macguffin} so it can take a body.",
+		"killed_someone": "The person you killed was {ally}'s family. They've been waiting to see what kind of person you are now.",
+		"double_agent": "One of your handlers is {ally}. The other is {antagonist}. You have been reporting on yourself.",
+		"stolen_identity": "The life you stole belonged to {ally}'s partner. They recognised the face the moment they met you.",
+		"mob_debt": "The Syndicate you owe is a shell company. Its owner is {antagonist}. {ally} was sent to collect."
 	},
 	"beats": [
-		{"id": "contact", "act": 1, "type": "talk", "who": "ally", "title": "A Signal in the Static",
+		{
+			"id": "contact",
+			"act": 1,
+			"type": "talk",
+			"who": "ally",
+			"title": "A Signal in the Static",
 			"intro": "QUACK intercepts a coded ping. \"Someone named {ally} - a {ally_job} - knows about {macguffin}. They're on {planet}. Sounds like a trap. I love traps.\"",
-			"talk": "{ally} pulls you behind a noodle stand. \"{antagonist}, {antagonist_title} at {faction}, plans to {scheme}. They need {macguffin}. We need to get there first. Start with {clue} - it was dumped on {next_planet}.\""},
-		{"id": "clue", "act": 1, "type": "retrieve", "item": "clue", "title": "Follow the Paper Trail",
+			"talk": "{ally} pulls you behind a noodle stand. \"{antagonist}, {antagonist_title} at {faction}, plans to {scheme}. They need {macguffin}. We need to get there first. Start with {clue} - it was dumped on {next_planet}.\""
+		},
+		{
+			"id": "clue",
+			"act": 1,
+			"type": "retrieve",
+			"item": "clue",
+			"title": "Follow the Paper Trail",
 			"intro": "{clue} is somewhere on {planet}, guarded by people who get paid not to ask questions.",
-			"done": "You crack {clue} open. A name falls out: {lieutenant}, {antagonist}'s fixer."},
-		{"id": "personal", "act": 2, "type": "talk", "who": "personal", "title": "Unfinished Business",
+			"done": "You crack {clue} open. A name falls out: {lieutenant}, {antagonist}'s fixer."
+		},
+		{
+			"id": "personal",
+			"act": 2,
+			"type": "talk",
+			"who": "personal",
+			"title": "Unfinished Business",
 			"intro": "{personal_intro}",
-			"talk": "{personal_met}"},
-		{"id": "lieutenant", "act": 2, "type": "defeat", "who": "lieutenant", "title": "The Fixer",
+			"talk": "{personal_met}"
+		},
+		{
+			"id": "lieutenant",
+			"act": 2,
+			"type": "defeat",
+			"who": "lieutenant",
+			"title": "The Fixer",
 			"intro": "{lieutenant} runs {antagonist}'s dirty work out of {planet}. They won't come quietly.",
-			"done": "{lieutenant} drops a vault key with the {faction} logo. It's warm. Ugh."},
-		{"id": "macguffin", "act": 2, "type": "retrieve", "item": "macguffin", "title": "Hostile Acquisition",
+			"done": "{lieutenant} drops a vault key with the {faction} logo. It's warm. Ugh."
+		},
+		{
+			"id": "macguffin",
+			"act": 2,
+			"type": "retrieve",
+			"item": "macguffin",
+			"title": "Hostile Acquisition",
 			"intro": "{macguffin} is stored on {planet}. Security is 'premium tier'.",
-			"done": "You hold {macguffin} - {macguffin_desc}. Every Consortium scanner in the sector just blinked."},
-		{"id": "twist", "act": 3, "type": "talk", "who": "ally", "title": "The Fine Print",
+			"done": "You hold {macguffin} - {macguffin_desc}. Every Consortium scanner in the sector just blinked."
+		},
+		{
+			"id": "twist",
+			"act": 3,
+			"type": "talk",
+			"who": "ally",
+			"title": "The Fine Print",
 			"intro": "{ally} wants to meet on {planet}. \"Bring {macguffin}. Come alone. Well, bring the duck.\"",
-			"talk": "{twist}"},
-		{"id": "finale", "act": 3, "type": "defeat", "who": "antagonist", "title": "Hostile Takeover",
+			"talk": "{twist}"
+		},
+		{
+			"id": "finale",
+			"act": 3,
+			"type": "defeat",
+			"who": "antagonist",
+			"title": "Hostile Takeover",
 			"intro": "{antagonist} is on {planet}, preparing to {scheme}. This ends now. Probably expensively.",
-			"done": "{antagonist} is down. {macguffin} hums in your hands. The whole Sprawl is watching the Lumen feed."}
+			"done": "{antagonist} is down. {macguffin} hums in your hands. The whole Sprawl is watching the Lumen feed."
+		}
 	],
 	"twist_choices": [
-		{"id": "forgive", "text": "Keep working with {ally}", "moral": {"mercy": 1.5, "order": 0, "greed": 0}},
-		{"id": "cut_ties", "text": "Cut {ally} loose", "moral": {"mercy": -0.5, "order": 0.5, "greed": 0}},
-		{"id": "sell_out", "text": "Sell {ally} out to {faction}", "moral": {"mercy": -1.5, "order": 0, "greed": 1.5}}
-	],
-	"endings": [
-		{"id": "expose", "text": "Broadcast {macguffin} on every Lumen screen", "epilogue": "The truth airs between two ads for Protein Paste. For one glorious quarter, nobody pays for air. {faction} stock crashes. You become a meme, then a legend, then a merchandise line."},
-		{"id": "seize", "text": "Keep {macguffin} and take {antagonist}'s seat", "epilogue": "You are now the {antagonist_title}. The view from the top floor is excellent. The air up here is free. For you."},
-		{"id": "destroy", "text": "Destroy {macguffin} so nobody owns it", "epilogue": "It burns with a strange, honest light. Nothing changes overnight. But nobody can ever {scheme}. The Odd Duck flies on, slightly lighter."}
+		{
+			"id": "forgive",
+			"text": "Keep working with {ally}",
+			"fate": "loyal",
+			"axes": {
+				"mercy": 1.5
+			}
+		},
+		{
+			"id": "cut_ties",
+			"text": "Cut {ally} loose",
+			"fate": "estranged",
+			"axes": {
+				"order": 0.5,
+				"mercy": -0.5
+			}
+		},
+		{
+			"id": "sell_out",
+			"text": "Sell {ally} out to {faction}",
+			"fate": "betrayed",
+			"axes": {
+				"greed": 1.5,
+				"mercy": -1.5
+			},
+			"effects": {
+				"credits": 150
+			},
+			"rep_faction": 15
+		},
+		{
+			"id": "kill_ally",
+			"text": "End {ally} here and now",
+			"fate": "dead",
+			"axes": {
+				"mercy": -2.5
+			}
+		},
+		{
+			"id": "turn_double",
+			"text": "Turn {ally} into a double agent against {antagonist}",
+			"requires": {
+				"any_flag": [
+					"spy",
+					"charming",
+					"lawyer",
+					"ruthless"
+				]
+			},
+			"fate": "double",
+			"add": {
+				"intel": 2
+			}
+		},
+		{
+			"id": "partner",
+			"text": "Kiss them. Complicated is your type.",
+			"requires_any": [
+				{
+					"flag": "charming"
+				},
+				{
+					"goal": "love"
+				},
+				{
+					"min_ally_trust": 2
+				}
+			],
+			"fate": "partner",
+			"axes": {
+				"mercy": 1
+			}
+		},
+		{
+			"id": "confess_back",
+			"text": "Tell them your own secret in return",
+			"requires": {
+				"any_flag": [
+					"honest",
+					"liar",
+					"dying",
+					"killer",
+					"identity_thief"
+				]
+			},
+			"fate": "confidant",
+			"add": {
+				"ally_trust": 2
+			},
+			"axes": {
+				"truth": 2
+			}
+		},
+		{
+			"id": "join_antagonist",
+			"text": "Go over to {antagonist}'s side",
+			"fate": "betrayed",
+			"set": {
+				"defected": true
+			},
+			"axes": {
+				"greed": 2,
+				"order": 1,
+				"mercy": -1
+			}
+		}
 	],
 	"side": {
-		"bounty": {"title": "Bounty: {target}", "offer": "\"{target} has been squeezing this block dry. Paragon won't touch them - they pay their fees on time. You could, though.\"", "done": "\"Gone? Really? Here - take this before I feel like an accomplice.\""},
-		"fetch": {"title": "Lost & Found: {item}", "offer": "\"I left {item} in a crate when the drones came. It's worth nothing to anyone but me. Please.\"", "done": "\"You actually found it.\" They hold {item} like it might evaporate. \"I owe you. Literally - here.\""},
-		"sabotage": {"title": "Ad Blocker", "offer": "\"These billboards scream at my kids all night. Break {count} of them. I'll pay. Lumen won't know it was me.\"", "done": "\"Quiet. Actual quiet. I forgot what it sounds like.\""}
+		"bounty": {
+			"title": "Bounty: {target}",
+			"offer": "\"{target} has been squeezing this block dry. Paragon won't touch them - they pay their fees on time. You could, though.\"",
+			"done": "\"Gone? Really? Here - take this before I feel like an accomplice.\""
+		},
+		"fetch": {
+			"title": "Lost & Found: {item}",
+			"offer": "\"I left {item} in a crate when the drones came. It's worth nothing to anyone but me. Please.\"",
+			"done": "\"You actually found it.\" They hold {item} like it might evaporate. \"I owe you. Literally - here.\""
+		},
+		"sabotage": {
+			"title": "Ad Blocker",
+			"offer": "\"These billboards scream at my kids all night. Break {count} of them. I'll pay. Lumen won't know it was me.\"",
+			"done": "\"Quiet. Actual quiet. I forgot what it sounds like.\""
+		}
 	},
-	"side_items": ["my grandmother's air canister", "a holo-photo of my dog", "a jar of pre-recall paste", "my union card", "a cassette of real birdsong", "my wedding ring (rented)"]
+	"side_items": [
+		"my grandmother's air canister",
+		"a holo-photo of my dog",
+		"a jar of pre-recall paste",
+		"my union card",
+		"a cassette of real birdsong",
+		"my wedding ring (rented)"
+	],
+	"approaches": {
+		"contact": [
+			{
+				"id": "trust",
+				"text": "\"I'm in. Tell me everything.\"",
+				"reply": "{ally} exhales. \"Good. I was running out of people who aren't for sale.\"",
+				"add": {
+					"ally_trust": 1
+				}
+			},
+			{
+				"id": "proof",
+				"text": "\"Prove it first.\"",
+				"reply": "{ally} hands you a cracked data-slate. It checks out. Mostly.",
+				"add": {
+					"intel": 1
+				},
+				"axes": {
+					"truth": 1
+				}
+			},
+			{
+				"id": "squeeze",
+				"text": "Squeeze them for everything they know",
+				"reply": "You pin {ally} to the noodle-stand counter. They talk fast and they'll remember it.",
+				"add": {
+					"intel": 2,
+					"ally_trust": -2
+				},
+				"axes": {
+					"mercy": -1
+				}
+			},
+			{
+				"id": "pay",
+				"text": "Pay for their loyalty (60 cr)",
+				"requires": {
+					"min_credits": 60
+				},
+				"effects": {
+					"credits": -60
+				},
+				"reply": "\"Money. The only honest language in the Sprawl.\"",
+				"add": {
+					"ally_trust": 1
+				},
+				"axes": {
+					"greed": 1
+				}
+			},
+			{
+				"id": "heir_job",
+				"text": "Offer them a job at your family's firm",
+				"requires": {
+					"flag": "heir"
+				},
+				"reply": "{ally} blinks. \"A job? With benefits? Do... do benefits still exist?\"",
+				"add": {
+					"ally_trust": 2
+				},
+				"axes": {
+					"order": 1
+				}
+			},
+			{
+				"id": "cop_record",
+				"text": "Run their record through your old Paragon login",
+				"requires": {
+					"flag": "cop"
+				},
+				"reply": "Three aliases, one warrant, a lot of unpaid parking in orbit. They're real, at least.",
+				"add": {
+					"intel": 1,
+					"ally_trust": -1
+				},
+				"axes": {
+					"truth": 1,
+					"order": 1
+				}
+			},
+			{
+				"id": "hack",
+				"text": "Read their messages while they talk",
+				"requires": {
+					"any_flag": [
+						"hacker",
+						"ai_ghost"
+					]
+				},
+				"reply": "Their inbox is a mess of encrypted favours and one message from 'Mum'. And one you'll want to remember.",
+				"add": {
+					"intel": 2,
+					"ally_trust": -1
+				},
+				"axes": {
+					"truth": 1
+				}
+			},
+			{
+				"id": "fake_name",
+				"text": "Tell them you're someone else entirely",
+				"requires": {
+					"any_flag": [
+						"liar",
+						"identity_thief",
+						"spy",
+						"has_alias"
+					]
+				},
+				"reply": "You become 'Dave', a freelance auditor. {ally} buys it. For now.",
+				"set": {
+					"ally_lied": true
+				},
+				"axes": {
+					"truth": -1
+				}
+			},
+			{
+				"id": "bigger",
+				"text": "\"This is bigger than both of us.\"",
+				"requires": {
+					"any_flag": [
+						"preacher",
+						"idealist",
+						"union"
+					]
+				},
+				"reply": "Something in {ally}'s face changes. \"...Yeah. Yeah, it is.\"",
+				"add": {
+					"ally_trust": 1
+				},
+				"axes": {
+					"mercy": 1
+				}
+			},
+			{
+				"id": "nothing",
+				"text": "\"I've got nothing but nerve. Is that enough?\"",
+				"requires": {
+					"max_wealth": 0
+				},
+				"reply": "{ally} laughs for the first time. \"Nerve is all anyone's got down here.\"",
+				"add": {
+					"ally_trust": 1
+				},
+				"axes": {
+					"truth": 1
+				}
+			},
+			{
+				"id": "kid",
+				"text": "\"Adults never notice kids. Let me do the sneaking.\"",
+				"requires": {
+					"age": [
+						"teen"
+					]
+				},
+				"reply": "{ally} looks you up and down. \"...That's horrifyingly smart.\"",
+				"add": {
+					"intel": 1
+				}
+			},
+			{
+				"id": "elder",
+				"text": "\"I've buried better schemes than this one.\"",
+				"requires": {
+					"age": [
+						"elder",
+						"ancient"
+					]
+				},
+				"reply": "{ally} straightens up like a cadet. \"Yes. Right. Sorry. Teach me.\"",
+				"add": {
+					"ally_trust": 1,
+					"intel": 1
+				}
+			}
+		],
+		"clue": [
+			{
+				"id": "read",
+				"text": "Read it now",
+				"reply": "Names, dates, a lot of money moving in circles.",
+				"add": {
+					"intel": 1
+				}
+			},
+			{
+				"id": "sell_copy",
+				"text": "Sell a copy to Lumen",
+				"reply": "Lumen pays well and edits better. By morning it's a 'lifestyle story'.",
+				"effects": {
+					"credits": 80
+				},
+				"add": {
+					"intel": 1,
+					"fame": 3
+				},
+				"axes": {
+					"greed": 1
+				},
+				"set": {
+					"leaked": true
+				}
+			},
+			{
+				"id": "redact",
+				"text": "Redact the innocent names first",
+				"reply": "You black out every name that's just a victim with paperwork.",
+				"axes": {
+					"mercy": 1
+				},
+				"add": {
+					"intel": 1
+				}
+			},
+			{
+				"id": "trace",
+				"text": "Trace who sent it",
+				"requires": {
+					"any_flag": [
+						"hacker",
+						"ai_ghost",
+						"knows_ledgers"
+					]
+				},
+				"reply": "The metadata leads straight to {lieutenant}'s private terminal. Sloppy.",
+				"add": {
+					"intel": 2
+				}
+			},
+			{
+				"id": "notarise",
+				"text": "Notarise it as evidence",
+				"requires": {
+					"any_flag": [
+						"lawyer",
+						"knows_ledgers",
+						"cop"
+					]
+				},
+				"reply": "Stamped, sealed, admissible. In a court that doesn't exist yet.",
+				"add": {
+					"evidence": 1
+				},
+				"axes": {
+					"order": 1
+				}
+			},
+			{
+				"id": "burn",
+				"text": "Memorise it and burn it",
+				"reply": "Now it only exists in your head. Nobody can steal it. Hopefully.",
+				"set": {
+					"memorised": true
+				},
+				"axes": {
+					"truth": -1
+				}
+			}
+		],
+		"personal": [
+			{
+				"id": "accept",
+				"text": "Take the deal",
+				"reply": "\"Then we understand each other.\"",
+				"add": {
+					"personal": 1
+				}
+			},
+			{
+				"id": "negotiate",
+				"text": "Negotiate better terms",
+				"requires": {
+					"any_flag": [
+						"charming",
+						"lawyer",
+						"rich",
+						"knows_ledgers"
+					]
+				},
+				"reply": "Twenty minutes later the deal is twice as good and {personal} doesn't know how.",
+				"add": {
+					"personal": 2
+				}
+			},
+			{
+				"id": "pay",
+				"text": "Pay for it upfront (150 cr)",
+				"requires": {
+					"min_credits": 150
+				},
+				"effects": {
+					"credits": -150
+				},
+				"reply": "\"Cash. How refreshingly old-fashioned.\"",
+				"add": {
+					"personal": 2
+				},
+				"axes": {
+					"greed": -1
+				}
+			},
+			{
+				"id": "force",
+				"text": "Force their hand",
+				"reply": "You make it very clear what happens if they don't help. They help.",
+				"add": {
+					"personal": 1
+				},
+				"axes": {
+					"mercy": -1
+				}
+			},
+			{
+				"id": "heart",
+				"text": "Tell them what this really means to you",
+				"requires": {
+					"any_flag": [
+						"honest",
+						"idealist"
+					]
+				},
+				"reply": "You don't plan the words. They just come. {personal} looks away, eyes wet. \"...Fine. For real this time.\"",
+				"add": {
+					"personal": 2
+				},
+				"axes": {
+					"mercy": 1,
+					"truth": 1
+				}
+			},
+			{
+				"id": "refuse",
+				"text": "Refuse - you'll do it your own way",
+				"reply": "\"Your funeral. Probably literally.\"",
+				"add": {
+					"personal": -1
+				},
+				"axes": {
+					"truth": 1
+				}
+			},
+			{
+				"id": "lie",
+				"text": "Promise them anything (you won't deliver)",
+				"requires": {
+					"any_flag": [
+						"liar",
+						"spy",
+						"identity_thief"
+					]
+				},
+				"reply": "You promise the moon. Literally, a moon. They believe you.",
+				"add": {
+					"personal": 1
+				},
+				"axes": {
+					"truth": -2
+				},
+				"set": {
+					"personal_lied": true
+				}
+			}
+		],
+		"macguffin": [
+			{
+				"id": "take",
+				"text": "Take it",
+				"reply": "It's heavier than it looks. Most important things are.",
+				"add": {}
+			},
+			{
+				"id": "copy",
+				"text": "Copy it before anyone knows you have it",
+				"requires": {
+					"any_flag": [
+						"hacker",
+						"ai_ghost",
+						"knows_ledgers",
+						"copywriter"
+					]
+				},
+				"reply": "One copy for the world, one for you. Insurance.",
+				"set": {
+					"copy": true
+				},
+				"axes": {
+					"truth": 1
+				}
+			},
+			{
+				"id": "killswitch",
+				"text": "Plant a kill-switch inside it",
+				"requires": {
+					"any_flag": [
+						"hacker",
+						"chemist",
+						"synthetic"
+					]
+				},
+				"reply": "If anyone else ever uses it, it eats itself. Including you. Probably.",
+				"set": {
+					"killswitch": true
+				}
+			},
+			{
+				"id": "dna_lock",
+				"text": "Lock it to your bloodline",
+				"requires": {
+					"any_flag": [
+						"heir",
+						"bloodline"
+					]
+				},
+				"reply": "It reads your blood and purrs. Now it's family property.",
+				"set": {
+					"locked": true
+				},
+				"axes": {
+					"greed": 1
+				}
+			},
+			{
+				"id": "hide",
+				"text": "Hide it where only you can find it",
+				"requires": {
+					"any_flag": [
+						"smuggler",
+						"courier",
+						"ghost"
+					]
+				},
+				"reply": "Smuggler's rule: never carry what you can't afford to lose.",
+				"set": {
+					"hidden": true
+				}
+			},
+			{
+				"id": "tell_ally",
+				"text": "Tell {ally} you have it",
+				"reply": "\"You actually did it.\" {ally} sounds almost scared.",
+				"add": {
+					"ally_trust": 1
+				}
+			},
+			{
+				"id": "tell_nobody",
+				"text": "Tell nobody. Not even {ally}.",
+				"reply": "Some things are safer in one pair of hands.",
+				"add": {
+					"ally_trust": -1
+				},
+				"set": {
+					"secret_holder": true
+				}
+			}
+		]
+	},
+	"surrender": {
+		"lieutenant": [
+			{
+				"id": "kill",
+				"text": "Finish them",
+				"fate": "killed",
+				"axes": {
+					"mercy": -2
+				},
+				"reply": "It's quick. It doesn't feel quick."
+			},
+			{
+				"id": "spare",
+				"text": "Let them go",
+				"fate": "spared",
+				"axes": {
+					"mercy": 2
+				},
+				"reply": "{lieutenant} stares at you like you've broken a law of physics. Then they run."
+			},
+			{
+				"id": "arrest",
+				"text": "Hand them over to Paragon",
+				"fate": "arrested",
+				"axes": {
+					"order": 2
+				},
+				"effects": {
+					"credits": 60,
+					"rep": {
+						"paragon": 5
+					}
+				},
+				"reply": "Paragon takes them away in a van with a loyalty-points logo on it."
+			},
+			{
+				"id": "recruit",
+				"text": "Offer them a place on your side",
+				"requires": {
+					"any_flag": [
+						"charming",
+						"ruthless",
+						"rich",
+						"idealist",
+						"spy"
+					]
+				},
+				"fate": "recruited",
+				"add": {
+					"intel": 1
+				},
+				"reply": "\"Switch sides? ...The dental plan can't be worse.\""
+			},
+			{
+				"id": "interrogate",
+				"text": "Interrogate them",
+				"fate": "broken",
+				"add": {
+					"intel": 2
+				},
+				"axes": {
+					"mercy": -1
+				},
+				"reply": "They tell you where {antagonist} sleeps, eats, and keeps their spare scheme."
+			},
+			{
+				"id": "extort",
+				"text": "Take everything they own",
+				"fate": "robbed",
+				"effects": {
+					"credits": 180
+				},
+				"axes": {
+					"greed": 2
+				},
+				"reply": "Their accounts, their ship, their ugly watch. All yours."
+			},
+			{
+				"id": "stream",
+				"text": "Stream their confession live",
+				"requires": {
+					"any_flag": [
+						"influencer",
+						"famous"
+					]
+				},
+				"fate": "exposed",
+				"add": {
+					"fame": 6
+				},
+				"axes": {
+					"truth": 2
+				},
+				"reply": "Four million viewers watch {lieutenant} name names. The chat goes feral."
+			}
+		],
+		"antagonist": [
+			{
+				"id": "kill",
+				"text": "End it. End them.",
+				"fate": "killed",
+				"axes": {
+					"mercy": -2
+				},
+				"reply": "{antagonist} looks surprised. Executives always do."
+			},
+			{
+				"id": "spare",
+				"text": "Exile them - let them live with it",
+				"fate": "exiled",
+				"axes": {
+					"mercy": 2
+				},
+				"reply": "\"You'll regret this,\" they say. Maybe. But not today."
+			},
+			{
+				"id": "arrest",
+				"text": "Hand them to Paragon",
+				"fate": "arrested",
+				"axes": {
+					"order": 2
+				},
+				"reply": "Paragon reads them their rights, then invoices them for the reading."
+			},
+			{
+				"id": "expose",
+				"text": "Make them confess on every screen",
+				"requires_any": [
+					{
+						"any_flag": [
+							"influencer",
+							"famous"
+						]
+					},
+					{
+						"min_fame": 10
+					},
+					{
+						"state": {
+							"copy": true
+						}
+					},
+					{
+						"item": "press_pass"
+					}
+				],
+				"fate": "exposed",
+				"add": {
+					"fame": 10
+				},
+				"axes": {
+					"truth": 3
+				},
+				"reply": "{antagonist} confesses between two ads for Premium Paste+. Ratings: record-breaking."
+			},
+			{
+				"id": "seize",
+				"text": "Make them sign everything over to you",
+				"requires_any": [
+					{
+						"any_flag": [
+							"heir",
+							"lawyer",
+							"rich"
+						]
+					},
+					{
+						"min_intel": 3
+					}
+				],
+				"fate": "seized",
+				"axes": {
+					"greed": 2,
+					"order": 1
+				},
+				"reply": "Ten thousand signatures later, you own their shares, their ships and their pension."
+			},
+			{
+				"id": "reparations",
+				"text": "Make them pay back every debt they created",
+				"fate": "reparations",
+				"axes": {
+					"mercy": 2,
+					"order": 1
+				},
+				"reply": "Billions flow out of {antagonist}'s accounts into strangers' lives. Strangers start crying in the street."
+			},
+			{
+				"id": "servant",
+				"text": "Make them work for you now",
+				"requires": {
+					"any_flag": [
+						"ruthless",
+						"rich",
+						"cynic"
+					]
+				},
+				"fate": "servant",
+				"axes": {
+					"greed": 1,
+					"mercy": -1
+				},
+				"reply": "The {antagonist_title} is now your assistant. They are excellent at it. That's the scary part."
+			},
+			{
+				"id": "lt_decides",
+				"text": "Let {lieutenant} decide",
+				"requires": {
+					"state": {
+						"lieutenant_fate": "recruited"
+					}
+				},
+				"fate": "betrayed_by_own",
+				"reply": "{lieutenant} steps forward. You look away. Some debts are personal."
+			},
+			{
+				"id": "redeem",
+				"text": "Talk them into changing",
+				"requires": {
+					"any_flag": [
+						"idealist",
+						"preacher",
+						"honest"
+					]
+				},
+				"fate": "redeemed",
+				"axes": {
+					"mercy": 3,
+					"truth": 1
+				},
+				"reply": "It takes an hour. Then {antagonist} weeps. Nobody, including them, knew they could."
+			}
+		]
+	},
+	"finale": [
+		{
+			"id": "broadcast",
+			"text": "Broadcast {macguffin} on every Lumen screen",
+			"axes": {
+				"truth": 2
+			},
+			"slide": "The truth airs between two ads for Protein Paste. For one glorious quarter, nobody pays for air. {faction} stock collapses so fast the graph needs a second screen."
+		},
+		{
+			"id": "seize_company",
+			"text": "Keep {macguffin} and take {antagonist}'s seat",
+			"axes": {
+				"greed": 2,
+				"order": 1
+			},
+			"slide": "You are now the {antagonist_title}. The view from the top floor is excellent. The air up here is free. For you."
+		},
+		{
+			"id": "destroy",
+			"text": "Destroy {macguffin} so nobody owns it",
+			"axes": {
+				"mercy": 1
+			},
+			"slide": "It burns with a strange, honest light. Nothing changes overnight. But nobody, ever again, gets to {scheme}."
+		},
+		{
+			"id": "sell_paragon",
+			"text": "Sell it to Paragon Compliance",
+			"faction": "paragon",
+			"axes": {
+				"greed": 2,
+				"order": 1
+			},
+			"effects": {
+				"credits": 2000
+			},
+			"slide": "Paragon buys {macguffin} and uses it the only way it knows: as a reason to arrest more people. You get a medal and a very large cheque."
+		},
+		{
+			"id": "sell_halcyon",
+			"text": "Sell it to Halcyon Debt & Trust",
+			"faction": "halcyon",
+			"axes": {
+				"greed": 2
+			},
+			"effects": {
+				"credits": 2500
+			},
+			"slide": "Halcyon turns {macguffin} into a financial product. By spring, people are taking out loans to pay the interest on breathing it."
+		},
+		{
+			"id": "sell_gristle",
+			"text": "Sell it to Gristle Foods",
+			"faction": "gristle",
+			"axes": {
+				"greed": 2
+			},
+			"effects": {
+				"credits": 1800
+			},
+			"slide": "Gristle grinds {macguffin} into a new flavour of paste. It tastes like victory. Nobody can say exactly whose."
+		},
+		{
+			"id": "sell_oxy",
+			"text": "Sell it to OxyGenix",
+			"faction": "oxy",
+			"axes": {
+				"greed": 2
+			},
+			"effects": {
+				"credits": 2200
+			},
+			"slide": "OxyGenix bottles {macguffin} as 'Essence of Freedom', 49.99 a breath. It outsells water."
+		},
+		{
+			"id": "sell_lumen",
+			"text": "Sell it to Lumen Media",
+			"faction": "lumen",
+			"axes": {
+				"greed": 2,
+				"truth": -1
+			},
+			"effects": {
+				"credits": 2000
+			},
+			"slide": "Lumen buys {macguffin} and buries it under eleven seasons of a reality show about it. The finale is rigged."
+		},
+		{
+			"id": "give_ally",
+			"text": "Give it to {ally}",
+			"requires_state_any": {
+				"ally_fate": [
+					"loyal",
+					"partner",
+					"double",
+					"confidant"
+				]
+			},
+			"axes": {
+				"mercy": 1
+			},
+			"slide": "{ally} holds {macguffin} the way you'd hold a newborn or a bomb. \"I'll do something good with it,\" they say. They mostly do."
+		},
+		{
+			"id": "give_people",
+			"text": "Give it to the people",
+			"requires_any": [
+				{
+					"min_followers": 3
+				},
+				{
+					"any_flag": [
+						"union",
+						"preacher",
+						"idealist"
+					]
+				}
+			],
+			"axes": {
+				"mercy": 2,
+				"order": -2
+			},
+			"slide": "You hand {macguffin} to a crowd of strangers on a street corner. By nightfall there are a thousand copies. By morning, a hundred thousand. The Consortium cannot sue a whole planet. It tries."
+		},
+		{
+			"id": "personal_use",
+			"text": "{personal_finale_text}",
+			"personal": true,
+			"axes": {},
+			"slide": "{personal_finale_slide}"
+		},
+		{
+			"id": "leverage",
+			"text": "Keep it hidden - as leverage, forever",
+			"requires": {
+				"any_flag": [
+					"spy",
+					"lawyer",
+					"ruthless",
+					"cynic",
+					"ghost"
+				]
+			},
+			"axes": {
+				"greed": 1,
+				"truth": -1
+			},
+			"slide": "You keep {macguffin} in a place nobody knows. Every board meeting in the Sprawl now starts with someone nervously asking whether you're watching. You are."
+		},
+		{
+			"id": "upload_self",
+			"text": "Upload {macguffin} into your own mind",
+			"requires": {
+				"any_flag": [
+					"ai_ghost",
+					"synthetic",
+					"hacker"
+				]
+			},
+			"axes": {
+				"order": -1
+			},
+			"slide": "{macguffin} pours into you like light through a crack. You can hear every vending machine in the Sprawl. They are all, very quietly, asking for help."
+		},
+		{
+			"id": "walk_away",
+			"text": "Leave it where it lies and walk away",
+			"axes": {
+				"truth": 1
+			},
+			"slide": "You leave {macguffin} on the floor of an empty boardroom. Some things are too heavy to win."
+		},
+		{
+			"id": "ransom",
+			"text": "Ransom it back to {faction}'s board",
+			"axes": {
+				"greed": 3
+			},
+			"effects": {
+				"credits": 3500
+			},
+			"slide": "The board pays. The board always pays. Then it hires someone to find you. The Sprawl is big. You are patient."
+		},
+		{
+			"id": "serve",
+			"text": "Hand it to {antagonist}, as promised",
+			"requires_state": {
+				"defected": true
+			},
+			"axes": {
+				"order": 2,
+				"greed": 1,
+				"mercy": -2
+			},
+			"slide": "{antagonist} accepts {macguffin} with a polite nod and goes on to {scheme}. You get a corner office and a recurring nightmare."
+		},
+		{
+			"id": "double_cross",
+			"text": "Double-cross {antagonist} at the very last second",
+			"requires_state": {
+				"defected": true
+			},
+			"axes": {
+				"truth": 1,
+				"greed": 1
+			},
+			"slide": "At the signing ceremony you swap {macguffin} for a jar of paste. {antagonist} opens it live on Lumen. The Sprawl has never laughed so hard."
+		}
+	],
+	"personal_finale": {
+		"pay_debt": {
+			"text": "Use it to erase every debt - starting with yours",
+			"slide": "Your balance reads 0.00. So does everyone's. Halcyon's servers weep."
+		},
+		"burn_consortium": {
+			"text": "Use it to set the whole Consortium on fire",
+			"slide": "Five towers fall in one night. Nobody is hurt. Everybody is free. Then the arguments about what comes next begin."
+		},
+		"find_sibling": {
+			"text": "Trade it for your sibling's freedom",
+			"slide": "A cryo-pod hisses open. Same eyes as yours. \"You came,\" your sibling says. \"They told me nobody ever comes.\""
+		},
+		"get_famous": {
+			"text": "Turn it into the documentary of the century",
+			"slide": "'{player}: The Truth' streams to eleven billion. You are now more famous than air."
+		},
+		"buy_a_planet": {
+			"text": "Trade it for a planet deed",
+			"slide": "You own a planet. It's small, it's ugly and it's yours. You name a crater after the Odd Duck."
+		},
+		"revenge": {
+			"text": "Make your enemy watch you use it against them",
+			"slide": "You make sure the last face they see on every screen is yours. Revenge, it turns out, is a broadcast medium."
+		},
+		"find_cure": {
+			"text": "Use it to buy - or steal - the cure",
+			"slide": "The cure goes in like cold water. For the first time in years, you plan for next year."
+		},
+		"protect_family": {
+			"text": "Use it to buy your family's contracts back",
+			"slide": "Your family's contracts burn in a kitchen sink. Somebody cries. Somebody makes tea. It's real tea."
+		},
+		"become_ceo": {
+			"text": "Use it as leverage for a board seat",
+			"slide": "The Consortium board votes you in unanimously. Nobody wanted to be the one who didn't."
+		},
+		"escape_sprawl": {
+			"text": "Trade it for the gate codes - and leave",
+			"slide": "The Odd Duck passes the last Consortium beacon. Ahead: nothing billed, nothing owned, nothing promised. It's terrifying. It's perfect."
+		},
+		"find_love": {
+			"text": "Trade it for your lost love's contract",
+			"slide": "They're older than you remember. So are you, technically. They still laugh at the same terrible joke."
+		},
+		"redemption": {
+			"text": "Give it to the people you hurt",
+			"slide": "You hand it over without a speech. They decide what it's worth. For the first time, it's not up to you."
+		}
+	},
+	"affinity": {
+		"pay_debt": {
+			"seize_company": 1,
+			"sell_halcyon": 1,
+			"ransom": 2
+		},
+		"burn_consortium": {
+			"broadcast": 2,
+			"give_people": 2,
+			"destroy": 1,
+			"seize_company": -2,
+			"serve": -3
+		},
+		"find_sibling": {
+			"give_ally": 1,
+			"broadcast": 1
+		},
+		"get_famous": {
+			"broadcast": 2,
+			"sell_lumen": 1,
+			"walk_away": -1
+		},
+		"buy_a_planet": {
+			"ransom": 2,
+			"seize_company": 2,
+			"sell_oxy": 1,
+			"sell_halcyon": 1
+		},
+		"revenge": {
+			"broadcast": 1,
+			"destroy": 1
+		},
+		"find_cure": {
+			"seize_company": 1,
+			"ransom": 1,
+			"sell_halcyon": 1
+		},
+		"protect_family": {
+			"ransom": 1,
+			"give_people": 1,
+			"seize_company": 1
+		},
+		"become_ceo": {
+			"seize_company": 3,
+			"serve": 1,
+			"leverage": 2
+		},
+		"escape_sprawl": {
+			"walk_away": 1,
+			"ransom": 1,
+			"upload_self": 1
+		},
+		"find_love": {
+			"give_ally": 1
+		},
+		"redemption": {
+			"give_people": 2,
+			"destroy": 2,
+			"reparations": 1,
+			"seize_company": -2,
+			"ransom": -2
+		}
+	},
+	"slides": {
+		"antagonist": {
+			"killed": "{antagonist} is buried in a branded coffin with a loyalty-points QR code. Their shares are divided by lawyers who never met them.",
+			"exiled": "{antagonist} lives out their days on a moon with no Lumen signal. They write you a letter every year. You never open them.",
+			"arrested": "{antagonist} gets a trial, a verdict and a cell with a view. Their memoir becomes a bestseller. Some things never change.",
+			"exposed": "{antagonist}'s confession becomes the most-watched clip in history. Kids recite it in schoolyards like a rhyme.",
+			"seized": "{antagonist} owns nothing now - not even their own name, which you trademarked out of spite.",
+			"reparations": "{antagonist} spends the rest of their fortune paying back strangers. They are, reportedly, happier than they've ever been. It disgusts them.",
+			"servant": "{antagonist} fetches your coffee every morning. They are frighteningly good at it. You never turn your back on them.",
+			"betrayed_by_own": "{lieutenant} settled it. You never asked how. {antagonist} simply stopped existing, the way people do in the Sprawl.",
+			"redeemed": "{antagonist} opens a free clinic. Then another. Lumen calls it 'the most shocking rebrand in history'.",
+			"untouched": "{antagonist} is still out there, still the {antagonist_title}, still planning to {scheme}. Someone else's problem now.",
+			"victorious": "{antagonist} wins. The Sprawl gets a new slogan. You helped write it."
+		},
+		"lieutenant": {
+			"killed": "{lieutenant} never smiles again. Mostly because of the being-dead.",
+			"spared": "{lieutenant} opens a noodle stand on a quiet moon. The noodles are terrible. The tips are generous.",
+			"arrested": "{lieutenant} rats out forty colleagues for a shorter sentence. The Paragon cafeteria names a sandwich after them.",
+			"recruited": "{lieutenant} works for you now. Loyal, efficient, slightly terrifying - the perfect employee.",
+			"broken": "{lieutenant} talked. Then kept talking. Last seen telling strangers everything, forever.",
+			"robbed": "{lieutenant} is broke, which in the Sprawl is a fate worse than prison. They apply for a Halcyon loan.",
+			"exposed": "{lieutenant}'s confession stream is now a cult classic. They get recognised everywhere. They hate it.",
+			"unknown": "Nobody knows what became of {lieutenant}. In the Sprawl, that's the most common ending of all."
+		},
+		"ally": {
+			"loyal": "{ally} stays. Through everything. Some people do.",
+			"estranged": "You and {ally} never speak again. Sometimes you see their name on a news crawl and almost call.",
+			"betrayed": "{ally} survives your betrayal. They write a song about it. It's catchy, which makes it worse.",
+			"dead": "{ally} is buried without a sponsor. You pay for the headstone. It's the only thing you've ever paid for with a clear conscience.",
+			"double": "{ally} plays both sides so well that, years later, even they aren't sure which side won. You did. Probably.",
+			"partner": "{ally} moves into the Odd Duck. Q.U.A.C.K. complains about the extra air. Nobody listens.",
+			"confidant": "You and {ally} keep each other's secrets for the rest of your lives. It's the closest thing to family the Sprawl allows.",
+			"unknown": "{ally} disappears into the Sprawl with a wave. You never quite learn who they really were."
+		},
+		"personal": {
+			"pay_debt": [
+				"Your debt reads zero. You frame the statement. It's the most beautiful document you've ever seen.",
+				"Your debt is smaller. Not gone. Smaller. In the Sprawl, that counts as a happy ending.",
+				"Your debt survives everything you did. It always will. Halcyon sends a fruit basket. It's on your tab."
+			],
+			"burn_consortium": [
+				"The Consortium falls. Not all at once - but it falls, and it was you who pushed.",
+				"The Consortium wobbles. Two of the five towers fall. The other three raise prices to compensate.",
+				"The Consortium shrugs you off like a bad quarter. You become a footnote in their annual report."
+			],
+			"find_sibling": [
+				"You find your sibling. You both cry in a cryo-bay, which is the least romantic place in the galaxy.",
+				"You find a message your sibling left. They're alive, somewhere further out. It's enough to keep going.",
+				"You never find your sibling. You keep the old receipt. You keep looking."
+			],
+			"get_famous": [
+				"You become the most famous person in the Sprawl. Kids dress up as you. Some of them even get it right.",
+				"You're famous for about a week. Then a dancing paste-can goes viral. Such is fame.",
+				"Lumen edits you out of your own story. Your face appears only in the background of someone else's."
+			],
+			"buy_a_planet": [
+				"You own a planet. You plant the first free tree in a century. It's mostly a stick. You love it.",
+				"You own a planet. It's an asteroid. It's a big asteroid. It's a start.",
+				"The deed auction closes before you can bid. You end up owning a parking space in orbit."
+			],
+			"revenge": [
+				"The one who ruined you is ruined. You expected it to feel better. It feels finished, which is better.",
+				"You get your revenge, mostly. It turns out revenge, like everything else here, comes with fees.",
+				"Your enemy outlives your anger. One day you realise you've stopped thinking about them. That's its own kind of win."
+			],
+			"find_cure": [
+				"You're cured. Completely. You start making five-year plans and it feels like a crime.",
+				"The cure buys you years, not forever. You spend them well.",
+				"There's no cure in time. You spend your last months exactly how you want. The Sprawl remembers."
+			],
+			"protect_family": [
+				"Your family is free. Off every balance sheet in the Sprawl. They throw you a party; it's mostly paste and tears.",
+				"Most of your family is free. One contract was resold before you could reach it. You're still looking.",
+				"Your family stays collateral. But they know you tried, and in the Sprawl that's rare enough to be a legend."
+			],
+			"become_ceo": [
+				"You become CEO. The Consortium changes - slowly, expensively, but it does. Probably because you were poor once. Or pretending.",
+				"You get a board seat but not the chair. You learn that the table is longer than it looks.",
+				"The board laughs you out of the building. You start your own company. It's called Spite Incorporated."
+			],
+			"escape_sprawl": [
+				"You leave the Sprawl forever. Beyond the gate, the stars have no logos.",
+				"You reach the gate and turn back - someone has to stay and fix things. You're annoyed about it.",
+				"The gate is a lie. A Lumen set. You laugh until you cry, then you get back in the ship."
+			],
+			"find_love": [
+				"You find them. They kept the ring. You both kept the ring.",
+				"You find them, but they've built a new life. You leave a flower at their door and go.",
+				"You never find them. You whisper the name when the ship is quiet. The ship, for once, doesn't bill you."
+			],
+			"redemption": [
+				"The people you wronged forgive you. Not because you asked - because you earned it.",
+				"Some forgive you. Some never will. You learn to carry both.",
+				"Nobody forgives you. You keep trying anyway. That, maybe, is the point."
+			]
+		}
+	},
+	"legacy": [
+		{
+			"id": "martyr",
+			"title": "THE MARTYR OF THE SPRAWL",
+			"when": {
+				"flag": "dying",
+				"min_axis": {
+					"mercy": 2
+				}
+			},
+			"text": "You spent your last strength on other people. They name a street after you. The ads on it are free."
+		},
+		{
+			"id": "turncoat",
+			"title": "THE CORPORATE TURNCOAT",
+			"when": {
+				"state": {
+					"defected": true
+				}
+			},
+			"text": "You chose the winning side. History, written by that side, is very kind to you."
+		},
+		{
+			"id": "prophet",
+			"title": "THE PROPHET OF FREE AIR",
+			"when": {
+				"min_followers": 6
+			},
+			"text": "Your followers number in the millions now. They quote you on walls. Some of the quotes are even real."
+		},
+		{
+			"id": "revolutionary",
+			"title": "THE REVOLUTIONARY",
+			"when": {
+				"finale_in": [
+					"give_people",
+					"broadcast"
+				],
+				"max_axis": {
+					"order": -1
+				}
+			},
+			"text": "You broke the rules until the rules broke. The new ones are being written in the street."
+		},
+		{
+			"id": "tyrant",
+			"title": "THE NEW TYRANT",
+			"when": {
+				"finale_in": [
+					"seize_company",
+					"leverage",
+					"upload_self"
+				],
+				"max_axis": {
+					"mercy": -1
+				}
+			},
+			"text": "You replaced the machine you hated, and became a better machine. The Sprawl fears you. You tell yourself that's respect."
+		},
+		{
+			"id": "tycoon",
+			"title": "THE TYCOON",
+			"when": {
+				"min_credits": 2500
+			},
+			"text": "You end richer than most planets. The Consortium sends you a membership card. You frame it next to your first debt notice."
+		},
+		{
+			"id": "celebrity",
+			"title": "THE MOST FAMOUS FACE IN SPACE",
+			"when": {
+				"min_fame": 25
+			},
+			"text": "Your face is on more screens than any ad. Lumen pays you not to retire."
+		},
+		{
+			"id": "saint",
+			"title": "THE SAINT OF THE GUTTERS",
+			"when": {
+				"min_axis": {
+					"mercy": 4
+				}
+			},
+			"text": "You helped more strangers than you can count. They remember. The Sprawl, despite itself, gets a little kinder."
+		},
+		{
+			"id": "fugitive",
+			"title": "THE MOST WANTED",
+			"when": {
+				"min_bounty": 600
+			},
+			"text": "Every Paragon wall has your face on it. You change your name, your ship and your hair. Not your ways."
+		},
+		{
+			"id": "ghost",
+			"title": "THE GHOST WHO WAS NEVER THERE",
+			"when": {
+				"max_reported": 0
+			},
+			"text": "No witness ever finished a call about you. Officially, none of this happened. Unofficially, everything did."
+		},
+		{
+			"id": "folk_hero",
+			"title": "THE FOLK HERO",
+			"when": {
+				"min_axis": {
+					"mercy": 1,
+					"truth": 1
+				}
+			},
+			"text": "Mothers tell your story to their kids. It gets better every time. You stop correcting them."
+		},
+		{
+			"id": "mercenary",
+			"title": "THE MERCENARY",
+			"when": {
+				"min_axis": {
+					"greed": 3
+				}
+			},
+			"text": "You did it for the money. You were honest about that, at least. The money was honest back."
+		},
+		{
+			"id": "survivor",
+			"title": "THE SURVIVOR",
+			"when": {},
+			"text": "You made it. In the Sprawl, that's the rarest ending of all."
+		}
+	],
+	"class_coda": {
+		"5": "Born a {heir} heir, you {wealth_change}. The family portrait gets a new frame - or a black line through your face.",
+		"4": "Old money, new story: you {wealth_change}.",
+		"3": "From the corner office, you {wealth_change}.",
+		"2": "The middle manager who {wealth_change}. Your old team still tells the story at the paste-cooler.",
+		"1": "Once a worker with two jobs and no sleep, you {wealth_change}.",
+		"0": "From under the ad-bridge, with nothing but nerve, you {wealth_change}."
+	},
+	"wealth_change": {
+		"up": "ended richer than you ever dreamed",
+		"same": "ended about where you started, which in the Sprawl is a miracle",
+		"down": "gave away or lost almost everything - and somehow didn't mind"
+	},
+	"age_coda": {
+		"teen": "Not bad for a {age}-year-old. Imagine what you'll do when you're old enough to sign contracts.",
+		"young": "At {age}, with your whole life ahead of you - and a lot less of it billed.",
+		"prime": "At {age}, you finally read the fine print of your own life, and rewrote it.",
+		"middle": "At {age}, your knees hurt and your legend doesn't.",
+		"elder": "At {age}, you proved the Sprawl wrong about what old people can do. It sends you a senior discount out of respect.",
+		"ancient": "Born centuries ago, you outlived the Consortium's version of history. Now you're in it."
+	},
+	"early": {
+		"pay_debt": {
+			"when": {
+				"min_credits": 3000,
+				"max_air_debt": 0
+			},
+			"text": "Pay off every debt you owe and walk away from the story",
+			"slide": "You pay your last cent of debt and simply... stop. The scheme goes on without you. You sleep twelve hours a night."
+		},
+		"burn_consortium": {
+			"when": {
+				"min_followers": 8
+			},
+			"text": "Call your followers into the streets - now",
+			"slide": "You don't wait for a MacGuffin. You light the fuse yourself. The uprising is messy, loud and entirely yours."
+		},
+		"find_sibling": {
+			"when": {
+				"flag": "sibling_lead",
+				"min_visited": 5
+			},
+			"text": "Follow the lead to your sibling and leave the rest behind",
+			"slide": "You follow the trail off the edge of the map. Whatever {antagonist} is planning, it's someone else's problem. You have family to find."
+		},
+		"get_famous": {
+			"when": {
+				"min_fame": 40
+			},
+			"text": "Sign Lumen's reality-show contract",
+			"slide": "Lumen gives you a show. Season one is about you. Season two is about your feud with season one."
+		},
+		"buy_a_planet": {
+			"when": {
+				"min_credits": 6000
+			},
+			"text": "Buy a small, terrible planet and retire",
+			"slide": "You buy a planet. It's mostly gravel. You sit on the gravel and watch two moons rise, and nobody bills you for the view."
+		},
+		"revenge": {
+			"when": {
+				"state": {
+					"lieutenant_fate": "killed"
+				},
+				"min_intel": 4
+			},
+			"text": "Use what you know to end your enemy quietly",
+			"slide": "You never confront {antagonist}. You just make one phone call with everything you know. Revenge doesn't always need a stage."
+		},
+		"find_cure": {
+			"when": {
+				"min_credits": 4000
+			},
+			"text": "Buy the cure on the black market",
+			"slide": "The cure costs everything you own. You're broke. You're alive. You'd make the trade a hundred times."
+		},
+		"protect_family": {
+			"when": {
+				"min_credits": 3500
+			},
+			"text": "Buy back your family's contracts and go home",
+			"slide": "You show up at your family's door with the contracts. Nobody asks where the money came from. Everybody eats."
+		},
+		"become_ceo": {
+			"when": {
+				"min_credits": 5000,
+				"min_max_rep": 60
+			},
+			"text": "Accept the board seat you've been offered",
+			"slide": "The Consortium recognises one of its own. You take the seat. From up here, {antagonist}'s scheme looks like an opportunity."
+		},
+		"escape_sprawl": {
+			"when": {
+				"min_credits": 2500
+			},
+			"text": "Buy a jump-gate ticket and leave the Sprawl",
+			"slide": "You buy a ticket out. No goodbyes. The Sprawl gets smaller in the rear window until it's just another advertisement for itself."
+		},
+		"find_love": {
+			"when": {
+				"flag": "love_lead",
+				"min_visited": 4
+			},
+			"text": "Follow the ring to the one you lost",
+			"slide": "You follow the twin ring to a dockside bar. They look up. Everything else in the universe can wait."
+		},
+		"redemption": {
+			"when": {
+				"min_axis": {
+					"mercy": 5
+				},
+				"min_followers": 3
+			},
+			"text": "Stay and help the people you've met",
+			"slide": "You stop chasing the big story. You open a clinic, a soup line and a school. The scheme falls apart on its own; small kindnesses are very bad for business."
+		}
+	}
 }

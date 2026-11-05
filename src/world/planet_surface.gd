@@ -16,6 +16,16 @@ func _setup() -> void:
 	env_layer = PlanetGenerator.layer(planet, "environments")
 	crisis_layer = PlanetGenerator.layer(planet, "crises")
 	anomaly_layer = PlanetGenerator.layer(planet, "anomalies")
+	# Planet stories leave scars (or relief) that change the place for good.
+	match str(planet.get("crisis_state", "")):
+		"resolved":
+			crisis_layer = crisis_layer.duplicate()
+			crisis_layer["enemy_mult"] = float(crisis_layer.get("enemy_mult", 1.0)) * 0.6
+			crisis_layer["name"] = "After the " + str(crisis_layer.get("name", "crisis"))
+		"worse":
+			crisis_layer = crisis_layer.duplicate()
+			crisis_layer["enemy_mult"] = float(crisis_layer.get("enemy_mult", 1.0)) * 1.4
+			crisis_layer["name"] = str(crisis_layer.get("name", "crisis")) + " (worse)"
 	palette = env_layer.duplicate(true)
 	owner_faction = planet.get("controller", "")
 	level_seed = int(planet.get("seed", 1))
@@ -94,6 +104,7 @@ func _post_build() -> void:
 		EventBus.toast.emit("%s is here, and they're not here to talk." % d.get("name", member_id), Color(1, 0.3, 0.3))
 	Game.save_game()
 	_ambient_life()
+	Stories.begin_visit(planet.get("id", ""))
 	refresh_quests()
 	_landing()
 

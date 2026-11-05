@@ -16,6 +16,8 @@ var ai_lines: Dictionary = {}
 var ads: Dictionary = {}
 var enemies: Dictionary = {}
 var items: Dictionary = {}
+var interactions: Dictionary = {}
+var stories: Dictionary = {}
 
 
 func _ready() -> void:
@@ -34,6 +36,8 @@ func reload() -> void:
 	ads = _load("ads.json")
 	enemies = _load("enemies.json")
 	items = _load("items.json")
+	interactions = _load("interactions.json")
+	stories = _load("stories.json")
 
 
 func faction_ids() -> Array:

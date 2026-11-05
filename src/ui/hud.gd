@@ -921,6 +921,7 @@ func _fill_shop(vendor: String, faction_id: String, stock: Array) -> void:
 	_safe_focus.call_deferred(close)
 	close.pressed.connect(func():
 		_shop_panel.visible = false
+		Game.shop_discount = 0.0
 		_after_modal_closed())
 	v.add_child(close)
 

@@ -1,10 +1,14 @@
 extends Node
 ## "Origin" autoload - Dynamic Origin & Tag Engine.
-## No classes. The player combines 3 tags: background / motivation / secret.
-## Tags decide: spawn point, starting credits & items, stat mods, starting rep
-## and bounties, story flags, and how NPCs react (reaction modifiers).
+## No classes. The player combines 6 tags: class (wealth / standing, incl. Consortium
+## heirs), age, background, personality, motivation, secret - over two million combos.
+## Tags decide: spawn point, starting credits/debt & items, stat mods, starting rep
+## and bounties, story flags, how NPCs react, and which interactions you get
+## (data/interactions.json reads the same flags).
 
-const CATEGORIES := ["background", "motivation", "secret"]
+const CATEGORIES := ["class", "age", "background", "personality", "motivation", "secret"]
+const TITLES := {"class": "CLASS // money & standing", "age": "AGE // how long you've survived", "background": "BACKGROUND // who you were",
+	"personality": "PERSONALITY // how you deal", "motivation": "MOTIVATION // what you want", "secret": "SECRET // what they don't know"}
 
 
 func list(category: String) -> Array:
@@ -32,6 +36,38 @@ func random_tags(rng: RandomNumberGenerator = null) -> Dictionary:
 	return out
 
 
+## Exact age inside an age bracket.
+func random_age(bracket: String, rng: RandomNumberGenerator = null) -> int:
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.randomize()
+	var r: Array = get_tag("age", bracket).get("range", [25, 35])
+	return rng.randi_range(int(r[0]), int(r[1]))
+
+
+func age_range(bracket: String) -> Vector2i:
+	var r: Array = get_tag("age", bracket).get("range", [20, 29])
+	return Vector2i(int(r[0]), int(r[1]))
+
+
+func wealth(tag_set: Dictionary = {}) -> int:
+	var ts := tag_set if not tag_set.is_empty() else Game.tags
+	return int(get_tag("class", ts.get("class", "")).get("wealth", 1))
+
+
+func heir_of(tag_set: Dictionary = {}) -> String:
+	var ts := tag_set if not tag_set.is_empty() else Game.tags
+	return str(get_tag("class", ts.get("class", "")).get("heir_of", ""))
+
+
+## Short "who you are" line, e.g. "a 67-year-old Paragon Heir street medic".
+func persona_line(tag_set: Dictionary = {}, age: int = -1) -> String:
+	var ts := tag_set if not tag_set.is_empty() else Game.tags
+	var a := age if age >= 0 else Game.age
+	return "%d-year-old %s %s, %s" % [a, get_tag("class", ts.get("class", "")).get("name", "?"),
+		get_tag("background", ts.get("background", "")).get("name", "?"), str(get_tag("personality", ts.get("personality", "")).get("name", "?")).to_lower()]
+
+
 ## Synergies unlocked by a tag combination.
 func synergies_for(tag_set: Dictionary) -> Array:
 	var chosen := tag_set.values()
@@ -54,6 +90,8 @@ func apply_new_game(tag_set: Dictionary) -> void:
 		if t.is_empty():
 			continue
 		Game.add_credits(int(t.get("credits", 0)))
+		if int(t.get("air_debt", 0)) > 0:
+			Game.add_air_debt(int(t["air_debt"]))
 		var items: Dictionary = t.get("items", {})
 		for item_id in items:
 			Game.add_item(item_id, int(items[item_id]))
@@ -98,10 +136,11 @@ func npc_reaction(faction: String, npc_traits: Array) -> int:
 func origin_story(tag_set: Dictionary = {}) -> String:
 	var ts := tag_set if not tag_set.is_empty() else Game.tags
 	var parts: Array[String] = []
+	var a: int = int(ts.get("age_years", Game.age))
 	for cat in CATEGORIES:
 		var story: String = get_tag(cat, ts.get(cat, "")).get("story", "")
 		if story != "":
-			parts.append(story)
+			parts.append(story.replace("{age}", str(a)))
 	for syn in synergies_for(ts):
 		parts.append(str(syn.get("text", "")))
 	return " ".join(parts)
@@ -110,6 +149,7 @@ func origin_story(tag_set: Dictionary = {}) -> String:
 func preview(tag_set: Dictionary) -> Dictionary:
 	## Summary for the character creator: credits, items, rep, mods text.
 	var credits := 0
+	var air_debt := 0
 	var items := {}
 	var rep := {}
 	var mods_text: Array[String] = []
@@ -117,6 +157,7 @@ func preview(tag_set: Dictionary) -> Dictionary:
 	for cat in CATEGORIES:
 		var t := get_tag(cat, tag_set.get(cat, ""))
 		credits += int(t.get("credits", 0))
+		air_debt += int(t.get("air_debt", 0))
 		var t_items: Dictionary = t.get("items", {})
 		for item_id in t_items:
 			items[item_id] = int(items.get(item_id, 0)) + int(t_items[item_id])
@@ -136,7 +177,7 @@ func preview(tag_set: Dictionary) -> Dictionary:
 		if m != "":
 			mods_text.append(m)
 	return {
-		"credits": credits, "items": items, "rep": rep, "bounty": bounty,
+		"credits": credits, "air_debt": air_debt, "items": items, "rep": rep, "bounty": bounty,
 		"mods": ", ".join(mods_text), "synergies": syn_names,
 		"spawn": get_tag("background", tag_set.get("background", "")).get("spawn", "cryo_bay"),
 	}

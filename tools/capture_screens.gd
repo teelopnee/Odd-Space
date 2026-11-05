@@ -34,6 +34,12 @@ func _process(_delta: float) -> bool:
 			_next(30)
 		2:
 			_shot("02_character_creation")
+			if OS.get_cmdline_user_args().has("--creator"):
+				var cc = current_scene
+				cc._show_category("background")
+				_step = 30
+				_wait = 10
+				return false
 			if _quick:
 				root.get_node("Game").new_game("Rex Vantablack", {"background": "cryo_debtor", "motivation": "burn_consortium", "secret": "kleptomaniac"}, 4242)
 				_step = 9
@@ -120,6 +126,14 @@ func _process(_delta: float) -> bool:
 			paused = false
 			_shot(_current)
 			_step = 10
+		30:
+			_shot("02b_character_creation_background")
+			current_scene._show_category("age")
+			_step = 31
+			_wait = 10
+		31:
+			_shot("02c_character_creation_age")
+			quit(0)
 	return false
 
 

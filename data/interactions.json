@@ -1,0 +1,2001 @@
+{
+	"_doc": "Interactions (Interactions autoload). Each verb appears in NPC conversations whose role is in 'roles' (civilian, merchant, witness, guard) when 'requires' is met by the PLAYER (flag/any_flag/not_flag, tag = any of the chosen tag ids, age = any bracket, item, min_credits, min_wealth, max_wealth, npc_trait = NPC has any of these traits, goal = motivation goal flag). chance (0-1) + chance_mods: 'npc:<trait>', 'faction:<npc faction>', 'flag:<player flag>', 'tag:<player tag>', 'attitude' (x NPC attitude), 'rep' (x player rep with NPC faction). success/fail: lines (random), effects (Encounters effect DSL + attitude, npc: calm|flee|silenced|informant|follow|angry, rumor, fame, followers, discount, secret), verb = Causality verb recorded (on success unless record_on = fail/always). once = per NPC. Tokens: {npc} {name} {age} {cost} {faction} {heir} {job} {need}.",
+	"verbs": {
+		"smalltalk": {
+			"text": "Make small talk",
+			"roles": [
+				"civilian"
+			],
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Honestly? Nobody's asked me anything in weeks. I'm {job}. It's... a job.\"",
+					"\"Small talk is taxed at 3% here, but I'll risk it.\" They actually smile."
+				],
+				"effects": {
+					"attitude": 8,
+					"rumor": true
+				}
+			}
+		},
+		"ask_need": {
+			"text": "Ask what they need",
+			"roles": [
+				"civilian"
+			],
+			"once": true,
+			"success": {
+				"lines": [
+					"\"What do I need? {need}. Same as everyone.\"",
+					"They look at you like nobody has ever asked. \"{need}. Can you believe it?\""
+				],
+				"effects": {
+					"attitude": 5,
+					"need_hint": true
+				}
+			}
+		},
+		"give_credits": {
+			"text": "Give them {cost} credits",
+			"roles": [
+				"civilian"
+			],
+			"cost": 15,
+			"verb": "charity",
+			"once": true,
+			"success": {
+				"lines": [
+					"\"...No catch? Is this a prank show?\" They pocket it fast, before reality corrects itself.",
+					"\"I'll pay you back. I won't, but I'll think about it.\""
+				],
+				"effects": {
+					"attitude": 20,
+					"rumor": true
+				}
+			}
+		},
+		"buy_meal": {
+			"text": "Buy them a meal ({cost} cr)",
+			"roles": [
+				"civilian"
+			],
+			"cost": 8,
+			"verb": "charity",
+			"once": true,
+			"requires": {
+				"npc_trait": [
+					"poor",
+					"worker"
+				]
+			},
+			"success": {
+				"lines": [
+					"They eat like the paste might be repossessed mid-bite. \"I owe you. Here's something nobody's supposed to know...\""
+				],
+				"effects": {
+					"attitude": 25,
+					"rumor": true,
+					"hp": 5
+				}
+			}
+		},
+		"threaten": {
+			"text": "Threaten them",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"chance": 0.5,
+			"verb": "intimidate",
+			"chance_mods": {
+				"flag:ruthless": 0.2,
+				"flag:hothead": 0.1,
+				"flag:bouncer": 0.2,
+				"flag:coward": -0.25,
+				"age:teen": -0.2,
+				"npc:corporate": -0.1,
+				"npc:rebel": -0.2,
+				"infamy": 0.04
+			},
+			"success": {
+				"lines": [
+					"They go pale and empty their pockets. \"Take it. Take it! I have a family. Well, a subscription to one.\"",
+					"\"Okay, okay! I don't want trouble. I can't afford trouble.\""
+				],
+				"effects": {
+					"credits": 20,
+					"attitude": -30,
+					"npc": "flee"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Are you threatening me? I have a Paragon panic button and I'm not afraid to subscribe.\"",
+					"They laugh. Actually laugh. That hurts more than a punch."
+				],
+				"effects": {
+					"attitude": -20,
+					"npc": "angry"
+				}
+			}
+		},
+		"pickpocket": {
+			"text": "Pickpocket them",
+			"roles": [
+				"civilian"
+			],
+			"chance": 0.45,
+			"verb": "theft",
+			"record_on": "fail",
+			"once": true,
+			"chance_mods": {
+				"flag:klepto": 0.3,
+				"flag:convict": 0.15,
+				"flag:invisible": 0.15,
+				"age:teen": 0.1,
+				"age:elder": -0.1,
+				"item:lockpick": 0.1,
+				"npc:weird": -0.1
+			},
+			"success": {
+				"lines": [
+					"Your fingers do their little dance. {npc} never feels a thing.",
+					"A wallet, a breath mint and a coupon for 5% off air. Not bad."
+				],
+				"effects": {
+					"credits": 30,
+					"items": {
+						"bribe_voucher": 0
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"HEY! THIEF! Somebody call Paragon! Somebody bill this person!\"",
+					"Their hand clamps on your wrist. \"That's my rent, you absolute ledger.\""
+				],
+				"effects": {
+					"attitude": -40,
+					"npc": "angry"
+				}
+			}
+		},
+		"insult": {
+			"text": "Insult the Consortium",
+			"roles": [
+				"civilian"
+			],
+			"chance": 0.6,
+			"once": true,
+			"chance_mods": {
+				"npc:rebel": 0.3,
+				"npc:poor": 0.15,
+				"npc:corporate": -0.5,
+				"flag:cynic": 0.15,
+				"flag:joker": 0.1
+			},
+			"success": {
+				"lines": [
+					"\"Ha! Finally someone says it. They charge for the echo in here, you know.\"",
+					"They lean in. \"Keep talking like that and they'll bill you. I like you.\""
+				],
+				"effects": {
+					"attitude": 15,
+					"rumor": true,
+					"rep": {
+						"paragon": -1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I'm reporting this to my loyalty-points manager.\"",
+					"\"The Consortium feeds my kids. Mostly paste. But still.\""
+				],
+				"effects": {
+					"attitude": -15
+				}
+			}
+		},
+		"recruit_informant": {
+			"text": "Pay them to be your eyes here ({cost} cr)",
+			"roles": [
+				"civilian"
+			],
+			"cost": 40,
+			"once": true,
+			"chance": 0.7,
+			"chance_mods": {
+				"attitude": 0.01,
+				"npc:poor": 0.1,
+				"npc:corporate": -0.3
+			},
+			"success": {
+				"lines": [
+					"\"Eyes for hire. If anyone radios Paragon about you, I'll 'lose signal'.\"",
+					"\"I hear everything on this street. Now you will too.\""
+				],
+				"effects": {
+					"npc": "informant",
+					"flag": {
+						"informant_here": true
+					},
+					"witness_slow": 0.25
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Snitch for you? I snitch for Paragon, and they pay in coupons. ...Fine, no.\" They keep the money."
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"pull_rank": {
+			"text": "\"Do you know who my family is?\"",
+			"roles": [
+				"civilian",
+				"merchant",
+				"witness"
+			],
+			"requires": {
+				"flag": "heir"
+			},
+			"chance": 0.75,
+			"verb": "intimidate",
+			"chance_mods": {
+				"npc:corporate": 0.2,
+				"npc:rebel": -0.6,
+				"npc:poor": -0.1,
+				"rep": 0.004
+			},
+			"success": {
+				"lines": [
+					"They recognise the {heir} crest and nearly bow into the pavement. \"Of course! Whatever you need, it's on the house. Everything is on your house.\"",
+					"\"Forgive me, I didn't recognise the - the jawline. Very {heir}.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"npc": "silenced",
+					"discount": 0.3
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Your family? Your family owns my debt. So yes. I know who they are.\" They spit near your shoes.",
+					"\"Rich kid wandering the gutter? Somebody call Lumen, this is content.\""
+				],
+				"effects": {
+					"attitude": -25,
+					"fame": 2
+				}
+			}
+		},
+		"write_cheque": {
+			"text": "Write them a cheque ({cost} cr)",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"min_wealth": 3
+			},
+			"cost": 120,
+			"verb": "bribe",
+			"success": {
+				"lines": [
+					"They stare at the number. Then at you. \"I... could buy air for a year.\"",
+					"\"Is this real? This is real. I never saw you. I never saw anything. I'm going to buy a window.\""
+				],
+				"effects": {
+					"attitude": 40,
+					"npc": "silenced",
+					"rumor": true
+				}
+			}
+		},
+		"call_lawyer": {
+			"text": "Have the family lawyer call them",
+			"roles": [
+				"witness",
+				"civilian"
+			],
+			"requires": {
+				"flag": "heir"
+			},
+			"verb": "intimidate",
+			"chance": 0.85,
+			"success": {
+				"lines": [
+					"Your lawyer's hologram flickers on. Forty seconds later {npc} has signed an NDA, a non-compete and a non-memory clause.",
+					"\"Under clause 9 of the Witness Courtesy Act, you saw nothing,\" the lawyer purrs. They agree. Everybody agrees."
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": -10
+				}
+			},
+			"fail": {
+				"lines": [
+					"The lawyer's hologram buffers. And buffers. \"Your subscription has lapsed,\" it says, and vanishes."
+				],
+				"effects": {}
+			}
+		},
+		"beg": {
+			"text": "Beg for spare credits",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"max_wealth": 1
+			},
+			"chance": 0.55,
+			"once": true,
+			"chance_mods": {
+				"npc:poor": 0.15,
+				"npc:worker": 0.1,
+				"npc:corporate": -0.25,
+				"flag:invisible": 0.1,
+				"age:teen": 0.15,
+				"age:elder": 0.15,
+				"flag:charming": 0.1
+			},
+			"success": {
+				"lines": [
+					"They fish out a coin. \"Don't spend it on air. ...Okay, spend it on air.\"",
+					"\"Here. Don't tell anyone I'm soft. It's bad for my credit score.\""
+				],
+				"effects": {
+					"credits": 12,
+					"attitude": 5
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Get a job.\" They have two. Neither pays.",
+					"They walk past you like you're an ad they've already skipped."
+				],
+				"effects": {}
+			}
+		},
+		"street_gossip": {
+			"text": "Trade street gossip",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"max_wealth": 1
+			},
+			"once": true,
+			"chance": 0.8,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:corporate": -0.4
+			},
+			"success": {
+				"lines": [
+					"\"You hear things down here, right? Me too. Swap?\"",
+					"Gossip is the only currency the Consortium hasn't taxed. Yet."
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true,
+					"rumor2": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I don't talk to gutter people.\" They say it from about one paycheck away."
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"blend_in": {
+			"text": "Melt into the crowd",
+			"roles": [
+				"witness"
+			],
+			"requires": {
+				"any_flag": [
+					"invisible",
+					"ghost"
+				]
+			},
+			"chance": 0.75,
+			"chance_mods": {
+				"age:teen": 0.1
+			},
+			"success": {
+				"lines": [
+					"You become one more grey shape under the ads. {npc} blinks. \"Where... I swear someone was right there.\""
+				],
+				"effects": {
+					"npc": "silenced"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Nice try, gutter-ghost. I've got your face on my retina cache.\""
+				],
+				"effects": {}
+			}
+		},
+		"show_barcode": {
+			"text": "Show your owner's barcode",
+			"roles": [
+				"witness",
+				"civilian"
+			],
+			"requires": {
+				"flag": "owned"
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:corporate": 0.2,
+				"npc:rebel": -0.3
+			},
+			"success": {
+				"lines": [
+					"They scan you. \"Oh - you're PROPERTY. Property can't commit crimes, legally. My mistake.\"",
+					"\"Collateral, huh.\" Their face softens. \"Me too. Section 4, sub-asset 12. Go on.\""
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": 10
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Property that misbehaves gets repossessed. I'm calling your owner.\""
+				],
+				"effects": {
+					"attitude": -10
+				}
+			}
+		},
+		"buy_loyalty": {
+			"text": "Buy their loyalty outright ({cost} cr)",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "rich"
+			},
+			"cost": 200,
+			"once": true,
+			"success": {
+				"lines": [
+					"\"For that much I'd follow you into a black hole. Do you need anyone followed into a black hole?\"",
+					"They sign a loyalty contract you wrote on a napkin. It is legally binding. Everything is."
+				],
+				"effects": {
+					"npc": "informant",
+					"attitude": 50,
+					"flag": {
+						"informant_here": true
+					},
+					"witness_slow": 0.35
+				}
+			}
+		},
+		"play_innocent": {
+			"text": "Play the innocent kid",
+			"roles": [
+				"witness",
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"age": [
+					"teen"
+				]
+			},
+			"chance": 0.7,
+			"chance_mods": {
+				"npc:corporate": -0.1,
+				"flag:charming": 0.1
+			},
+			"success": {
+				"lines": [
+					"You do the eyes. The big ones. \"Aw. Kids today. Go on, run home before the curfew billing starts.\"",
+					"\"You? A criminal? You're barely billable.\""
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": 10
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Don't 'mister' me, I've seen kids repo a whole freighter.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"pocket_money": {
+			"text": "Ask for pocket money",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"age": [
+					"teen"
+				]
+			},
+			"chance": 0.5,
+			"once": true,
+			"chance_mods": {
+				"age:teen": 0.0,
+				"npc:worker": 0.15,
+				"npc:corporate": 0.1
+			},
+			"success": {
+				"lines": [
+					"\"Don't tell your parents. Or my parents. Or my bank.\"",
+					"They sigh and hand you a few credits. \"Buy something that isn't paste.\""
+				],
+				"effects": {
+					"credits": 15
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Pocket money? I'M still waiting for MY pocket money.\""
+				],
+				"effects": {}
+			}
+		},
+		"senior_discount": {
+			"text": "\"I'll be needing my senior discount.\"",
+			"roles": [
+				"merchant"
+			],
+			"requires": {
+				"age": [
+					"elder",
+					"ancient"
+				]
+			},
+			"chance": 0.8,
+			"success": {
+				"lines": [
+					"\"Of course, sir or madam or esteemed relic. Fifteen percent off, and a free ad.\"",
+					"They check your face, then the law. The law, grudgingly, agrees."
+				],
+				"effects": {
+					"discount": 0.2
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"The senior discount was discontinued for being too popular with seniors.\""
+				],
+				"effects": {}
+			}
+		},
+		"back_in_my_day": {
+			"text": "Tell them how things were back in your day",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"age": [
+					"elder",
+					"ancient"
+				]
+			},
+			"chance": 0.65,
+			"once": true,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:artsy": 0.15,
+				"tag:ancient": 0.15
+			},
+			"success": {
+				"lines": [
+					"\"...Free air? Unbilled rain? Is that true?\" They listen until they forget whatever they were about to do. Including the phone call.",
+					"By the time you reach the part about public parks, they're crying a little. \"I didn't know it could be different.\""
+				],
+				"effects": {
+					"attitude": 20,
+					"npc": "silenced",
+					"rumor": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Yeah, yeah, and you walked to work uphill both ways in zero-G.\"",
+					"Their eyes glaze over. They hold up a finger, still on hold with Paragon."
+				],
+				"effects": {}
+			}
+		},
+		"remember_old_world": {
+			"text": "Describe the world before the Consortium",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"tag": [
+					"ancient"
+				]
+			},
+			"once": true,
+			"chance": 0.9,
+			"success": {
+				"lines": [
+					"You describe the sky with no ads. {npc} goes quiet. \"Where would someone even go to find that again?\" A spark. A dangerous one."
+				],
+				"effects": {
+					"attitude": 25,
+					"rep": {
+						"lumen": -1
+					},
+					"followers": 1
+				}
+			}
+		},
+		"treat_wounds": {
+			"text": "Patch up their injuries",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"any_flag": [
+					"medic",
+					"chemist"
+				]
+			},
+			"once": true,
+			"verb": "charity",
+			"requires_item_any": [
+				"medkit",
+				"painkillers"
+			],
+			"success": {
+				"lines": [
+					"You clean, stitch, bandage. \"No invoice? No... invoice?\" They hold your hand a second too long.",
+					"\"Halcyon wanted 400 for that. You did it with gum and a smile.\""
+				],
+				"effects": {
+					"attitude": 30,
+					"rumor": true,
+					"items": {
+						"medkit": -1
+					},
+					"rep": {
+						"halcyon": -1
+					}
+				}
+			}
+		},
+		"hack_wristpad": {
+			"text": "Hack their wristpad",
+			"roles": [
+				"civilian",
+				"witness",
+				"merchant"
+			],
+			"requires": {
+				"any_flag": [
+					"hacker",
+					"ai_ghost"
+				]
+			},
+			"chance": 0.7,
+			"verb": "theft",
+			"record_on": "fail",
+			"chance_mods": {
+				"item:cyberdeck": 0.15,
+				"npc:weird": -0.2,
+				"npc:corporate": 0.1
+			},
+			"success": {
+				"lines": [
+					"Ten seconds of glowing glyphs. Their Paragon call drops, their balance drops, and their wallpaper is now you.",
+					"You slip into their wristpad. Credit, contacts, and a very embarrassing search history."
+				],
+				"effects": {
+					"credits": 35,
+					"npc": "silenced",
+					"rumor": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"Their firewall bites back. Your deck smokes. \"Did you just try to HACK me?\""
+				],
+				"effects": {
+					"hp": -5,
+					"attitude": -25,
+					"npc": "angry"
+				}
+			}
+		},
+		"flash_badge": {
+			"text": "Flash your old Paragon badge",
+			"roles": [
+				"witness",
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"flag": "cop"
+			},
+			"chance": 0.65,
+			"verb": "intimidate",
+			"chance_mods": {
+				"npc:rebel": -0.4,
+				"npc:corporate": 0.15,
+				"rep": 0.003
+			},
+			"success": {
+				"lines": [
+					"\"Officer! I didn't - I was just calling to report... my own enthusiasm for compliance.\"",
+					"They see the visor logo and snap to attention. Nobody checks the expiry date. Nobody ever does."
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": -5
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"That badge expired in 3029. Impersonating an officer is a premium-tier crime.\""
+				],
+				"effects": {
+					"attitude": -20,
+					"bounty": {
+						"paragon": 20
+					}
+				}
+			}
+		},
+		"legal_threat": {
+			"text": "Hit them with legalese",
+			"roles": [
+				"witness",
+				"merchant",
+				"civilian"
+			],
+			"requires": {
+				"flag": "lawyer"
+			},
+			"chance": 0.75,
+			"verb": "intimidate",
+			"chance_mods": {
+				"npc:corporate": 0.15,
+				"item:legal_pad": 0.1
+			},
+			"success": {
+				"lines": [
+					"\"...pursuant to sub-clause 14, your memory of this event is the intellectual property of my client.\" They nod, terrified, and delete it.",
+					"You cite three statutes, two of which you invented. They fold."
+				],
+				"effects": {
+					"npc": "silenced",
+					"discount": 0.15
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I have a lawyer too.\" They do. He's worse than you. This could take years."
+				],
+				"effects": {
+					"attitude": -10
+				}
+			}
+		},
+		"preach": {
+			"text": "Preach the Free Breath",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "preacher"
+			},
+			"chance": 0.55,
+			"once": true,
+			"chance_mods": {
+				"npc:poor": 0.25,
+				"npc:weird": 0.2,
+				"npc:corporate": -0.4,
+				"flag:idealist": 0.15,
+				"flag:charming": 0.1
+			},
+			"success": {
+				"lines": [
+					"\"Air belongs to everyone,\" you say. {npc} repeats it, quietly, like a password. They'll be back - with friends.",
+					"Something lights up behind their eyes. \"Where do I sign? Wait - nothing to sign? That's the most beautiful thing I've ever heard.\""
+				],
+				"effects": {
+					"attitude": 30,
+					"followers": 1,
+					"rep": {
+						"oxy": -1,
+						"lumen": -1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Free air? Sounds like a scam. A good scam, but a scam.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"organise": {
+			"text": "Organise them (\"Workers of the Sprawl...\")",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "union"
+			},
+			"chance": 0.6,
+			"once": true,
+			"verb": "trespass",
+			"chance_mods": {
+				"npc:worker": 0.3,
+				"npc:poor": 0.15,
+				"npc:corporate": -0.6,
+				"flag:idealist": 0.1
+			},
+			"success": {
+				"lines": [
+					"You talk wages, hours, air. By the end they've signed your card in invisible ink. \"When it starts, I'm in.\""
+				],
+				"effects": {
+					"attitude": 25,
+					"followers": 1,
+					"rep": {
+						"gristle": -2,
+						"halcyon": -2
+					},
+					"flag": {
+						"union_cells": 1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Unions are illegal on Tuesdays. And it's always Tuesday.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"livestream": {
+			"text": "Livestream them",
+			"roles": [
+				"civilian",
+				"witness",
+				"merchant"
+			],
+			"requires": {
+				"any_flag": [
+					"influencer",
+					"famous"
+				]
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:artsy": 0.3,
+				"npc:corporate": -0.1,
+				"item:ring_light": 0.15
+			},
+			"success": {
+				"lines": [
+					"You go live. {npc} becomes a meme in eleven seconds and loves every bit of it. \"Tell my mum!\"",
+					"The chat explodes. 40,000 bots and three real people. One of them sends a tip."
+				],
+				"effects": {
+					"fame": 5,
+					"credits": 15,
+					"attitude": 15,
+					"npc": "silenced"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Turn that off! I'm in witness protection! Well, witness subscription!\""
+				],
+				"effects": {
+					"attitude": -15,
+					"fame": 1
+				}
+			}
+		},
+		"share_meal": {
+			"text": "Cook them something real",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "chef"
+			},
+			"once": true,
+			"requires_item_any": [
+				"paste_ration"
+			],
+			"success": {
+				"lines": [
+					"You turn grey paste into something that smells like a memory. They eat, and for a minute they're somewhere else.",
+					"\"What IS this?\" Paste. With love. And a dangerous amount of chilli."
+				],
+				"effects": {
+					"attitude": 35,
+					"rumor": true,
+					"rumor2": true,
+					"items": {
+						"paste_ration": -1
+					}
+				}
+			}
+		},
+		"double_or_nothing": {
+			"text": "Double or nothing? ({cost} cr)",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"flag": "gambler"
+			},
+			"cost": 20,
+			"chance": 0.5,
+			"chance_mods": {
+				"item:loaded_dice": 0.2,
+				"flag:compulsive_liar": 0.05
+			},
+			"success": {
+				"lines": [
+					"The dice land. You win. They pay, swearing in three corporate dialects.",
+					"\"Again?\" they ask. You never say no to again."
+				],
+				"effects": {
+					"credits": 40,
+					"attitude": 5
+				}
+			},
+			"fail": {
+				"lines": [
+					"Snake eyes. Your credits leave you like they always do."
+				],
+				"effects": {
+					"attitude": 5
+				}
+			}
+		},
+		"sell_contraband": {
+			"text": "Sell contraband air",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"flag": "smuggler"
+			},
+			"requires_item_any": [
+				"contraband"
+			],
+			"verb": "smuggle",
+			"chance": 0.8,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:corporate": -0.4
+			},
+			"success": {
+				"lines": [
+					"\"Unlicensed? Untaxed? ...It smells like a forest. Two, please.\"",
+					"They inhale. Real air. Their eyes water. \"Where do you GET this?\""
+				],
+				"effects": {
+					"credits": 70,
+					"items": {
+						"contraband": -1
+					},
+					"attitude": 15
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Smuggled air? I'm OxyGenix Loyal Tier! I'm calling it in!\""
+				],
+				"effects": {
+					"attitude": -20,
+					"npc": "angry"
+				}
+			}
+		},
+		"repo_their_stuff": {
+			"text": "Repossess something of theirs",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "repo"
+			},
+			"chance": 0.65,
+			"verb": "theft",
+			"record_on": "always",
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"flag:ruthless": 0.15
+			},
+			"success": {
+				"lines": [
+					"Old habits. You scan their implants for missed payments and find one. They hand over a gadget, shaking.",
+					"\"Halcyon said it was mine for life!\" Halcyon defines 'life' as 'until Tuesday'."
+				],
+				"effects": {
+					"credits": 45,
+					"attitude": -40,
+					"npc": "flee",
+					"rep": {
+						"halcyon": 2
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"You don't work for Halcyon anymore. I checked. EVERYONE checked.\""
+				],
+				"effects": {
+					"attitude": -30,
+					"npc": "angry"
+				}
+			}
+		},
+		"deliver_message": {
+			"text": "Offer to carry a message for them",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "courier"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"Could you get this to my sister on another planet? Paragon reads all the mail.\" You pocket it. You never look inside.",
+					"They hand you a sealed note and a coin. \"Fastest courier in the Sprawl, they say.\""
+				],
+				"effects": {
+					"credits": 20,
+					"attitude": 20,
+					"rumor": true
+				}
+			}
+		},
+		"interface": {
+			"text": "Interface with their implants",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"flag": "synthetic"
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:weird": 0.2,
+				"npc:corporate": -0.1
+			},
+			"success": {
+				"lines": [
+					"Your eyes flicker binary. Their implant agrees to forget. \"Have a compliant day,\" it says, in their voice.",
+					"Machine to machine. Their wristpad decides it likes you more than it likes them."
+				],
+				"effects": {
+					"npc": "silenced",
+					"rumor": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Did your eyes just go blue? Are you a - are you OFFICE EQUIPMENT?\""
+				],
+				"effects": {
+					"attitude": -20
+				}
+			}
+		},
+		"prison_talk": {
+			"text": "Speak penal-colony slang",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "convict"
+			},
+			"once": true,
+			"chance": 0.7,
+			"chance_mods": {
+				"npc:rebel": 0.25,
+				"npc:corporate": -0.5
+			},
+			"success": {
+				"lines": [
+					"\"Colony 9? Cell block D? ...Brother. Sister. Whatever. You're family.\" They tell you everything."
+				],
+				"effects": {
+					"attitude": 30,
+					"rumor": true,
+					"rumor2": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"They don't get it. Then they do, and they back away slowly."
+				],
+				"effects": {
+					"attitude": -15
+				}
+			}
+		},
+		"write_jingle": {
+			"text": "Write them a jingle",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"any_flag": [
+					"famous_jingle",
+					"copywriter"
+				]
+			},
+			"once": true,
+			"chance": 0.75,
+			"chance_mods": {
+				"npc:artsy": 0.2
+			},
+			"success": {
+				"lines": [
+					"Thirty seconds and you've written them a theme song. They'll hum it until they die, which in the Sprawl is soon.",
+					"\"♪ {npc}, {npc}, worth every credit! ♪\" A merchant two stalls down offers to buy the rights."
+				],
+				"effects": {
+					"attitude": 25,
+					"credits": 10,
+					"discount": 0.1
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Is that... the OxyGenix jingle with my name in it? I'm calling legal.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"bouncer_escort": {
+			"text": "Offer to walk them home safely",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "bouncer"
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"Nobody bothers someone walking next to you. At their door they press a coin into your hand and a secret into your ear."
+				],
+				"effects": {
+					"attitude": 30,
+					"credits": 10,
+					"rumor": true
+				}
+			}
+		},
+		"charm": {
+			"text": "Turn on the charm",
+			"roles": [
+				"civilian",
+				"merchant",
+				"witness"
+			],
+			"requires": {
+				"flag": "charming"
+			},
+			"chance": 0.65,
+			"chance_mods": {
+				"npc:artsy": 0.15,
+				"npc:corporate": 0.05,
+				"npc:weird": -0.1,
+				"attitude": 0.008
+			},
+			"success": {
+				"lines": [
+					"\"Well. Aren't you a breath of fresh, unlicensed air.\"",
+					"They laugh at your joke before you finish it. You could ask for anything. You ask for a little."
+				],
+				"effects": {
+					"attitude": 25,
+					"discount": 0.15,
+					"npc": "silenced"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Is that a line? That's a line. I've heard better from vending machines.\""
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"extort": {
+			"text": "Make them an offer they can't refuse",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"flag": "ruthless"
+			},
+			"chance": 0.6,
+			"verb": "intimidate",
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:rebel": -0.2,
+				"infamy": 0.05,
+				"flag:bouncer": 0.15
+			},
+			"success": {
+				"lines": [
+					"You explain, calmly, what happens to people who don't pay protection. They pay protection.",
+					"\"Every week?\" Every week. They nod like someone signing their own repo papers."
+				],
+				"effects": {
+					"credits": 40,
+					"attitude": -45,
+					"npc": "flee"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I already pay protection. To Paragon. They'll want to meet you.\""
+				],
+				"effects": {
+					"attitude": -25,
+					"bounty": {
+						"paragon": 15
+					}
+				}
+			}
+		},
+		"confess": {
+			"text": "Tell them the honest truth",
+			"roles": [
+				"witness",
+				"civilian"
+			],
+			"requires": {
+				"flag": "honest"
+			},
+			"chance": 0.55,
+			"chance_mods": {
+				"npc:poor": 0.15,
+				"npc:worker": 0.15,
+				"npc:corporate": -0.3,
+				"attitude": 0.01
+			},
+			"success": {
+				"lines": [
+					"You tell them exactly what you did and why. Nobody has told them the truth in years. They hang up on Paragon.",
+					"\"That's... the most honest thing I've heard since the Consortium patented honesty.\""
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": 20
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Thanks for the confession. Paragon gives a bonus for those.\""
+				],
+				"effects": {
+					"attitude": -10
+				}
+			}
+		},
+		"plead": {
+			"text": "Beg them not to hurt you",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"flag": "coward"
+			},
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"age:elder": 0.15,
+				"age:teen": 0.15
+			},
+			"success": {
+				"lines": [
+					"You grovel with a sincerity that would win awards. They pity you so hard they forget what they were doing.",
+					"\"Get up, get up. You're making me feel like a shareholder.\""
+				],
+				"effects": {
+					"npc": "silenced",
+					"attitude": 5
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Pathetic. This is going on Lumen.\""
+				],
+				"effects": {
+					"fame": 1,
+					"attitude": -5
+				}
+			}
+		},
+		"provoke": {
+			"text": "Start a fight",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "hothead"
+			},
+			"chance": 0.7,
+			"verb": "assault",
+			"record_on": "always",
+			"success": {
+				"lines": [
+					"One shove becomes a brawl. You win. You always win. Someone pays you to stop.",
+					"Fists, then apologies, then they buy you a drink. Hotheads understand each other."
+				],
+				"effects": {
+					"credits": 15,
+					"hp": -8,
+					"attitude": 10
+				}
+			},
+			"fail": {
+				"lines": [
+					"They hit back harder than expected. You both lie in the street, billing each other for medical."
+				],
+				"effects": {
+					"hp": -18,
+					"attitude": -10
+				}
+			}
+		},
+		"mock_ads": {
+			"text": "Mock the nearest billboard together",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"flag": "cynic"
+			},
+			"once": true,
+			"chance": 0.7,
+			"chance_mods": {
+				"npc:artsy": 0.2,
+				"npc:rebel": 0.2,
+				"npc:corporate": -0.4
+			},
+			"success": {
+				"lines": [
+					"You both read the billboard aloud in the voice of a dying robot. It's the best five minutes they've had all year.",
+					"\"'Breathe Responsibly'? I breathe IRRESPONSIBLY.\" They're crying laughing."
+				],
+				"effects": {
+					"attitude": 25,
+					"rumor": true,
+					"rep": {
+						"lumen": -1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Shh! The billboard can hear you. It has a loyalty programme.\""
+				],
+				"effects": {}
+			}
+		},
+		"inspire": {
+			"text": "Tell them things can change",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"flag": "idealist"
+			},
+			"chance": 0.5,
+			"once": true,
+			"chance_mods": {
+				"npc:poor": 0.15,
+				"npc:worker": 0.15,
+				"npc:rebel": 0.25,
+				"npc:corporate": -0.3,
+				"flag:charming": 0.1
+			},
+			"success": {
+				"lines": [
+					"You don't promise anything. You just say it out loud. They stand a little straighter. \"Yeah. Yeah, maybe.\"",
+					"\"If someone like you still believes it...\" They hang up the Paragon call. \"...then I can too.\""
+				],
+				"effects": {
+					"attitude": 25,
+					"followers": 1,
+					"npc": "silenced"
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Change? The last guy who said that got repossessed. By his own shoes.\""
+				],
+				"effects": {}
+			}
+		},
+		"joke": {
+			"text": "Tell a joke",
+			"roles": [
+				"civilian",
+				"witness",
+				"merchant"
+			],
+			"requires": {
+				"flag": "joker"
+			},
+			"chance": 0.65,
+			"chance_mods": {
+				"npc:artsy": 0.2,
+				"npc:weird": 0.1,
+				"npc:corporate": -0.2,
+				"faction:paragon": -0.25
+			},
+			"success": {
+				"lines": [
+					"\"How many OxyGenix execs does it take to change a light? None - they bill you for the dark.\" They wheeze. The phone call is forgotten.",
+					"Your joke is so bad it loops back to good. They're laughing too hard to report anything."
+				],
+				"effects": {
+					"attitude": 20,
+					"npc": "silenced",
+					"discount": 0.05
+				}
+			},
+			"fail": {
+				"lines": [
+					"Silence. A billboard laughs instead, pre-recorded. Somehow that's worse."
+				],
+				"effects": {
+					"attitude": -5
+				}
+			}
+		},
+		"lie": {
+			"text": "Spin them a story",
+			"roles": [
+				"witness",
+				"civilian",
+				"merchant"
+			],
+			"chance": 0.45,
+			"verb": "comply",
+			"chance_mods": {
+				"flag:compulsive_liar": 0.35,
+				"flag:charming": 0.15,
+				"flag:honest": -0.4,
+				"flag:spy": 0.15,
+				"flag:identity_thief": 0.15,
+				"npc:weird": -0.1
+			},
+			"success": {
+				"lines": [
+					"You tell them you're an undercover Lumen producer filming 'Compliance Heroes'. They thank you. They want an autograph.",
+					"Your lie is so detailed it has footnotes. They believe every one."
+				],
+				"effects": {
+					"npc": "silenced",
+					"discount": 0.1
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Your story has a plot hole. I'm a plot-hole inspector. Licensed.\""
+				],
+				"effects": {
+					"attitude": -15
+				}
+			}
+		},
+		"ask_sibling": {
+			"text": "Show them your sibling's photo",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "sibling"
+			},
+			"once": true,
+			"chance": 0.35,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"attitude": 0.01
+			},
+			"success": {
+				"lines": [
+					"They squint. \"Same eyes as you... I saw someone like that. Heading off-world, in a Halcyon transport.\"",
+					"\"Yeah! Worked the vats with them. They talked about a sibling in cryo. Said they'd find you first.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true,
+					"flag": {
+						"sibling_lead": true
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Sorry. Everyone looks the same after a few years of paste.\""
+				],
+				"effects": {}
+			}
+		},
+		"ask_love": {
+			"text": "Ask if they've seen the one you lost",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"goal": "love"
+			},
+			"once": true,
+			"chance": 0.35,
+			"chance_mods": {
+				"npc:artsy": 0.15,
+				"attitude": 0.01
+			},
+			"success": {
+				"lines": [
+					"\"Wedding ring like that? There's someone at the docks who wears the twin. Never takes it off. Never talks about it.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true,
+					"flag": {
+						"love_lead": true
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Everyone's lost someone. Here they bill you for the grief.\""
+				],
+				"effects": {}
+			}
+		},
+		"ai_whisper": {
+			"text": "Let the ghost in your head do the talking",
+			"roles": [
+				"civilian",
+				"witness",
+				"merchant"
+			],
+			"requires": {
+				"flag": "ai_ghost"
+			},
+			"chance": 0.55,
+			"chance_mods": {
+				"npc:weird": 0.25,
+				"npc:corporate": -0.1
+			},
+			"success": {
+				"lines": [
+					"Your mouth says things you didn't plan, in a voice like a customer-service chime. It works. It always works. That's what scares you.",
+					"The ghost quotes their own purchase history back at them. They hand over whatever it asks for."
+				],
+				"effects": {
+					"npc": "silenced",
+					"credits": 15,
+					"rumor": true
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Why did your voice just glitch? Why did you say my mother's maiden name?\""
+				],
+				"effects": {
+					"attitude": -25
+				}
+			}
+		},
+		"spy_contact": {
+			"text": "Use a double-agent passphrase",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"flag": "spy"
+			},
+			"chance": 0.4,
+			"once": true,
+			"chance_mods": {
+				"npc:corporate": 0.2
+			},
+			"success": {
+				"lines": [
+					"\"...The paste is warm tonight,\" you say. Their eyes widen. \"And the air is never free.\" A fellow agent. Which side? Does it matter?"
+				],
+				"effects": {
+					"npc": "informant",
+					"rumor": true,
+					"rumor2": true,
+					"flag": {
+						"informant_here": true
+					},
+					"witness_slow": 0.3
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Why are you telling me the paste is warm? It's always warm. That's the problem.\""
+				],
+				"effects": {}
+			}
+		},
+		"terminal_honesty": {
+			"text": "Tell them you're dying",
+			"roles": [
+				"civilian",
+				"witness"
+			],
+			"requires": {
+				"flag": "dying"
+			},
+			"chance": 0.6,
+			"once": true,
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:worker": 0.1,
+				"npc:corporate": -0.2
+			},
+			"success": {
+				"lines": [
+					"\"...How long?\" Not long. They take your hand. Whatever they were about to do, they don't.",
+					"They give you their last air canister. You try to refuse. They insist."
+				],
+				"effects": {
+					"attitude": 30,
+					"npc": "silenced",
+					"items": {
+						"air_canister": 1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Halcyon can finance your funeral. Want their number?\""
+				],
+				"effects": {}
+			}
+		},
+		"syndicate_name": {
+			"text": "Drop the Syndicate's name",
+			"roles": [
+				"civilian",
+				"merchant",
+				"witness"
+			],
+			"requires": {
+				"flag": "mob_debt"
+			},
+			"chance": 0.55,
+			"verb": "intimidate",
+			"chance_mods": {
+				"npc:poor": 0.1,
+				"npc:rebel": 0.1,
+				"npc:corporate": -0.2
+			},
+			"success": {
+				"lines": [
+					"At the word 'Syndicate' they go very still. \"I don't want any trouble with... them.\" Neither do you, honestly."
+				],
+				"effects": {
+					"npc": "silenced",
+					"discount": 0.15
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"The Syndicate? They're looking for YOU, friend. There's a reward.\""
+				],
+				"effects": {
+					"attitude": -15,
+					"flag": {
+						"syndicate_heat": true
+					}
+				}
+			}
+		},
+		"haggle": {
+			"text": "Haggle",
+			"roles": [
+				"merchant"
+			],
+			"chance": 0.5,
+			"once": true,
+			"chance_mods": {
+				"flag:charming": 0.2,
+				"flag:lawyer": 0.1,
+				"age:elder": 0.1,
+				"flag:ex_auditor": 0.2,
+				"tag:ex_auditor": 0.2,
+				"attitude": 0.01,
+				"flag:rich": -0.25
+			},
+			"success": {
+				"lines": [
+					"\"Fine! Fine. You drive a harder bargain than Halcyon. Ten percent off.\"",
+					"\"You're robbing me. Legally. I respect it.\""
+				],
+				"effects": {
+					"discount": 0.12
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Haggling? That's a premium feature.\" The price goes UP."
+				],
+				"effects": {
+					"discount": -0.1
+				}
+			}
+		},
+		"shoplift": {
+			"text": "Pocket something from the stall",
+			"roles": [
+				"merchant"
+			],
+			"chance": 0.4,
+			"verb": "theft",
+			"record_on": "fail",
+			"once": true,
+			"chance_mods": {
+				"flag:klepto": 0.35,
+				"flag:invisible": 0.15,
+				"age:teen": 0.1,
+				"item:lockpick": 0.1
+			},
+			"success": {
+				"lines": [
+					"A medkit migrates from the counter to your pocket. The merchant is busy arguing with an ad.",
+					"You browse. You 'browse'. Your pockets are heavier."
+				],
+				"effects": {
+					"items": {
+						"medkit": 1
+					}
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Put. It. Back.\" They've seen a thousand shoplifters. You were number one thousand and one."
+				],
+				"effects": {
+					"attitude": -30,
+					"npc": "angry"
+				}
+			}
+		}
+	},
+	"npc": {
+		"jobs": {
+			"poor": [
+				"scrap picker",
+				"paste taster",
+				"ad-sleeper (they rent out their dreams)",
+				"queue stander",
+				"air-vent cleaner",
+				"unlicensed busker",
+				"organ-lease tenant",
+				"recycled-water bottler"
+			],
+			"worker": [
+				"vat stirrer",
+				"hull welder",
+				"repo-drone mechanic",
+				"dock loader",
+				"night-shift billing clerk",
+				"air-filter changer",
+				"noodle cook",
+				"sky-car valet"
+			],
+			"artsy": [
+				"holo-graffiti artist",
+				"synth busker",
+				"jingle ghostwriter",
+				"tattooist",
+				"underground DJ",
+				"forger of 'vintage' ads",
+				"street poet",
+				"dream-ad editor"
+			],
+			"corporate": [
+				"junior compliance associate",
+				"brand evangelist",
+				"debt-collection intern",
+				"synergy coordinator",
+				"quarterly-review survivor",
+				"loyalty-points auditor",
+				"air-pricing analyst",
+				"executive's assistant's assistant"
+			],
+			"rebel": [
+				"pirate-radio host",
+				"union courier",
+				"free-air smuggler",
+				"billboard saboteur",
+				"underground medic",
+				"leaflet printer",
+				"ex-Paragon deserter",
+				"data liberator"
+			],
+			"weird": [
+				"cryo-dream interpreter",
+				"self-declared prophet",
+				"pigeon (they insist)",
+				"time-traveller (unconfirmed)",
+				"professional mourner",
+				"conspiracy archivist",
+				"collector of bad omens",
+				"retired android (claims)"
+			]
+		},
+		"needs": {
+			"poor": [
+				"Air. Just air",
+				"A bed that isn't rented by the hour",
+				"Food that isn't paste",
+				"Someone to pay off my water debt",
+				"Medicine my kid can afford"
+			],
+			"worker": [
+				"A day off. One. Ever",
+				"My overtime, which Gristle 'forgot'",
+				"A union nobody can repossess",
+				"A boss who goes missing. Permanently",
+				"Shoes that don't belong to Halcyon"
+			],
+			"artsy": [
+				"An audience that isn't bots",
+				"A wall Lumen doesn't own",
+				"Ten minutes of silence, no ads",
+				"A muse. Or rent. Rent first",
+				"Someone to buy my soul at a fair price"
+			],
+			"corporate": [
+				"A promotion before my clone gets it",
+				"Proof my manager embezzles",
+				"Three more loyalty points for Platinum",
+				"Someone to blame for the quarterly",
+				"A way out that doesn't void my pension"
+			],
+			"rebel": [
+				"Explosives. Legally, glitter",
+				"A broadcast slot Lumen doesn't control",
+				"My cell-mate out of a Paragon colony",
+				"Proof the Consortium lies. More proof",
+				"A ship that doesn't phone home"
+			],
+			"weird": [
+				"The sky to stop humming at me",
+				"A pre-war spoon (long story)",
+				"To be believed, once",
+				"My reflection back. It left",
+				"To know what's in the paste. Really"
+			]
+		},
+		"greet_by_wealth": {
+			"5": [
+				"\"Is that a {heir} crest? Oh. OH. Can I... get you anything? Anything at all?\"",
+				"\"Rich people don't come down here. Unless they're lost. Or buying the street.\""
+			],
+			"4": [
+				"\"Nice coat. Real fabric? I could live a month on one sleeve.\"",
+				"\"You smell like money. Old money. The kind that doesn't pay for air.\""
+			],
+			"3": [
+				"\"Executive type, huh? Here to 'experience the street'? It costs extra.\"",
+				"\"You've got that corner-office posture. My spine is jealous.\""
+			],
+			"2": [
+				"\"Another middle-tier soul. Hanging on, like the rest of us.\"",
+				"\"You look like you approve expense reports. Approve mine?\""
+			],
+			"1": [
+				"\"Rough shift? You look like a rough shift.\"",
+				"\"Hey, I know that look. Two jobs, no sleep. Same.\""
+			],
+			"0": [
+				"\"You sleep under the ad-bridge too? I think I've seen you there.\"",
+				"\"Careful, Paragon sweeps this corner for people who look like us.\""
+			]
+		},
+		"greet_by_age": {
+			"teen": [
+				"\"Shouldn't you be in a learning-subscription somewhere, kid?\"",
+				"\"Kids these days. Already in debt. Respect.\""
+			],
+			"elder": [
+				"\"Respect your elders, they said. Then they billed the elders.\"",
+				"\"You remember when air was free, grandparent? Tell me it was real.\""
+			],
+			"ancient": [
+				"\"You're... really old. Like, museum old. Are you on loan?\"",
+				"\"Is it true you were born before the Consortium? What was it like?\""
+			]
+		},
+		"greet_by_trait_reaction": {
+			"warm": [
+				"\"Hey, you look like one of us. Rough century, huh?\"",
+				"\"Finally, someone who doesn't smell like a shareholder.\"",
+				"\"You've got kind eyes. Rare. Probably illegal.\""
+			],
+			"cold": [
+				"\"I know your type. Keep walking.\"",
+				"\"Don't stand so close, you'll lower my credit score.\"",
+				"\"Whatever you're selling, I already owe on it.\""
+			],
+			"neutral": [
+				"\"Breathe quietly, friend. They bill by the decibel now.\"",
+				"\"Got any spare air? No? Yeah. Nobody does.\"",
+				"\"Don't look at the ads too long. They look back.\""
+			]
+		},
+		"rumors": {
+			"saga": [
+				"\"Someone called {ally} has been asking around {objective_planet} about {macguffin}. Sounds like trouble. The fun kind.\"",
+				"\"They say {antagonist} - the {antagonist_title} - wants to {scheme}. Lumen calls it 'a bold vision'.\"",
+				"\"Word is {lieutenant} does the dirty work for {antagonist}. Never seen without a smile. Or a body.\""
+			],
+			"planet": [
+				"\"Over on {other_planet} it's {other_crisis}. Glad I'm here. Well. 'Glad'.\"",
+				"\"{other_planet}? Run by {other_controller} now. Don't go there with a bounty.\""
+			],
+			"local": [
+				"\"There's trouble brewing here. {local_hint}\"",
+				"\"Talk to {local_name}. They know what's really going on around here.\""
+			],
+			"personal_sibling": [
+				"\"There's a cryo-manifest going around with your face on it. Well - someone with your face.\""
+			],
+			"personal_love": [
+				"\"Someone's been leaving flowers at the cryo-vault on {objective_planet}. Real flowers. Who does that?\""
+			],
+			"tips": [
+				"\"The merchant here marks everything up when Paragon's watching. Come back after a crime. Kidding. Mostly.\"",
+				"\"Smash an AIR-O-MAT and you get two canisters. Lumen will report it, though.\"",
+				"\"Paragon officers can be bribed. Halcyon drones can't. Drones don't have pockets.\"",
+				"\"Kill a witness before they finish the call and the news never spreads. Not that I'd know.\""
+			]
+		}
+	}
+}

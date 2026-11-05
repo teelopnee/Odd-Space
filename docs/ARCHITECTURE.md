@@ -31,10 +31,22 @@
 | `Crew` | `crew_manager.gd` | Morality engine: approval = dot(action moral vector, member values); betrayals on warp. |
 | `FlawPerk` | `flaw_perk_system.gd` | Mishap counters → flaw offers (+skill points); perk shop. |
 | `Encounters` | `encounter_director.gd` | Weighted warp encounters, choice chances, effect DSL. |
+| `Stories` | `stories.gd` | Per-planet local story (leader vs boss, gated choices, tasks, outcomes that change the planet) + street events. `data/stories.json`. |
+| `Interactions` | `interactions.gd` | Character-dependent verbs on NPCs (pull rank, beg, hack, preach, charm, extort...), NPC personas (job, need, mood), rumours. `data/interactions.json`. |
 | `Saga` | `saga.gd` | Procedural story per universe seed: cast (ally, antagonist, lieutenant, personal thread), MacGuffin, 7 beats over 3 acts laid across random planets, twist from your Secret, 3 endings, per-planet side quests, journal. Templates in `data/saga.json`. |
 | `ShipAI` | `ship_ai.gd` | QUACK commentary with cooldowns (`data/ai_lines.json`). |
 | `Audio` | `audio_manager.gd` | Music/SFX by name; missing files are ignored. |
 | `Router` | `scene_router.gd` | Scene changes with fade + params. |
+
+## Branching & endings
+- Choices everywhere use one requirement grammar (`Interactions.requirements_met` + `Saga.cond_ok`):
+  flag / any_flag / tag / age / goal / item / min_credits / min_wealth / max_wealth / npc_trait, plus story keys
+  state / min_axis / max_axis / min_fame / min_followers / min_intel / min_visited ...
+- `Saga.axes` (mercy, order, greed, truth) accumulate from story choices, planet outcomes, street events and every
+  Causality action (x0.2). Fame and followers live in `Game.flags`.
+- Elites with a `saga_tag` surrender at 25% HP (`Enemy._surrender`) -> Saga/Stories choose their fate.
+- `Saga.compose_ending()` = resolution + antagonist/lieutenant/ally fates + personal outcome + planet slides + crew +
+  legacy title + class/age codas. `tools/count_endings.gd` reports the size of that space.
 
 ## Stats
 `StatBlock` = BASE + Σadd, × (1 + Σmul), grouped by source (`tag:`, `synergy:`, `perk:`, `flaw:`).

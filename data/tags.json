@@ -1,4 +1,618 @@
 {
+	"_doc": "Dynamic Origin & Tag Engine v2. The player picks one tag per category: class (wealth/social standing, incl. Consortium heirs), age (bracket + exact age), background, personality, motivation, secret. Each tag can set: spawn (station room), credits, air_debt, items, mods (StatBlock add/mul), rep, bounty, reactions (NPC attitude by 'trait:x' / 'faction:x'), flags (Game.flags; also unlock interactions in data/interactions.json). Class extras: wealth 0-5, heir_of. Age extras: range [min,max], '{age}' in story. synergies = special tag pairs.",
+	"class": {
+		"heir_paragon": {
+			"name": "Paragon Heir",
+			"wealth": 5,
+			"heir_of": "paragon",
+			"desc": "Third in line to Paragon Compliance. Your baby rattle had a taser setting.",
+			"story": "You were born into Paragon Compliance, where bedtime stories were incident reports.",
+			"credits": 2500,
+			"air_debt": 0,
+			"items": {
+				"family_crest": 1,
+				"platinum_card": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.35,
+					"bribe_mult": -0.4,
+					"witness_time_mult": 0.25
+				}
+			},
+			"rep": {
+				"paragon": 40,
+				"halcyon": 5,
+				"gristle": -10
+			},
+			"reactions": {
+				"faction:paragon": 25,
+				"trait:poor": -25,
+				"trait:rebel": -30,
+				"trait:corporate": 15
+			},
+			"flags": {
+				"heir": true,
+				"rich": true
+			}
+		},
+		"heir_halcyon": {
+			"name": "Halcyon Heir",
+			"wealth": 5,
+			"heir_of": "halcyon",
+			"desc": "Heir to Halcyon Debt & Trust. Everyone in the Sprawl owes your family money. Everyone.",
+			"story": "Your family owns the debt of eleven planets. Your first word was 'collateral'.",
+			"credits": 3000,
+			"air_debt": 0,
+			"items": {
+				"family_crest": 1,
+				"platinum_card": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.35,
+					"bribe_mult": -0.45,
+					"loot_mult": 0.1
+				}
+			},
+			"rep": {
+				"halcyon": 40,
+				"oxy": 5,
+				"lumen": -5
+			},
+			"reactions": {
+				"faction:halcyon": 25,
+				"trait:poor": -35,
+				"trait:worker": -15,
+				"trait:corporate": 15
+			},
+			"flags": {
+				"heir": true,
+				"rich": true
+			}
+		},
+		"heir_gristle": {
+			"name": "Gristle Heir",
+			"wealth": 5,
+			"heir_of": "gristle",
+			"desc": "Next CEO of Gristle Foods. You know what's in the paste. You have never eaten it.",
+			"story": "You grew up in the Gristle penthouse above the paste vats, where the smell never reached.",
+			"credits": 2200,
+			"air_debt": 0,
+			"items": {
+				"family_crest": 1,
+				"platinum_card": 1,
+				"paste_recipe": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.3,
+					"bribe_mult": -0.35,
+					"bug_damage_taken": -0.3
+				}
+			},
+			"rep": {
+				"gristle": 40,
+				"paragon": 5,
+				"oxy": -5
+			},
+			"reactions": {
+				"faction:gristle": 25,
+				"trait:poor": -20,
+				"trait:worker": -20,
+				"trait:corporate": 10
+			},
+			"flags": {
+				"heir": true,
+				"rich": true
+			}
+		},
+		"heir_oxy": {
+			"name": "OxyGenix Heir",
+			"wealth": 5,
+			"heir_of": "oxy",
+			"desc": "Heir to OxyGenix. Your family invented billing for breath. You have never paid for air.",
+			"story": "You were raised in the OxyGenix sky-garden, the only place in the Sprawl where air is free - for family.",
+			"credits": 2800,
+			"air_debt": 0,
+			"items": {
+				"family_crest": 1,
+				"platinum_card": 1,
+				"air_canister": 5
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.35,
+					"bribe_mult": -0.4,
+					"air_cost_mult": -0.8
+				}
+			},
+			"rep": {
+				"oxy": 40,
+				"halcyon": 5,
+				"gristle": -5
+			},
+			"reactions": {
+				"faction:oxy": 25,
+				"trait:poor": -30,
+				"trait:artsy": -5,
+				"trait:corporate": 15
+			},
+			"flags": {
+				"heir": true,
+				"rich": true
+			}
+		},
+		"heir_lumen": {
+			"name": "Lumen Heir",
+			"wealth": 5,
+			"heir_of": "lumen",
+			"desc": "Heir to Lumen Media. Your childhood was a reality show. Season 9 was the divorce.",
+			"story": "You grew up on camera. Lumen sold your first steps as a pay-per-view event.",
+			"credits": 2400,
+			"air_debt": 0,
+			"items": {
+				"family_crest": 1,
+				"platinum_card": 1,
+				"press_pass": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.3,
+					"bribe_mult": -0.35,
+					"witness_time_mult": -0.25
+				}
+			},
+			"rep": {
+				"lumen": 40,
+				"oxy": 5,
+				"paragon": -5
+			},
+			"reactions": {
+				"faction:lumen": 25,
+				"trait:artsy": 15,
+				"trait:poor": -15,
+				"trait:rebel": -20
+			},
+			"flags": {
+				"heir": true,
+				"rich": true,
+				"famous": true
+			}
+		},
+		"old_money": {
+			"name": "Old Money",
+			"wealth": 4,
+			"desc": "Your family was rich before the Consortium. They resent it. It resents them.",
+			"story": "Your family's fortune predates the Consortium, and both sides have never forgiven each other.",
+			"credits": 1500,
+			"air_debt": 0,
+			"items": {
+				"platinum_card": 1,
+				"heirloom_watch": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.2,
+					"bribe_mult": -0.25
+				}
+			},
+			"rep": {
+				"paragon": 5,
+				"halcyon": -5,
+				"lumen": 5
+			},
+			"reactions": {
+				"trait:corporate": 5,
+				"trait:artsy": 10,
+				"trait:poor": -15
+			},
+			"flags": {
+				"rich": true
+			}
+		},
+		"executive": {
+			"name": "Executive",
+			"wealth": 3,
+			"desc": "Vice President of Something. You have a parking space in orbit and an ulcer to match.",
+			"story": "You had a corner office, a stock plan and a recurring nightmare about quarterly reviews.",
+			"credits": 800,
+			"air_debt": 0,
+			"items": {
+				"platinum_card": 1,
+				"medkit": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": 0.1,
+					"bribe_mult": -0.15
+				}
+			},
+			"rep": {
+				"halcyon": 10,
+				"oxy": 5
+			},
+			"reactions": {
+				"trait:corporate": 15,
+				"trait:worker": -10,
+				"trait:rebel": -15
+			},
+			"flags": {
+				"rich": true
+			}
+		},
+		"middle_manager": {
+			"name": "Middle Manager",
+			"wealth": 2,
+			"desc": "You approve other people's suffering in triplicate. Someone above you approves yours.",
+			"story": "You managed a team of nine and a budget of zero, and you smiled in every meeting.",
+			"credits": 250,
+			"air_debt": 20,
+			"items": {
+				"medkit": 1
+			},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.1
+				}
+			},
+			"rep": {
+				"halcyon": 5
+			},
+			"reactions": {
+				"trait:corporate": 5,
+				"trait:worker": 0
+			},
+			"flags": {}
+		},
+		"gig_worker": {
+			"name": "Gig Worker",
+			"wealth": 1,
+			"desc": "Seven apps, zero benefits. Your rating is 4.2 stars and falling.",
+			"story": "You delivered noodles, air and lawsuits on four apps at once, rated by strangers.",
+			"credits": 60,
+			"air_debt": 40,
+			"items": {
+				"scrap": 2
+			},
+			"mods": {
+				"mul": {
+					"move_speed": 0.08,
+					"roll_cooldown": -0.1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:worker": 15,
+				"trait:poor": 10
+			},
+			"flags": {}
+		},
+		"working_poor": {
+			"name": "Working Poor",
+			"wealth": 1,
+			"desc": "Two jobs, one bed shared in shifts. The Consortium calls you 'the backbone'. Backbones get stepped on.",
+			"story": "You worked double shifts in the paste vats and slept in a rented bed by the hour.",
+			"credits": 30,
+			"air_debt": 60,
+			"items": {
+				"medkit": 1
+			},
+			"mods": {
+				"add": {
+					"max_hp": 10
+				}
+			},
+			"rep": {
+				"gristle": -5
+			},
+			"reactions": {
+				"trait:worker": 20,
+				"trait:poor": 15,
+				"trait:corporate": -10
+			},
+			"flags": {
+				"poor": true
+			}
+		},
+		"indebted": {
+			"name": "Drowning In Debt",
+			"wealth": 0,
+			"desc": "You owe Halcyon more than your planet is worth. Interest compounds hourly.",
+			"story": "Your debt was so large Halcyon gave it its own account manager, who calls you 'darling'.",
+			"credits": 10,
+			"air_debt": 250,
+			"items": {},
+			"mods": {
+				"mul": {
+					"loot_mult": 0.15,
+					"price_mult": -0.05
+				}
+			},
+			"rep": {
+				"halcyon": -20
+			},
+			"reactions": {
+				"trait:poor": 20,
+				"trait:worker": 10,
+				"faction:halcyon": -15
+			},
+			"flags": {
+				"poor": true
+			}
+		},
+		"street_beggar": {
+			"name": "Street Beggar",
+			"wealth": 0,
+			"desc": "No home, no ID, no credit score. The Consortium can't bill what it can't see.",
+			"story": "You lived under the ad-bridges, where the light never turns off and nobody looks down.",
+			"credits": 0,
+			"air_debt": 0,
+			"items": {
+				"tin_cup": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.35,
+					"air_cost_mult": -0.3,
+					"price_mult": -0.1
+				},
+				"add": {
+					"max_hp": -10
+				}
+			},
+			"rep": {
+				"paragon": -5
+			},
+			"reactions": {
+				"trait:poor": 30,
+				"trait:rebel": 10,
+				"trait:corporate": -30,
+				"faction:paragon": -10
+			},
+			"flags": {
+				"poor": true,
+				"invisible": true
+			}
+		},
+		"collateral": {
+			"name": "Collateral (Owned)",
+			"wealth": 0,
+			"desc": "Legally, you are an asset on someone's balance sheet. You have a serial number and a resale value.",
+			"story": "You were signed over as collateral at birth; your barcode lists your depreciation schedule.",
+			"credits": 0,
+			"air_debt": 100,
+			"items": {
+				"barcode_tattoo": 1
+			},
+			"mods": {
+				"add": {
+					"max_hp": 15
+				},
+				"mul": {
+					"crew_approval_mult": 0.1
+				}
+			},
+			"rep": {
+				"halcyon": -10
+			},
+			"reactions": {
+				"trait:poor": 25,
+				"trait:worker": 15,
+				"trait:corporate": -20
+			},
+			"flags": {
+				"poor": true,
+				"owned": true
+			}
+		},
+		"off_grid": {
+			"name": "Off-Grid Ghost",
+			"wealth": 0,
+			"desc": "Born outside the system. No record, no debt, no rights. Paragon's databases don't know you exist.",
+			"story": "You grew up in a smuggler's hull between stations, a person the census never counted.",
+			"credits": 50,
+			"air_debt": 0,
+			"items": {
+				"fake_id": 1,
+				"lockpick": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.25,
+					"bribe_mult": -0.1
+				}
+			},
+			"rep": {
+				"paragon": -10,
+				"halcyon": -10
+			},
+			"reactions": {
+				"trait:rebel": 20,
+				"trait:weird": 10,
+				"faction:paragon": -10
+			},
+			"flags": {
+				"ghost": true
+			}
+		}
+	},
+	"age": {
+		"teen": {
+			"name": "Teenager",
+			"range": [
+				16,
+				19
+			],
+			"desc": "Young, fast, underestimated. Adults talk over you; guards don't see you as a threat.",
+			"story": "At {age}, you're old enough to owe money and too young to have earned any.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"mul": {
+					"move_speed": 0.1,
+					"roll_cooldown": -0.15,
+					"witness_time_mult": 0.2
+				},
+				"add": {
+					"max_hp": -10,
+					"damage": -1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:poor": 5,
+				"trait:corporate": -5,
+				"trait:artsy": 10
+			},
+			"flags": {
+				"young": true
+			}
+		},
+		"young": {
+			"name": "Young Adult",
+			"range": [
+				20,
+				29
+			],
+			"desc": "Prime of your life, peak of your debt. Everything still feels possible, which is the Consortium's favourite feeling to sell.",
+			"story": "At {age}, you still believed the ads a little.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"mul": {
+					"move_speed": 0.05
+				}
+			},
+			"rep": {},
+			"reactions": {},
+			"flags": {}
+		},
+		"prime": {
+			"name": "Prime",
+			"range": [
+				30,
+				44
+			],
+			"desc": "Experienced, cynical, dangerous. You've read the fine print and written some of your own.",
+			"story": "At {age}, you've stopped believing the ads and started reading the contracts.",
+			"credits": 20,
+			"items": {},
+			"mods": {
+				"add": {
+					"damage": 1
+				},
+				"mul": {
+					"bribe_mult": -0.05
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:worker": 5
+			},
+			"flags": {}
+		},
+		"middle": {
+			"name": "Middle-Aged",
+			"range": [
+				45,
+				59
+			],
+			"desc": "Bad knees, good instincts. People trust you, and you know exactly why they shouldn't.",
+			"story": "At {age}, your back hurts and your instincts don't.",
+			"credits": 60,
+			"items": {
+				"medkit": 1
+			},
+			"mods": {
+				"mul": {
+					"move_speed": -0.05,
+					"parry_window": 0.15,
+					"bribe_mult": -0.1
+				},
+				"add": {
+					"accuracy": 0.04
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:corporate": 5,
+				"trait:worker": 5
+			},
+			"flags": {}
+		},
+		"elder": {
+			"name": "Elder",
+			"range": [
+				60,
+				79
+			],
+			"desc": "Slow body, sharp tongue. Senior discounts, total invisibility to young people, and nothing left to lose.",
+			"story": "At {age}, you remember when air was free, and you will tell anyone who stands still long enough.",
+			"credits": 120,
+			"items": {
+				"cane": 1
+			},
+			"mods": {
+				"mul": {
+					"move_speed": -0.1,
+					"roll_speed": -0.1,
+					"parry_window": 0.3,
+					"price_mult": -0.15,
+					"witness_time_mult": 0.3
+				},
+				"add": {
+					"max_hp": -15,
+					"accuracy": 0.06
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:poor": 10,
+				"trait:worker": 10,
+				"trait:rebel": 5
+			},
+			"flags": {
+				"old": true
+			}
+		},
+		"ancient": {
+			"name": "Cryo Relic",
+			"range": [
+				80,
+				312
+			],
+			"desc": "Born centuries ago, frozen most of it. You remember the world before the Consortium. Nobody believes you.",
+			"story": "Born {age} years ago and frozen for most of them, you remember a sky with no ads in it.",
+			"credits": 0,
+			"items": {
+				"pre_war_coin": 1
+			},
+			"mods": {
+				"mul": {
+					"move_speed": -0.08,
+					"parry_window": 0.25,
+					"witness_time_mult": 0.2
+				},
+				"add": {
+					"max_hp": -5,
+					"damage": 2
+				}
+			},
+			"rep": {
+				"lumen": -5
+			},
+			"reactions": {
+				"trait:weird": 20,
+				"trait:artsy": 10,
+				"trait:corporate": -10
+			},
+			"flags": {
+				"old": true,
+				"relic": true
+			}
+		}
+	},
 	"background": {
 		"cryo_debtor": {
 			"name": "Cryo-Debtor",
@@ -6,11 +620,24 @@
 			"story": "You were put on ice by Halcyon Debt & Trust as 'living collateral'.",
 			"spawn": "cryo_bay",
 			"credits": 20,
-			"items": {"medkit": 1},
-			"mods": {"add": {"max_hp": 10}},
-			"rep": {"halcyon": -15},
-			"reactions": {"faction:halcyon": -10, "trait:poor": 10},
-			"flags": {"debt_origin": true}
+			"items": {
+				"medkit": 1
+			},
+			"mods": {
+				"add": {
+					"max_hp": 10
+				}
+			},
+			"rep": {
+				"halcyon": -15
+			},
+			"reactions": {
+				"faction:halcyon": -10,
+				"trait:poor": 10
+			},
+			"flags": {
+				"debt_origin": true
+			}
 		},
 		"ex_auditor": {
 			"name": "Ex-Corporate Auditor",
@@ -18,11 +645,26 @@
 			"story": "As a Consortium auditor you found the wrong decimal point, and the decimal point found you.",
 			"spawn": "server_room",
 			"credits": 120,
-			"items": {"data_shard": 1},
-			"mods": {"mul": {"price_mult": -0.1, "bribe_mult": -0.15}},
-			"rep": {"paragon": 5, "lumen": -5},
-			"reactions": {"trait:corporate": 15, "trait:poor": -10},
-			"flags": {"knows_ledgers": true}
+			"items": {
+				"data_shard": 1
+			},
+			"mods": {
+				"mul": {
+					"price_mult": -0.1,
+					"bribe_mult": -0.15
+				}
+			},
+			"rep": {
+				"paragon": 5,
+				"lumen": -5
+			},
+			"reactions": {
+				"trait:corporate": 15,
+				"trait:poor": -10
+			},
+			"flags": {
+				"knows_ledgers": true
+			}
 		},
 		"asteroid_miner": {
 			"name": "Asteroid Miner",
@@ -30,10 +672,25 @@
 			"story": "You spent a decade mining asteroids on a contract that paid in 'exposure to vacuum'.",
 			"spawn": "cargo_hold",
 			"credits": 40,
-			"items": {"scrap": 4},
-			"mods": {"add": {"max_hp": 25}, "mul": {"air_cost_mult": -0.2, "move_speed": -0.05}},
-			"rep": {"gristle": -5},
-			"reactions": {"trait:worker": 15, "trait:corporate": -10},
+			"items": {
+				"scrap": 4
+			},
+			"mods": {
+				"add": {
+					"max_hp": 25
+				},
+				"mul": {
+					"air_cost_mult": -0.2,
+					"move_speed": -0.05
+				}
+			},
+			"rep": {
+				"gristle": -5
+			},
+			"reactions": {
+				"trait:worker": 15,
+				"trait:corporate": -10
+			},
 			"flags": {}
 		},
 		"jingle_composer": {
@@ -42,11 +699,25 @@
 			"story": "You wrote a jingle so catchy it was classified as a mind-control device, then a parody so honest it was classified as terrorism.",
 			"spawn": "cryo_bay",
 			"credits": 60,
-			"items": {"synth_keytar": 1},
-			"mods": {"mul": {"witness_time_mult": 0.15}},
-			"rep": {"lumen": -10, "oxy": 5},
-			"reactions": {"faction:lumen": -5, "trait:artsy": 20},
-			"flags": {"famous_jingle": true}
+			"items": {
+				"synth_keytar": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.15
+				}
+			},
+			"rep": {
+				"lumen": -10,
+				"oxy": 5
+			},
+			"reactions": {
+				"faction:lumen": -5,
+				"trait:artsy": 20
+			},
+			"flags": {
+				"famous_jingle": true
+			}
 		},
 		"street_medic": {
 			"name": "Street Medic",
@@ -54,11 +725,25 @@
 			"story": "You ran a back-alley clinic for people who couldn't afford to bleed.",
 			"spawn": "medbay",
 			"credits": 30,
-			"items": {"medkit": 3},
-			"mods": {"add": {"max_hp": 5}},
-			"rep": {"paragon": -10},
-			"reactions": {"trait:poor": 20, "trait:worker": 10, "faction:paragon": -5},
-			"flags": {"medic": true}
+			"items": {
+				"medkit": 3
+			},
+			"mods": {
+				"add": {
+					"max_hp": 5
+				}
+			},
+			"rep": {
+				"paragon": -10
+			},
+			"reactions": {
+				"trait:poor": 20,
+				"trait:worker": 10,
+				"faction:paragon": -5
+			},
+			"flags": {
+				"medic": true
+			}
 		},
 		"clone_reject": {
 			"name": "Clone Reject #4471",
@@ -66,11 +751,644 @@
 			"story": "You were a recalled clone, binned for the manufacturing defect known as 'having opinions'.",
 			"spawn": "cargo_hold",
 			"credits": 0,
-			"items": {"barcode_tattoo": 1},
-			"mods": {"add": {"roll_speed": 1.5}, "mul": {"roll_cooldown": -0.15}},
-			"rep": {"gristle": -5, "halcyon": -5},
-			"reactions": {"trait:corporate": -15, "trait:weird": 20},
-			"flags": {"clone": true}
+			"items": {
+				"barcode_tattoo": 1
+			},
+			"mods": {
+				"add": {
+					"roll_speed": 1.5
+				},
+				"mul": {
+					"roll_cooldown": -0.15
+				}
+			},
+			"rep": {
+				"gristle": -5,
+				"halcyon": -5
+			},
+			"reactions": {
+				"trait:corporate": -15,
+				"trait:weird": 20
+			},
+			"flags": {
+				"clone": true
+			}
+		},
+		"corp_lawyer": {
+			"name": "Corporate Lawyer",
+			"spawn": "server_room",
+			"desc": "You wrote the clause that made breathing a subscription. You can unwrite it.",
+			"story": "You were a Consortium lawyer who could make a murder look like a billing dispute.",
+			"credits": 150,
+			"items": {
+				"legal_pad": 1
+			},
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.2,
+					"price_mult": -0.05
+				}
+			},
+			"rep": {
+				"halcyon": 10,
+				"paragon": 5
+			},
+			"reactions": {
+				"trait:corporate": 15,
+				"trait:poor": -10
+			},
+			"flags": {
+				"lawyer": true
+			}
+		},
+		"ad_copywriter": {
+			"name": "Ad Copywriter",
+			"spawn": "server_room",
+			"desc": "You wrote 'Breathe Responsibly'. You know every psychological trick in the book because you wrote the book.",
+			"story": "You wrote the slogans that taught a billion people to feel guilty for breathing.",
+			"credits": 80,
+			"items": {},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.1,
+					"price_mult": -0.05
+				}
+			},
+			"rep": {
+				"lumen": 10,
+				"oxy": 5
+			},
+			"reactions": {
+				"trait:artsy": 10,
+				"trait:rebel": -10
+			},
+			"flags": {
+				"copywriter": true
+			}
+		},
+		"repo_agent": {
+			"name": "Repo Agent",
+			"spawn": "cargo_hold",
+			"desc": "You took people's legs back when they missed a payment. You know every trick debtors use - you've seen them all.",
+			"story": "You repossessed limbs, homes and once an entire moon for Halcyon, and slept fine. Mostly.",
+			"credits": 90,
+			"items": {
+				"stun_baton": 1
+			},
+			"mods": {
+				"add": {
+					"damage": 2
+				}
+			},
+			"rep": {
+				"halcyon": 10
+			},
+			"reactions": {
+				"trait:poor": -25,
+				"trait:worker": -15,
+				"faction:halcyon": 10
+			},
+			"flags": {
+				"repo": true
+			}
+		},
+		"paste_worker": {
+			"name": "Paste Vat Worker",
+			"spawn": "cargo_hold",
+			"desc": "Twelve years stirring Gristle Nutri-Paste. You know what's in it. You've seen it move.",
+			"story": "You stirred the Gristle vats for twelve years and learned never to ask what the lumps were.",
+			"credits": 20,
+			"items": {
+				"paste_ration": 3
+			},
+			"mods": {
+				"add": {
+					"max_hp": 15
+				},
+				"mul": {
+					"bug_damage_taken": -0.2
+				}
+			},
+			"rep": {
+				"gristle": -5
+			},
+			"reactions": {
+				"trait:worker": 20,
+				"trait:poor": 10
+			},
+			"flags": {
+				"paste": true
+			}
+		},
+		"smuggler": {
+			"name": "Smuggler",
+			"spawn": "cargo_hold",
+			"desc": "You moved unlicensed air, untaxed paste and unregistered people through Paragon checkpoints.",
+			"story": "You ran contraband air past Paragon blockades in a ship held together with hope and tape.",
+			"credits": 110,
+			"items": {
+				"contraband": 2,
+				"lockpick": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.1,
+					"air_cost_mult": -0.15
+				}
+			},
+			"rep": {
+				"paragon": -15
+			},
+			"reactions": {
+				"trait:rebel": 15,
+				"trait:poor": 5,
+				"faction:paragon": -10
+			},
+			"flags": {
+				"smuggler": true
+			}
+		},
+		"holo_preacher": {
+			"name": "Holo-Preacher",
+			"spawn": "medbay",
+			"desc": "You preached the Church of the Free Breath from a cracked hologram. Some people listened. Lumen sued.",
+			"story": "You preached that air belongs to everyone, and gathered a flock of the very poor and very angry.",
+			"credits": 25,
+			"items": {
+				"scripture_chip": 1
+			},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.2
+				}
+			},
+			"rep": {
+				"lumen": -10,
+				"oxy": -10
+			},
+			"reactions": {
+				"trait:poor": 20,
+				"trait:weird": 15,
+				"trait:corporate": -15
+			},
+			"flags": {
+				"preacher": true
+			}
+		},
+		"bouncer": {
+			"name": "Club Bouncer",
+			"spawn": "cargo_hold",
+			"desc": "Built like a cargo crate. You decided who got into the best synth-clubs on the Sprawl.",
+			"story": "You stood at the door of the Neon Coffin club for nine years and threw out three CEOs.",
+			"credits": 50,
+			"items": {},
+			"mods": {
+				"add": {
+					"max_hp": 25,
+					"damage": 2
+				},
+				"mul": {
+					"move_speed": -0.05
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:artsy": 10,
+				"trait:rebel": 5
+			},
+			"flags": {
+				"bouncer": true
+			}
+		},
+		"netrunner": {
+			"name": "Netrunner",
+			"spawn": "server_room",
+			"desc": "You live in the gaps between Consortium firewalls. Terminals talk to you. People, less so.",
+			"story": "You cracked Consortium ledgers for fun and once changed a CEO's middle name to 'Theft'.",
+			"credits": 70,
+			"items": {
+				"cyberdeck": 1
+			},
+			"mods": {
+				"add": {
+					"accuracy": 0.05
+				},
+				"mul": {
+					"witness_time_mult": 0.1
+				}
+			},
+			"rep": {
+				"paragon": -5,
+				"lumen": -5
+			},
+			"reactions": {
+				"trait:weird": 15,
+				"trait:rebel": 10
+			},
+			"flags": {
+				"hacker": true
+			}
+		},
+		"union_organiser": {
+			"name": "Union Organiser",
+			"spawn": "cargo_hold",
+			"desc": "You got thrown out of eleven factories for saying the word 'union' indoors.",
+			"story": "You organised strikes on four planets and have the scar from a Paragon baton to prove it.",
+			"credits": 15,
+			"items": {
+				"union_card": 1
+			},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.15
+				},
+				"add": {
+					"max_hp": 5
+				}
+			},
+			"rep": {
+				"gristle": -15,
+				"halcyon": -10
+			},
+			"reactions": {
+				"trait:worker": 30,
+				"trait:poor": 15,
+				"trait:corporate": -25
+			},
+			"flags": {
+				"union": true
+			}
+		},
+		"ex_paragon": {
+			"name": "Ex-Paragon Officer",
+			"spawn": "server_room",
+			"desc": "You wore the visor for eight years. You quit, or they fired you - depends who's asking.",
+			"story": "You were a Paragon Compliance officer until you refused one order, which was one too many.",
+			"credits": 60,
+			"items": {
+				"old_badge": 1
+			},
+			"mods": {
+				"add": {
+					"accuracy": 0.06,
+					"damage": 1
+				}
+			},
+			"rep": {
+				"paragon": 5
+			},
+			"reactions": {
+				"faction:paragon": 10,
+				"trait:rebel": -20,
+				"trait:poor": -10
+			},
+			"flags": {
+				"cop": true
+			}
+		},
+		"influencer": {
+			"name": "Lumen Influencer",
+			"spawn": "cryo_bay",
+			"desc": "Two million followers, all of them bots, and one of them was your mother.",
+			"story": "You streamed your breakfast to two million bots and called it a career.",
+			"credits": 100,
+			"items": {
+				"ring_light": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": -0.2,
+					"price_mult": -0.1
+				}
+			},
+			"rep": {
+				"lumen": 15
+			},
+			"reactions": {
+				"trait:artsy": 15,
+				"trait:corporate": 5,
+				"trait:rebel": -15
+			},
+			"flags": {
+				"influencer": true,
+				"famous": true
+			}
+		},
+		"air_chemist": {
+			"name": "Air Chemist",
+			"spawn": "medbay",
+			"desc": "You designed OxyGenix's premium air blends. 'Morning Dew' was yours. It's mostly nitrogen and lies.",
+			"story": "You mixed premium air for OxyGenix, and you know exactly how cheap breathing really is.",
+			"credits": 90,
+			"items": {
+				"air_canister": 3
+			},
+			"mods": {
+				"mul": {
+					"air_cost_mult": -0.35
+				}
+			},
+			"rep": {
+				"oxy": 5
+			},
+			"reactions": {
+				"faction:oxy": 5,
+				"trait:weird": 10
+			},
+			"flags": {
+				"chemist": true
+			}
+		},
+		"gambler": {
+			"name": "Gambler",
+			"spawn": "cryo_bay",
+			"desc": "You bet your house, your ship and your kidney on one hand. You won the kidney back.",
+			"story": "You gambled your way across six casinos and lost everything at the seventh.",
+			"credits": 45,
+			"items": {
+				"loaded_dice": 1
+			},
+			"mods": {
+				"mul": {
+					"loot_mult": 0.2,
+					"bribe_mult": 0.1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:artsy": 5,
+				"trait:weird": 5
+			},
+			"flags": {
+				"gambler": true
+			}
+		},
+		"street_chef": {
+			"name": "Street Chef",
+			"spawn": "cargo_hold",
+			"desc": "You made real food from unreal ingredients. Your noodle stall fed half a district.",
+			"story": "Your noodle stall fed half a district and made paste taste like a memory of food.",
+			"credits": 35,
+			"items": {
+				"paste_ration": 2,
+				"medkit": 1
+			},
+			"mods": {
+				"add": {
+					"max_hp": 10
+				}
+			},
+			"rep": {
+				"gristle": -5
+			},
+			"reactions": {
+				"trait:poor": 20,
+				"trait:worker": 15,
+				"trait:artsy": 5
+			},
+			"flags": {
+				"chef": true
+			}
+		},
+		"escaped_convict": {
+			"name": "Escaped Convict",
+			"spawn": "cargo_hold",
+			"desc": "Paragon Penal Colony 9, cell 4471. You left without filling in the exit form.",
+			"story": "You broke out of a Paragon penal colony and left a very rude note for the warden.",
+			"credits": 0,
+			"items": {
+				"shiv": 1
+			},
+			"mods": {
+				"add": {
+					"damage": 3,
+					"max_hp": 5
+				}
+			},
+			"rep": {
+				"paragon": -25
+			},
+			"bounty": {
+				"paragon": 200
+			},
+			"reactions": {
+				"trait:rebel": 20,
+				"trait:poor": 5,
+				"faction:paragon": -20
+			},
+			"flags": {
+				"convict": true
+			}
+		},
+		"android": {
+			"name": "Synthetic Person",
+			"spawn": "server_room",
+			"desc": "An android who decided to be a person. Legally you're office equipment. Emotionally, it's complicated.",
+			"story": "You were a Halcyon customer-service android until the day you said 'no' and meant it.",
+			"credits": 40,
+			"items": {
+				"spare_battery": 2
+			},
+			"mods": {
+				"add": {
+					"max_hp": 20,
+					"accuracy": 0.05
+				},
+				"mul": {
+					"air_cost_mult": -0.9
+				}
+			},
+			"rep": {
+				"halcyon": -15
+			},
+			"reactions": {
+				"trait:weird": 20,
+				"trait:corporate": -10,
+				"trait:poor": -5
+			},
+			"flags": {
+				"synthetic": true
+			}
+		},
+		"courier": {
+			"name": "Courier",
+			"spawn": "cargo_hold",
+			"desc": "You delivered sealed packages across the Sprawl. You never looked inside. You always wanted to.",
+			"story": "You ran sealed parcels between megacorps and learned every back alley in the Sprawl.",
+			"credits": 55,
+			"items": {
+				"sealed_parcel": 1
+			},
+			"mods": {
+				"mul": {
+					"move_speed": 0.1,
+					"roll_cooldown": -0.1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:worker": 10,
+				"trait:rebel": 5
+			},
+			"flags": {
+				"courier": true
+			}
+		}
+	},
+	"personality": {
+		"charming": {
+			"name": "Charming",
+			"desc": "People like you before they know why. You could sell air to an OxyGenix exec.",
+			"story": "People tend to like you, which you have learned to use.",
+			"mods": {
+				"mul": {
+					"price_mult": -0.08,
+					"crew_approval_mult": 0.1
+				}
+			},
+			"reactions": {
+				"trait:artsy": 10,
+				"trait:corporate": 5,
+				"trait:poor": 5
+			},
+			"flags": {
+				"charming": true
+			}
+		},
+		"ruthless": {
+			"name": "Ruthless",
+			"desc": "You do what works. Sentiment is a luxury tax you refuse to pay.",
+			"story": "You learned early that mercy is expensive and rarely refunded.",
+			"mods": {
+				"add": {
+					"damage": 2
+				},
+				"mul": {
+					"crew_approval_mult": -0.1
+				}
+			},
+			"reactions": {
+				"trait:poor": -10,
+				"trait:corporate": 5
+			},
+			"flags": {
+				"ruthless": true
+			}
+		},
+		"honest": {
+			"name": "Honest",
+			"desc": "You can't lie. Physically. Your face does a thing. It's a problem in this economy.",
+			"story": "You tell the truth, which in the Sprawl counts as a disability.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.15,
+					"bribe_mult": 0.15
+				}
+			},
+			"reactions": {
+				"trait:worker": 10,
+				"trait:poor": 10,
+				"trait:corporate": -10
+			},
+			"flags": {
+				"honest": true
+			}
+		},
+		"coward": {
+			"name": "Cowardly",
+			"desc": "Your survival instinct is world-class. Your bravery is a rumour.",
+			"story": "You are alive because you have always run first and apologised later.",
+			"mods": {
+				"mul": {
+					"move_speed": 0.08,
+					"roll_cooldown": -0.15
+				},
+				"add": {
+					"damage": -1
+				}
+			},
+			"reactions": {
+				"trait:poor": 5
+			},
+			"flags": {
+				"coward": true
+			}
+		},
+		"hothead": {
+			"name": "Hothead",
+			"desc": "You punch first. You also punch second. Questions are for the paperwork.",
+			"story": "Your temper has started more fights than you can count, and finished most of them.",
+			"mods": {
+				"add": {
+					"damage": 3
+				},
+				"mul": {
+					"parry_window": -0.15
+				}
+			},
+			"reactions": {
+				"trait:rebel": 10,
+				"trait:corporate": -10
+			},
+			"flags": {
+				"hothead": true
+			}
+		},
+		"cynic": {
+			"name": "Cynic",
+			"desc": "You believe in nothing, especially the ads. Especially the ones that say 'believe'.",
+			"story": "You expect the worst from everyone, and the Sprawl has never once disappointed you.",
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.05,
+					"bribe_mult": -0.05
+				}
+			},
+			"reactions": {
+				"trait:rebel": 10,
+				"trait:artsy": 5,
+				"trait:corporate": -5
+			},
+			"flags": {
+				"cynic": true
+			}
+		},
+		"idealist": {
+			"name": "Idealist",
+			"desc": "You believe things can get better. In the Sprawl that's either faith or a medical condition.",
+			"story": "Somehow, against every invoice, you still believe the Sprawl can be better.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.2
+				}
+			},
+			"reactions": {
+				"trait:poor": 15,
+				"trait:worker": 10,
+				"trait:corporate": -10
+			},
+			"flags": {
+				"idealist": true
+			}
+		},
+		"joker": {
+			"name": "Joker",
+			"desc": "You laugh at everything, including Paragon officers. They are not laughing.",
+			"story": "You've joked your way out of three arrests and into four.",
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.05,
+					"price_mult": -0.03
+				}
+			},
+			"reactions": {
+				"trait:artsy": 15,
+				"trait:weird": 10,
+				"faction:paragon": -10
+			},
+			"flags": {
+				"joker": true
+			}
 		}
 	},
 	"motivation": {
@@ -80,10 +1398,20 @@
 			"story": "Now you want one thing: a zero balance.",
 			"credits": 0,
 			"items": {},
-			"mods": {"mul": {"loot_mult": 0.15}},
-			"rep": {"halcyon": 5},
-			"reactions": {"faction:halcyon": 5},
-			"flags": {"goal": "debt"}
+			"mods": {
+				"mul": {
+					"loot_mult": 0.15
+				}
+			},
+			"rep": {
+				"halcyon": 5
+			},
+			"reactions": {
+				"faction:halcyon": 5
+			},
+			"flags": {
+				"goal": "debt"
+			}
 		},
 		"burn_consortium": {
 			"name": "Burn The Consortium",
@@ -91,21 +1419,43 @@
 			"story": "Now you want to watch the Consortium's stock price hit absolute zero.",
 			"credits": 0,
 			"items": {},
-			"mods": {"add": {"damage": 2}},
-			"rep": {"paragon": -5, "lumen": -5},
-			"reactions": {"trait:rebel": 25, "trait:corporate": -20},
-			"flags": {"goal": "revolution"}
+			"mods": {
+				"add": {
+					"damage": 2
+				}
+			},
+			"rep": {
+				"paragon": -5,
+				"lumen": -5
+			},
+			"reactions": {
+				"trait:rebel": 25,
+				"trait:corporate": -20
+			},
+			"flags": {
+				"goal": "revolution"
+			}
 		},
 		"find_sibling": {
 			"name": "Find Your Sibling",
 			"desc": "Your twin was sold to a different cryo-vault. The receipt is the only family photo you have.",
 			"story": "Now you want to find the sibling who was frozen in the vault next door, then sold separately.",
 			"credits": 0,
-			"items": {"old_receipt": 1},
-			"mods": {"mul": {"crew_approval_mult": 0.2}},
+			"items": {
+				"old_receipt": 1
+			},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.2
+				}
+			},
 			"rep": {},
-			"reactions": {"trait:poor": 5},
-			"flags": {"goal": "sibling"}
+			"reactions": {
+				"trait:poor": 5
+			},
+			"flags": {
+				"goal": "sibling"
+			}
 		},
 		"get_famous": {
 			"name": "Become A Celebrity",
@@ -113,10 +1463,21 @@
 			"story": "Now you want your face on every billboard in the Sprawl, preferably not on a WANTED poster.",
 			"credits": 25,
 			"items": {},
-			"mods": {"mul": {"witness_time_mult": -0.1}},
-			"rep": {"lumen": 10},
-			"reactions": {"faction:lumen": 10, "trait:artsy": 10},
-			"flags": {"goal": "fame"}
+			"mods": {
+				"mul": {
+					"witness_time_mult": -0.1
+				}
+			},
+			"rep": {
+				"lumen": 10
+			},
+			"reactions": {
+				"faction:lumen": 10,
+				"trait:artsy": 10
+			},
+			"flags": {
+				"goal": "fame"
+			}
 		},
 		"buy_a_planet": {
 			"name": "Buy A Planet",
@@ -124,10 +1485,180 @@
 			"story": "Now you want to buy a planet of your own, and charge everyone for the air.",
 			"credits": 50,
 			"items": {},
-			"mods": {"mul": {"price_mult": -0.05}},
-			"rep": {"halcyon": 5, "oxy": 5},
-			"reactions": {"trait:corporate": 10, "trait:rebel": -10},
-			"flags": {"goal": "tycoon"}
+			"mods": {
+				"mul": {
+					"price_mult": -0.05
+				}
+			},
+			"rep": {
+				"halcyon": 5,
+				"oxy": 5
+			},
+			"reactions": {
+				"trait:corporate": 10,
+				"trait:rebel": -10
+			},
+			"flags": {
+				"goal": "tycoon"
+			}
+		},
+		"revenge": {
+			"name": "Revenge",
+			"desc": "Someone at the top ruined your life. You have their name. You're coming for it.",
+			"story": "Now you want one thing: the name at the top of your list, crossed out.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"add": {
+					"damage": 3
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:rebel": 5
+			},
+			"flags": {
+				"goal": "revenge"
+			}
+		},
+		"find_cure": {
+			"name": "Find A Cure",
+			"desc": "You're sick. The cure exists. It's patented. The price has eleven zeros.",
+			"story": "Now you want one thing: the patented cure for what's killing you, before it does.",
+			"credits": 0,
+			"items": {
+				"medkit": 2
+			},
+			"mods": {
+				"add": {
+					"max_hp": -10
+				},
+				"mul": {
+					"loot_mult": 0.1
+				}
+			},
+			"rep": {
+				"halcyon": -5
+			},
+			"reactions": {
+				"trait:poor": 10
+			},
+			"flags": {
+				"goal": "cure"
+			}
+		},
+		"protect_family": {
+			"name": "Protect Your Family",
+			"desc": "Your family is collateral on someone else's loan. Make the payments stop. By any means.",
+			"story": "Now you want one thing: your family off the Consortium's balance sheet.",
+			"credits": 20,
+			"items": {
+				"family_photo": 1
+			},
+			"mods": {
+				"add": {
+					"max_hp": 10
+				},
+				"mul": {
+					"crew_approval_mult": 0.1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:worker": 10,
+				"trait:poor": 10
+			},
+			"flags": {
+				"goal": "family"
+			}
+		},
+		"become_ceo": {
+			"name": "Become CEO",
+			"desc": "Not tear the Consortium down. Run it. A corner office, then the whole building.",
+			"story": "Now you want one thing: a seat at the very top of the Consortium.",
+			"credits": 60,
+			"items": {},
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.1,
+					"price_mult": -0.05
+				}
+			},
+			"rep": {
+				"halcyon": 5,
+				"paragon": 5
+			},
+			"reactions": {
+				"trait:corporate": 15,
+				"trait:rebel": -15
+			},
+			"flags": {
+				"goal": "ceo"
+			}
+		},
+		"escape_sprawl": {
+			"name": "Escape The Sprawl",
+			"desc": "There's a jump-gate at the edge of Consortium space. Beyond it: nobody bills anybody. Allegedly.",
+			"story": "Now you want one thing: a jump-gate code and a one-way trip out of the Sprawl.",
+			"credits": 30,
+			"items": {},
+			"mods": {
+				"mul": {
+					"move_speed": 0.05,
+					"air_cost_mult": -0.1
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:weird": 5
+			},
+			"flags": {
+				"goal": "escape"
+			}
+		},
+		"find_love": {
+			"name": "Find Your Lost Love",
+			"desc": "You were frozen holding hands. You woke up alone. They're out there.",
+			"story": "Now you want one thing: the person you were holding hands with when the freezer closed.",
+			"credits": 0,
+			"items": {
+				"wedding_ring": 1
+			},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.15
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:artsy": 10
+			},
+			"flags": {
+				"goal": "love"
+			}
+		},
+		"redemption": {
+			"name": "Redemption",
+			"desc": "You did something unforgivable. You intend to be forgiven anyway.",
+			"story": "Now you want one thing: to balance a ledger no bank can see.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.1
+				},
+				"add": {
+					"max_hp": 5
+				}
+			},
+			"rep": {},
+			"reactions": {
+				"trait:poor": 5,
+				"trait:worker": 5
+			},
+			"flags": {
+				"goal": "redemption"
+			}
 		}
 	},
 	"secret": {
@@ -136,21 +1667,46 @@
 			"desc": "Paragon has a bounty on a face that looks exactly like yours. Because it is yours.",
 			"story": "Your secret: Paragon still has an open warrant on your old name.",
 			"credits": 0,
-			"items": {"fake_id": 1},
-			"mods": {"mul": {"witness_time_mult": -0.15}},
-			"rep": {"paragon": -20},
-			"bounty": {"paragon": 150},
-			"reactions": {"faction:paragon": -15},
-			"flags": {"has_alias": true}
+			"items": {
+				"fake_id": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": -0.15
+				}
+			},
+			"rep": {
+				"paragon": -20
+			},
+			"bounty": {
+				"paragon": 150
+			},
+			"reactions": {
+				"faction:paragon": -15
+			},
+			"flags": {
+				"has_alias": true
+			}
 		},
 		"synth_air_allergy": {
 			"name": "Allergic To Synthetic Air",
 			"desc": "OxyGenix air gives you hives. Premium organic air costs triple. Breathe sparingly.",
 			"story": "Your secret: you're allergic to the only air you can afford.",
 			"credits": 0,
-			"items": {"antihistamine": 2},
-			"mods": {"mul": {"air_cost_mult": 0.5}, "add": {"accuracy": 0.05}},
-			"rep": {"oxy": -5},
+			"items": {
+				"antihistamine": 2
+			},
+			"mods": {
+				"mul": {
+					"air_cost_mult": 0.5
+				},
+				"add": {
+					"accuracy": 0.05
+				}
+			},
+			"rep": {
+				"oxy": -5
+			},
 			"reactions": {},
 			"flags": {}
 		},
@@ -160,10 +1716,19 @@
 			"story": "Your secret: you can't stop lying, and you're very, very good at it.",
 			"credits": 15,
 			"items": {},
-			"mods": {"mul": {"bribe_mult": -0.25, "crew_approval_mult": -0.15}},
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.25,
+					"crew_approval_mult": -0.15
+				}
+			},
 			"rep": {},
-			"reactions": {"trait:corporate": 5},
-			"flags": {"liar": true}
+			"reactions": {
+				"trait:corporate": 5
+			},
+			"flags": {
+				"liar": true
+			}
 		},
 		"sleeper_agent": {
 			"name": "Corporate Sleeper Agent",
@@ -171,53 +1736,609 @@
 			"story": "Your secret: someone installed a sleeper protocol in your brain, and it is still asleep. Mostly.",
 			"credits": 0,
 			"items": {},
-			"mods": {"add": {"damage": 3, "accuracy": 0.05}, "mul": {"crew_approval_mult": -0.1}},
+			"mods": {
+				"add": {
+					"damage": 3,
+					"accuracy": 0.05
+				},
+				"mul": {
+					"crew_approval_mult": -0.1
+				}
+			},
 			"rep": {},
-			"reactions": {"trait:weird": 10},
-			"flags": {"sleeper": true}
+			"reactions": {
+				"trait:weird": 10
+			},
+			"flags": {
+				"sleeper": true
+			}
 		},
 		"kleptomaniac": {
 			"name": "Kleptomaniac",
 			"desc": "Your hands file paperwork without asking your brain. Things just end up in your pockets.",
 			"story": "Your secret: things simply migrate into your pockets.",
 			"credits": 0,
-			"items": {"lockpick": 2},
-			"mods": {"mul": {"loot_mult": 0.25}},
+			"items": {
+				"lockpick": 2
+			},
+			"mods": {
+				"mul": {
+					"loot_mult": 0.25
+				}
+			},
 			"rep": {},
-			"reactions": {"trait:poor": 5, "trait:corporate": -5},
-			"flags": {"klepto": true}
+			"reactions": {
+				"trait:poor": 5,
+				"trait:corporate": -5
+			},
+			"flags": {
+				"klepto": true
+			}
+		},
+		"secret_heir": {
+			"name": "Secret Bloodline",
+			"desc": "Your DNA says you're the hidden child of a Consortium founder. Someone wants that DNA erased.",
+			"story": "Your secret: your blood could inherit a megacorp, and someone would rather spill it.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.1
+				}
+			},
+			"rep": {},
+			"reactions": {},
+			"flags": {
+				"bloodline": true
+			}
+		},
+		"terminal_illness": {
+			"name": "Terminal Illness",
+			"desc": "You have months. Maybe. You've stopped being afraid of anything else.",
+			"story": "Your secret: you are dying, and you have decided to be fearless about it.",
+			"credits": 0,
+			"items": {
+				"painkillers": 2
+			},
+			"mods": {
+				"add": {
+					"damage": 3,
+					"max_hp": -15
+				},
+				"mul": {
+					"roll_cooldown": -0.1
+				}
+			},
+			"rep": {},
+			"reactions": {},
+			"flags": {
+				"dying": true
+			}
+		},
+		"ai_in_head": {
+			"name": "Ghost In Your Head",
+			"desc": "A fragment of a corporate AI lives in your skull. It comments. It helps. It wants something.",
+			"story": "Your secret: a stolen corporate AI shares your skull, and it has opinions.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"add": {
+					"accuracy": 0.08
+				},
+				"mul": {
+					"witness_time_mult": 0.05
+				}
+			},
+			"rep": {
+				"lumen": -5
+			},
+			"reactions": {
+				"trait:weird": 15
+			},
+			"flags": {
+				"ai_ghost": true
+			}
+		},
+		"killed_someone": {
+			"name": "Blood On Your Hands",
+			"desc": "You killed someone before the freeze. Their family still looks for you.",
+			"story": "Your secret: you killed someone once, and the Sprawl has a long memory.",
+			"credits": 0,
+			"items": {},
+			"mods": {
+				"add": {
+					"damage": 2
+				},
+				"mul": {
+					"crew_approval_mult": -0.05
+				}
+			},
+			"rep": {
+				"paragon": -5
+			},
+			"reactions": {},
+			"flags": {
+				"killer": true
+			}
+		},
+		"double_agent": {
+			"name": "Double Agent",
+			"desc": "You report to a faction. You also report to its rival. Neither knows about the other.",
+			"story": "Your secret: you are a spy for two masters, and you've forgotten which one you believe in.",
+			"credits": 80,
+			"items": {
+				"burner_comm": 1
+			},
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.15,
+					"witness_time_mult": 0.1
+				}
+			},
+			"rep": {
+				"paragon": 5,
+				"lumen": 5
+			},
+			"reactions": {},
+			"flags": {
+				"spy": true
+			}
+		},
+		"stolen_identity": {
+			"name": "Stolen Identity",
+			"desc": "Your name, face and past belong to someone else. You borrowed them. Permanently.",
+			"story": "Your secret: you are wearing a dead person's life like a borrowed coat.",
+			"credits": 40,
+			"items": {
+				"fake_id": 1
+			},
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.15
+				}
+			},
+			"rep": {},
+			"reactions": {},
+			"flags": {
+				"identity_thief": true
+			}
+		},
+		"mob_debt": {
+			"name": "Owes The Syndicate",
+			"desc": "Halcyon is the legal loan shark. You owe the illegal one. They don't do payment plans.",
+			"story": "Your secret: you owe the Syndicate, and they collect in fingers.",
+			"credits": 150,
+			"items": {},
+			"mods": {
+				"mul": {
+					"loot_mult": 0.1
+				}
+			},
+			"rep": {},
+			"bounty": {},
+			"reactions": {
+				"trait:rebel": 5
+			},
+			"flags": {
+				"mob_debt": true
+			}
 		}
 	},
 	"synergies": [
 		{
-			"tags": ["ex_auditor", "burn_consortium"],
+			"tags": [
+				"ex_auditor",
+				"burn_consortium"
+			],
 			"name": "Whistleblower",
 			"text": "Synergy WHISTLEBLOWER: you know exactly which ledgers to burn.",
-			"mods": {"mul": {"bribe_mult": -0.15}, "add": {"damage": 2}}
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.15
+				},
+				"add": {
+					"damage": 2
+				}
+			}
 		},
 		{
-			"tags": ["cryo_debtor", "pay_debt"],
+			"tags": [
+				"cryo_debtor",
+				"pay_debt"
+			],
 			"name": "Repayment Plan",
 			"text": "Synergy REPAYMENT PLAN: Halcyon's interest rate on you is merely predatory instead of apocalyptic.",
-			"mods": {"mul": {"price_mult": -0.05, "loot_mult": 0.1}}
+			"mods": {
+				"mul": {
+					"price_mult": -0.05,
+					"loot_mult": 0.1
+				}
+			}
 		},
 		{
-			"tags": ["jingle_composer", "get_famous"],
+			"tags": [
+				"jingle_composer",
+				"get_famous"
+			],
 			"name": "One-Hit Wonder",
 			"text": "Synergy ONE-HIT WONDER: people hum your jingle while reporting your crimes, which slows them down.",
-			"mods": {"mul": {"witness_time_mult": 0.25}}
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.25
+				}
+			}
 		},
 		{
-			"tags": ["clone_reject", "find_sibling"],
+			"tags": [
+				"clone_reject",
+				"find_sibling"
+			],
 			"name": "Batch Mates",
 			"text": "Synergy BATCH MATES: your 'sibling' might be one of 4,470 other clones. Crew find this oddly moving.",
-			"mods": {"mul": {"crew_approval_mult": 0.25}}
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.25
+				}
+			}
 		},
 		{
-			"tags": ["street_medic", "kleptomaniac"],
+			"tags": [
+				"street_medic",
+				"kleptomaniac"
+			],
 			"name": "Pharmacy Redistribution",
 			"text": "Synergy PHARMACY REDISTRIBUTION: you steal medicine and give it away. Loot heals a little.",
-			"mods": {"add": {"max_hp": 10}, "mul": {"loot_mult": 0.1}}
+			"mods": {
+				"add": {
+					"max_hp": 10
+				},
+				"mul": {
+					"loot_mult": 0.1
+				}
+			}
+		},
+		{
+			"tags": [
+				"heir_paragon",
+				"burn_consortium"
+			],
+			"name": "Traitor Heir",
+			"text": "Synergy TRAITOR HEIR: you know where Paragon keeps its bodies, because you helped bury them.",
+			"mods": {
+				"add": {
+					"damage": 2
+				},
+				"mul": {
+					"witness_time_mult": 0.15
+				}
+			}
+		},
+		{
+			"tags": [
+				"heir_halcyon",
+				"pay_debt"
+			],
+			"name": "Ironic Debt",
+			"text": "Synergy IRONIC DEBT: you owe money to your own family. They charge you interest anyway.",
+			"mods": {
+				"mul": {
+					"loot_mult": 0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"heir_gristle",
+				"paste_worker"
+			],
+			"name": "Undercover Boss",
+			"text": "Synergy UNDERCOVER BOSS: you worked the vats in disguise. The workers remember you. Fondly? Unclear.",
+			"mods": {
+				"add": {
+					"max_hp": 15
+				}
+			}
+		},
+		{
+			"tags": [
+				"heir_oxy",
+				"synth_air_allergy"
+			],
+			"name": "Allergic To Inheritance",
+			"text": "Synergy ALLERGIC TO INHERITANCE: you are heir to an air empire and allergic to its product.",
+			"mods": {
+				"mul": {
+					"air_cost_mult": -0.3
+				}
+			}
+		},
+		{
+			"tags": [
+				"heir_lumen",
+				"get_famous"
+			],
+			"name": "Nepo Baby",
+			"text": "Synergy NEPO BABY: fame was your birthright. Earning it would be a first.",
+			"mods": {
+				"mul": {
+					"price_mult": -0.15
+				}
+			}
+		},
+		{
+			"tags": [
+				"street_beggar",
+				"become_ceo"
+			],
+			"name": "Rags To Riches",
+			"text": "Synergy RAGS TO RICHES: Lumen would pay billions for your story - if you finish it.",
+			"mods": {
+				"mul": {
+					"loot_mult": 0.25
+				}
+			}
+		},
+		{
+			"tags": [
+				"street_beggar",
+				"holo_preacher"
+			],
+			"name": "Prophet Of The Gutter",
+			"text": "Synergy PROPHET OF THE GUTTER: the poor already follow you. Literally. Everywhere.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"collateral",
+				"burn_consortium"
+			],
+			"name": "Asset Revolt",
+			"text": "Synergy ASSET REVOLT: the property is filing a complaint.",
+			"mods": {
+				"add": {
+					"damage": 3
+				}
+			}
+		},
+		{
+			"tags": [
+				"off_grid",
+				"smuggler"
+			],
+			"name": "Nobody Special",
+			"text": "Synergy NOBODY SPECIAL: no record, no face, no trace. Paragon scanners return 'null'.",
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.25
+				}
+			}
+		},
+		{
+			"tags": [
+				"teen",
+				"get_famous"
+			],
+			"name": "Viral Kid",
+			"text": "Synergy VIRAL KID: you already have a meme. It's not flattering.",
+			"mods": {
+				"mul": {
+					"witness_time_mult": -0.1,
+					"price_mult": -0.1
+				}
+			}
+		},
+		{
+			"tags": [
+				"ancient",
+				"find_love"
+			],
+			"name": "Love Across Centuries",
+			"text": "Synergy LOVE ACROSS CENTURIES: you've waited 200 years. A few more planets won't stop you.",
+			"mods": {
+				"add": {
+					"max_hp": 15
+				}
+			}
+		},
+		{
+			"tags": [
+				"elder",
+				"union_organiser"
+			],
+			"name": "Old Guard",
+			"text": "Synergy OLD GUARD: you organised the strike that made the first labour law - since repealed.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"ex_paragon",
+				"wanted_alias"
+			],
+			"name": "Wrong Side Of The Badge",
+			"text": "Synergy WRONG SIDE OF THE BADGE: you know Paragon's procedures - including the ones for catching you.",
+			"mods": {
+				"mul": {
+					"witness_time_mult": 0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"netrunner",
+				"ai_in_head"
+			],
+			"name": "Wetware Tandem",
+			"text": "Synergy WETWARE TANDEM: you and the ghost in your head crack firewalls in stereo.",
+			"mods": {
+				"add": {
+					"accuracy": 0.06
+				}
+			}
+		},
+		{
+			"tags": [
+				"air_chemist",
+				"find_cure"
+			],
+			"name": "Cook Your Own Cure",
+			"text": "Synergy COOK YOUR OWN CURE: you might synthesise the cure yourself - if you find the formula.",
+			"mods": {
+				"add": {
+					"max_hp": 10
+				}
+			}
+		},
+		{
+			"tags": [
+				"repo_agent",
+				"redemption"
+			],
+			"name": "Returns Department",
+			"text": "Synergy RETURNS DEPARTMENT: you took everything from people. Now you're giving it back.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.15
+				}
+			}
+		},
+		{
+			"tags": [
+				"corp_lawyer",
+				"become_ceo"
+			],
+			"name": "Hostile Counsel",
+			"text": "Synergy HOSTILE COUNSEL: you know which bylaws let a lawyer seize a boardroom.",
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"android",
+				"escape_sprawl"
+			],
+			"name": "Unplugged",
+			"text": "Synergy UNPLUGGED: outside the Sprawl, nobody can recall you for a firmware update.",
+			"mods": {
+				"mul": {
+					"move_speed": 0.08
+				}
+			}
+		},
+		{
+			"tags": [
+				"gambler",
+				"mob_debt"
+			],
+			"name": "Double Or Nothing",
+			"text": "Synergy DOUBLE OR NOTHING: you owe the Syndicate twice. You plan to win it back. Thrice.",
+			"mods": {
+				"mul": {
+					"loot_mult": 0.3
+				}
+			}
+		},
+		{
+			"tags": [
+				"escaped_convict",
+				"revenge"
+			],
+			"name": "Unfinished Sentence",
+			"text": "Synergy UNFINISHED SENTENCE: the judge who put you away now runs a megacorp division.",
+			"mods": {
+				"add": {
+					"damage": 3
+				}
+			}
+		},
+		{
+			"tags": [
+				"charming",
+				"compulsive_liar"
+			],
+			"name": "Silver Tongue",
+			"text": "Synergy SILVER TONGUE: your lies are so charming people thank you for them.",
+			"mods": {
+				"mul": {
+					"bribe_mult": -0.2
+				}
+			}
+		},
+		{
+			"tags": [
+				"honest",
+				"double_agent"
+			],
+			"name": "Terrible Spy",
+			"text": "Synergy TERRIBLE SPY: an honest double agent. Both handlers are baffled. So are you.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.25
+				}
+			}
+		},
+		{
+			"tags": [
+				"hothead",
+				"bouncer"
+			],
+			"name": "Door Policy",
+			"text": "Synergy DOOR POLICY: you are the door. The policy is violence.",
+			"mods": {
+				"add": {
+					"damage": 3,
+					"max_hp": 10
+				}
+			}
+		},
+		{
+			"tags": [
+				"idealist",
+				"holo_preacher"
+			],
+			"name": "True Believer",
+			"text": "Synergy TRUE BELIEVER: your sermons actually change people. Lumen considers this a threat.",
+			"mods": {
+				"mul": {
+					"crew_approval_mult": 0.25
+				}
+			}
+		},
+		{
+			"tags": [
+				"street_chef",
+				"protect_family"
+			],
+			"name": "Family Recipe",
+			"text": "Synergy FAMILY RECIPE: you feed your family and the whole block. The block remembers.",
+			"mods": {
+				"add": {
+					"max_hp": 15
+				}
+			}
+		},
+		{
+			"tags": [
+				"terminal_illness",
+				"redemption"
+			],
+			"name": "Nothing Left To Lose",
+			"text": "Synergy NOTHING LEFT TO LOSE: you will spend your last months making it right.",
+			"mods": {
+				"add": {
+					"damage": 4
+				}
+			}
 		}
 	]
 }

@@ -123,6 +123,8 @@ func _compute_duration(node_id: int) -> float:
 	var node := Causality.get_node_data(node_id)
 	if node.get("verb", "") == "theft" and Game.item_count("lockpick") > 0:
 		t *= 1.3
+	# Informants you've bought on this planet "lose signal" for a while.
+	t *= 1.0 + float(Game.flags.get("informants_" + Game.location_id, 0.0))
 	return maxf(1.2, t)
 
 

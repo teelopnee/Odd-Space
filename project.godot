@@ -12,7 +12,7 @@ config_version=5
 
 config/name="ODD-SPACE"
 config/description="Sci-Fi HD-2D Action-RPG: retro-futurist dark satire, causality-driven emergent narrative."
-config/version="0.3.0"
+config/version="0.4.0"
 run/main_scene="res://scenes/ui/title_screen.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0.03, 0.01, 0.07, 1)
@@ -30,6 +30,8 @@ Crew="*res://src/autoload/crew_manager.gd"
 FlawPerk="*res://src/autoload/flaw_perk_system.gd"
 Encounters="*res://src/autoload/encounter_director.gd"
 Saga="*res://src/autoload/saga.gd"
+Stories="*res://src/autoload/stories.gd"
+Interactions="*res://src/autoload/interactions.gd"
 ShipAI="*res://src/autoload/ship_ai.gd"
 Audio="*res://src/autoload/audio_manager.gd"
 Router="*res://src/autoload/scene_router.gd"

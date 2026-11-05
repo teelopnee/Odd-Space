@@ -1,14 +1,23 @@
 extends Control
 ## Dynamic Origin & Tag Engine UI. No classes: pick one tag from each of
-## BACKGROUND / MOTIVATION / SECRET, pick (or roll) how you look, and pick how
+## CLASS (beggar ... Consortium heir) / AGE (+ exact years) / BACKGROUND /
+## PERSONALITY / MOTIVATION / SECRET, pick (or roll) how you look, and pick how
 ## the story starts - thawed out of cryo-collateral, or as a native of one of
 ## this universe's generated worlds. The universe seed makes the run unique
 ## (planets, saga cast, story beats) and can be typed in to share a run.
 
 const START_CRYO := ""
 
-var _selected := {"background": "", "motivation": "", "secret": ""}
+var _selected := {"class": "", "age": "", "background": "", "personality": "", "motivation": "", "secret": ""}
 var _buttons := {}  # category -> {id: Button}
+var _tab_buttons := {}  # category -> Button
+var _cat_pages := {}  # category -> Control
+var _cat_title: Label
+var _age_row: HBoxContainer
+var _age_slider: HSlider
+var _age_label: Label
+var _age := 25
+var _current_cat := "class"
 var _name_edit: LineEdit
 var _preview: RichTextLabel
 var _look_view: LookPreview
@@ -58,21 +67,61 @@ func _ready() -> void:
 	cols.add_theme_constant_override("separation", 10)
 	v.add_child(cols)
 	cols.add_child(_appearance_panel())
-	var titles := {"background": "BACKGROUND // who you were", "motivation": "MOTIVATION // what you want", "secret": "SECRET / FLAW // what they don't know"}
+	var mid := PanelContainer.new()
+	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(mid)
+	var mv := VBoxContainer.new()
+	mv.add_theme_constant_override("separation", 6)
+	mid.add_child(mv)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 4)
+	mv.add_child(tabs)
+	var tab_group := ButtonGroup.new()
 	for cat in Origin.CATEGORIES:
-		var panel := PanelContainer.new()
-		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		cols.add_child(panel)
-		var pv := VBoxContainer.new()
-		panel.add_child(pv)
-		pv.add_child(HUD.make_label(titles[cat], 15, Color(1.0, 0.82, 0.24)))
-		var scroll := ScrollContainer.new()
-		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		pv.add_child(scroll)
-		var list := VBoxContainer.new()
-		list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		scroll.add_child(list)
+		var tb := Button.new()
+		tb.toggle_mode = true
+		tb.button_group = tab_group
+		tb.text = cat.to_upper()
+		tb.custom_minimum_size = Vector2(0, 40)
+		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tb.clip_text = true
+		tb.add_theme_font_size_override("font_size", 14)
+		tb.pressed.connect(_show_category.bind(cat))
+		tabs.add_child(tb)
+		_tab_buttons[cat] = tb
+	_cat_title = HUD.make_label("", 15, Color(1.0, 0.82, 0.24))
+	_cat_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_cat_title.max_lines_visible = 2
+	_cat_title.custom_minimum_size = Vector2(120, 0)
+	_cat_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mv.add_child(_cat_title)
+	_age_row = HBoxContainer.new()
+	_age_row.add_child(HUD.make_label("EXACT AGE:", 15, Color(0.24, 0.9, 1.0)))
+	_age_slider = HSlider.new()
+	_age_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_age_slider.custom_minimum_size = Vector2(0, 36)
+	_age_slider.step = 1
+	_age_slider.value_changed.connect(_on_age_changed)
+	_age_row.add_child(_age_slider)
+	_age_label = HUD.make_label("25", 18, Color(1.0, 0.82, 0.24))
+	_age_label.custom_minimum_size = Vector2(56, 0)
+	_age_row.add_child(_age_label)
+	mv.add_child(_age_row)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	mv.add_child(scroll)
+	var pages := VBoxContainer.new()
+	pages.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(pages)
+	for cat in Origin.CATEGORIES:
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		grid.add_theme_constant_override("h_separation", 6)
+		grid.add_theme_constant_override("v_separation", 4)
+		pages.add_child(grid)
+		_cat_pages[cat] = grid
 		var group := ButtonGroup.new()
 		_buttons[cat] = {}
 		for t in Origin.list(cat):
@@ -82,12 +131,14 @@ func _ready() -> void:
 			b.button_group = group
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			b.add_theme_font_size_override("font_size", 16)
+			b.custom_minimum_size = Vector2(0, 40)
+			b.add_theme_font_size_override("font_size", 15)
 			b.clip_text = true
 			b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 			b.tooltip_text = str(t.get("desc", ""))
 			b.pressed.connect(_select.bind(cat, t.id))
-			list.add_child(b)
+			b.focus_entered.connect(_peek.bind(cat, t.id))
+			grid.add_child(b)
 			_buttons[cat][t.id] = b
 
 	# How the story starts + which universe.
@@ -131,7 +182,7 @@ func _ready() -> void:
 	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_theme_constant_override("separation", 12)
 	v.add_child(foot)
-	foot.add_child(HUD.make_label("START = begin  |  B = back  ", 13, Color(0.7, 0.8, 1.0)))
+	foot.add_child(HUD.make_label("LB/RB = category  |  START = begin  |  B = back  ", 13, Color(0.7, 0.8, 1.0)))
 	foot.add_child(_button("< BACK", func(): Router.goto(Router.TITLE)))
 	foot.add_child(_button("RANDOMIZE ALL", _randomize_all))
 	var go := _button("BEGIN >", _start)
@@ -142,9 +193,8 @@ func _ready() -> void:
 	_set_seed(_rng.randi() % 1000000000)
 	_random_look()
 	_randomize_tags()
+	_show_category("class")
 	Audio.play_music("odd_duck_theme")
-	var first: Button = _buttons["background"].values()[0]
-	_safe_focus.call_deferred(first)
 
 
 func _appearance_panel() -> Control:
@@ -180,7 +230,60 @@ func _appearance_panel() -> Control:
 	return panel
 
 
+func _show_category(cat: String) -> void:
+	_current_cat = cat
+	for c in _cat_pages:
+		_cat_pages[c].visible = c == cat
+	var tb: Button = _tab_buttons.get(cat)
+	if tb and not tb.button_pressed:
+		tb.button_pressed = true
+	_cat_title.text = Origin.TITLES.get(cat, cat.to_upper())
+	_age_row.visible = cat == "age"
+	var sel: Button = _buttons[cat].get(_selected.get(cat, ""))
+	if sel == null and not _buttons[cat].is_empty():
+		sel = _buttons[cat].values()[0]
+	if sel:
+		_safe_focus.call_deferred(sel)
+
+
+func _step_category(dir: int) -> void:
+	var i := Origin.CATEGORIES.find(_current_cat)
+	_show_category(Origin.CATEGORIES[posmod(i + dir, Origin.CATEGORIES.size())])
+	Audio.play_sfx("blip", 0.1, -8.0)
+
+
+## Hovering/focusing an option previews its description without selecting it.
+func _peek(cat: String, id: String) -> void:
+	var t := Origin.get_tag(cat, id)
+	if not t.is_empty():
+		_cat_title.text = "%s  -  %s" % [str(t.get("name", "")).to_upper(), t.get("desc", "")]
+
+
+func _on_age_changed(v: float) -> void:
+	_age = int(v)
+	_age_label.text = str(_age)
+	_update_preview()
+
+
+func _sync_age_slider(randomize_age: bool) -> void:
+	var r := Origin.age_range(_selected.get("age", "young"))
+	_age_slider.min_value = r.x
+	_age_slider.max_value = r.y
+	if randomize_age or _age < r.x or _age > r.y:
+		_age = _rng.randi_range(r.x, r.y)
+	_age_slider.set_value_no_signal(_age)
+	_age_label.text = str(_age)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("target_cycle"):
+		_step_category(-1)
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("parry") and not _name_edit.has_focus() and not _seed_edit.has_focus():
+		_step_category(1)
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("pause"):
 		_start()
 		get_viewport().set_input_as_handled()
@@ -217,6 +320,8 @@ func _select(cat: String, id: String) -> void:
 	var b: Button = _buttons[cat].get(id)
 	if b and not b.button_pressed:
 		b.button_pressed = true
+	if cat == "age" and _age_slider != null:
+		_sync_age_slider(true)
 	Audio.play_sfx("blip", 0.1, -8.0)
 	_update_preview()
 
@@ -347,7 +452,7 @@ func _start_text() -> String:
 func _update_preview() -> void:
 	if _preview == null or _start_option == null:
 		return
-	var text := ""
+	var text := "[color=#ffd23e][b]YOU:[/b][/color] %s\n" % Origin.persona_line(_selected, _age)
 	for cat in Origin.CATEGORIES:
 		var t := Origin.get_tag(cat, _selected[cat])
 		if t.is_empty():
@@ -362,8 +467,8 @@ func _update_preview() -> void:
 		reps.append("%s %+d" % [DataDB.factions.get(fid, {}).get("short", fid), p.rep[fid]])
 	var native := _start_planet_id() != START_CRYO
 	var wake: String = str(_galaxy[_start_option.selected - 1].get("name", "?")).to_upper() + " (HOME)" if native else str(p.spawn).replace("_", " ").to_upper()
-	text += "\n[color=#3ee6ff]WAKE UP IN:[/color] %s    [color=#3ee6ff]CREDITS:[/color] %d    [color=#3ee6ff]ITEMS:[/color] %s" % [
-		wake, int(p.credits) + (40 if native else 0), ", ".join(PackedStringArray(items)) if not items.is_empty() else "none"]
+	text += "\n[color=#3ee6ff]WAKE UP IN:[/color] %s    [color=#3ee6ff]CREDITS:[/color] %d    [color=#3ee6ff]AIR DEBT:[/color] %d    [color=#3ee6ff]ITEMS:[/color] %s" % [
+		wake, int(p.credits) + (40 if native else 0), int(p.get("air_debt", 0)), ", ".join(PackedStringArray(items)) if not items.is_empty() else "none"]
 	if not reps.is_empty():
 		text += "\n[color=#3ee6ff]CONSORTIUM OPINION:[/color] " + ", ".join(PackedStringArray(reps))
 	if int(p.bounty) > 0:
@@ -373,7 +478,9 @@ func _update_preview() -> void:
 	if not p.synergies.is_empty():
 		text += "\n[color=#ffd23e][b]SYNERGY UNLOCKED: %s[/b][/color]" % ", ".join(PackedStringArray(p.synergies))
 	text += "\n" + _start_text()
-	text += "\n\n[i]%s[/i]" % Origin.origin_story(_selected)
+	var story_set := _selected.duplicate()
+	story_set["age_years"] = _age
+	text += "\n\n[i]%s[/i]" % Origin.origin_story(story_set)
 	text += "\n[color=#9a7dff]Universe #%d: 7 worlds, one saga nobody else will ever play. Share the number to share the universe.[/color]" % _seed
 	_preview.text = text
 
@@ -384,7 +491,7 @@ func _start() -> void:
 			return
 	_apply_seed_text()
 	var start := _start_planet_id()
-	Game.new_game(_name_edit.text, _selected, _seed, _look, start)
+	Game.new_game(_name_edit.text, _selected, _seed, _look, start, _age)
 	if start == START_CRYO:
 		Router.goto(Router.STATION)
 	else:

@@ -11,7 +11,9 @@ const AUTOSAVE_SLOT := 0
 const SETTINGS_PATH := "user://settings.json"
 
 var player_name := "Drifter"
-var tags := {"background": "", "motivation": "", "secret": ""}
+var tags := {"class": "", "age": "", "background": "", "personality": "", "motivation": "", "secret": ""}
+var shop_discount := 0.0  ## per-conversation merchant discount (Interactions)
+var age := 30  ## exact age in years (inside the age tag's bracket)
 ## Player appearance: {"variant": "h00", "colors": {...}} (see CharacterLook).
 var player_look: Dictionary = {}
 var credits := 0
@@ -70,10 +72,15 @@ func _process(delta: float) -> void:
 # --- New game / reset -------------------------------------------------------------
 
 ## start_planet_id: "" = thaw in Cold Storage Lot 47; otherwise you're a native of that planet.
-func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Dictionary = {}, start_planet_id: String = "") -> void:
+func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Dictionary = {}, start_planet_id: String = "", p_age: int = -1) -> void:
 	reset_all()
 	player_name = p_name if p_name.strip_edges() != "" else "Drifter"
 	tags = p_tags.duplicate()
+	for cat in Origin.CATEGORIES:
+		if not tags.has(cat) or str(tags[cat]) == "":
+			tags[cat] = _default_tag(cat)
+	var bracket := Origin.age_range(tags.get("age", "young"))
+	age = clampi(p_age, bracket.x, bracket.y) if p_age > 0 else Origin.random_age(tags.get("age", "young"))
 	player_look = look.duplicate(true)
 	world_seed = seed_value if seed_value >= 0 else randi()
 	Origin.apply_new_game(tags)
@@ -97,9 +104,15 @@ func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Di
 	EventBus.stats_changed.emit()
 
 
+## Older saves / callers that only pass the original 3 tags get neutral defaults.
+func _default_tag(cat: String) -> String:
+	return {"class": "working_poor", "age": "young", "personality": "cynic", "background": "cryo_debtor", "motivation": "pay_debt", "secret": "wanted_alias"}.get(cat, "")
+
+
 func reset_all() -> void:
 	player_name = "Drifter"
-	tags = {"background": "", "motivation": "", "secret": ""}
+	tags = {"class": "", "age": "", "background": "", "personality": "", "motivation": "", "secret": ""}
+	age = 30
 	player_look = {}
 	credits = 0
 	air_debt = 0
@@ -119,7 +132,7 @@ func reset_all() -> void:
 
 
 func _systems() -> Array:
-	return [Factions, Causality, Crew, FlawPerk, Encounters, Saga]
+	return [Factions, Causality, Crew, FlawPerk, Encounters, Saga, Stories]
 
 
 # --- Stats helpers -------------------------------------------------------------------
@@ -169,6 +182,8 @@ func price_of(item_id: String, seller_faction: String = "") -> int:
 	var mult := Factions.price_multiplier(seller_faction) if seller_faction != "" else stat("price_mult")
 	if not current_planet.is_empty():
 		mult *= float(PlanetGenerator.layer(current_planet, "crises").get("price_mult", 1.0))
+		mult *= float(current_planet.get("price_adjust", 1.0))  # set by planet story outcomes
+	mult *= 1.0 - shop_discount  # the merchant you're talking to likes (or hates) you
 	return maxi(1, roundi(base * mult))
 
 
@@ -185,6 +200,7 @@ func _bill_air() -> void:
 	var mult := stat("air_cost_mult")
 	if not current_planet.is_empty():
 		mult *= float(current_planet.get("air_mult", 1.0))
+		mult *= float(current_planet.get("air_adjust", 1.0))  # planet story outcomes
 	var cost := maxi(1, roundi(AIR_BASE_COST * mult))
 	if credits >= cost:
 		add_credits(-cost)
@@ -279,7 +295,7 @@ func save_game(slot: int = AUTOSAVE_SLOT) -> bool:
 		"version": SAVE_VERSION,
 		"saved_at": Time.get_datetime_string_from_system(),
 		"game": {
-			"player_name": player_name, "tags": tags, "look": player_look, "credits": credits, "air_debt": air_debt,
+			"player_name": player_name, "tags": tags, "age": age, "look": player_look, "credits": credits, "air_debt": air_debt,
 			"hp": hp, "inventory": inventory, "skill_points": skill_points, "perks": perks,
 			"flaws": flaws, "flags": flags, "world_seed": world_seed, "galaxy": galaxy,
 			"location_id": location_id, "location_name": location_name,
@@ -291,6 +307,7 @@ func save_game(slot: int = AUTOSAVE_SLOT) -> bool:
 		"flawperk": FlawPerk.to_save(),
 		"encounters": Encounters.to_save(),
 		"saga": Saga.to_save(),
+		"stories": Stories.to_save(),
 	}
 	var f := FileAccess.open(save_path(slot), FileAccess.WRITE)
 	if f == null:
@@ -313,6 +330,10 @@ func load_game(slot: int = AUTOSAVE_SLOT) -> bool:
 	var g: Dictionary = data.get("game", {})
 	player_name = g.get("player_name", "Drifter")
 	tags = g.get("tags", tags)
+	for cat in Origin.CATEGORIES:
+		if not tags.has(cat) or str(tags[cat]) == "":
+			tags[cat] = _default_tag(cat)
+	age = int(g.get("age", 30))
 	player_look = g.get("look", {})
 	credits = int(g.get("credits", 0))
 	air_debt = int(g.get("air_debt", 0))
@@ -337,6 +358,7 @@ func load_game(slot: int = AUTOSAVE_SLOT) -> bool:
 	FlawPerk.from_save(data.get("flawperk", {}))
 	Encounters.from_save(data.get("encounters", {}))
 	Saga.from_save(data.get("saga", {}))
+	Stories.from_save(data.get("stories", {}))
 	has_active_run = true
 	EventBus.game_loaded.emit()
 	EventBus.stats_changed.emit()

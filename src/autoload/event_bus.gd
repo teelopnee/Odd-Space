@@ -50,6 +50,8 @@ signal ai_say(text: String, mood: String)
 signal toast(text: String, color: Color)
 signal encounter_started(encounter: Dictionary)
 signal encounter_finished(encounter_id: String, choice_id: String)
+signal interaction_done(verb_id: String, success: bool, npc: Node)
+signal story_event(kind: String, info: Dictionary)
 signal planet_entered(planet: Dictionary)
 signal interact_prompt_changed(text: String)
 ## Ask the HUD to show a dialogue. choices: Array of {text, id, disabled?}.

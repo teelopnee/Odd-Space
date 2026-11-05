@@ -1,14 +1,206 @@
 {
 	"_doc": "Items. 'use' effects run from the inventory / HUD medkit button. price = base price before faction/crisis multipliers.",
-	"medkit": {"name": "Medkit (Generic)", "desc": "Heals 40 HP. Side effects include a Halcyon invoice.", "price": 35, "use": {"heal": 40}},
-	"air_canister": {"name": "Air Canister", "desc": "Pays 30 credits of air debt. Bottled at the source (a vent).", "price": 25, "use": {"air_debt": -30}},
-	"scrap": {"name": "Scrap", "desc": "Hull junk. Sells for 6 credits each.", "price": 6, "sell": true},
-	"data_shard": {"name": "Ledger Shard", "desc": "Proof that someone, somewhere, embezzled. Sells for 80.", "price": 80, "sell": true},
-	"synth_keytar": {"name": "Synth Keytar", "desc": "Your old instrument. Emotionally priceless. Financially 12 credits.", "price": 12},
-	"barcode_tattoo": {"name": "Barcode Tattoo", "desc": "Scans as 'RECALLED'. Not removable.", "price": 0},
-	"old_receipt": {"name": "Old Receipt", "desc": "'1x Sibling, cryo-preserved. No refunds.'", "price": 0},
-	"fake_id": {"name": "Fake ID", "desc": "Says you're 'Dave'. You don't look like a Dave.", "price": 40},
-	"antihistamine": {"name": "Antihistamine", "desc": "Heals 15 HP. Tastes like regret.", "price": 10, "use": {"heal": 15}},
-	"lockpick": {"name": "Lockpick", "desc": "Makes theft quieter: witnesses take longer to notice.", "price": 15},
-	"bribe_voucher": {"name": "Bribe Voucher", "desc": "Pre-paid hush money. Silences one witness for free.", "price": 50}
+	"medkit": {
+		"name": "Medkit (Generic)",
+		"desc": "Heals 40 HP. Side effects include a Halcyon invoice.",
+		"price": 35,
+		"use": {
+			"heal": 40
+		}
+	},
+	"air_canister": {
+		"name": "Air Canister",
+		"desc": "Pays 30 credits of air debt. Bottled at the source (a vent).",
+		"price": 25,
+		"use": {
+			"air_debt": -30
+		}
+	},
+	"scrap": {
+		"name": "Scrap",
+		"desc": "Hull junk. Sells for 6 credits each.",
+		"price": 6,
+		"sell": true
+	},
+	"data_shard": {
+		"name": "Ledger Shard",
+		"desc": "Proof that someone, somewhere, embezzled. Sells for 80.",
+		"price": 80,
+		"sell": true
+	},
+	"synth_keytar": {
+		"name": "Synth Keytar",
+		"desc": "Your old instrument. Emotionally priceless. Financially 12 credits.",
+		"price": 12
+	},
+	"barcode_tattoo": {
+		"name": "Barcode Tattoo",
+		"desc": "Scans as 'RECALLED'. Not removable.",
+		"price": 0
+	},
+	"old_receipt": {
+		"name": "Old Receipt",
+		"desc": "'1x Sibling, cryo-preserved. No refunds.'",
+		"price": 0
+	},
+	"fake_id": {
+		"name": "Fake ID",
+		"desc": "Says you're 'Dave'. You don't look like a Dave.",
+		"price": 40
+	},
+	"antihistamine": {
+		"name": "Antihistamine",
+		"desc": "Heals 15 HP. Tastes like regret.",
+		"price": 10,
+		"use": {
+			"heal": 15
+		}
+	},
+	"lockpick": {
+		"name": "Lockpick",
+		"desc": "Makes theft quieter: witnesses take longer to notice.",
+		"price": 15
+	},
+	"bribe_voucher": {
+		"name": "Bribe Voucher",
+		"desc": "Pre-paid hush money. Silences one witness for free.",
+		"price": 50
+	},
+	"burner_comm": {
+		"name": "Burner Comm",
+		"desc": "Two handlers on speed-dial. Never press the wrong one.",
+		"price": 20
+	},
+	"cane": {
+		"name": "Walking Cane",
+		"desc": "Supports your knees and your arguments.",
+		"price": 8
+	},
+	"contraband": {
+		"name": "Contraband Air",
+		"desc": "Unlicensed, untaxed, delicious. Sells for 45 to the right person.",
+		"price": 45,
+		"sell": true
+	},
+	"cyberdeck": {
+		"name": "Cyberdeck",
+		"desc": "Lets you hack terminals and wristpads. Warranty void since 3011.",
+		"price": 120
+	},
+	"family_crest": {
+		"name": "Family Crest",
+		"desc": "Opens doors, closes mouths. Corporate security salutes it.",
+		"price": 0
+	},
+	"family_photo": {
+		"name": "Family Photo",
+		"desc": "Everyone in it is someone's collateral. You'll fix that.",
+		"price": 0
+	},
+	"heirloom_watch": {
+		"name": "Heirloom Watch",
+		"desc": "Pre-Consortium gold. Sells for 300 if you have no sentiment.",
+		"price": 300,
+		"sell": true
+	},
+	"legal_pad": {
+		"name": "Legal Pad",
+		"desc": "Pre-printed cease-and-desist letters. Surprisingly effective.",
+		"price": 10
+	},
+	"loaded_dice": {
+		"name": "Loaded Dice",
+		"desc": "Fair-ish. Improves your odds when you gamble.",
+		"price": 25
+	},
+	"old_badge": {
+		"name": "Old Paragon Badge",
+		"desc": "Expired. Most people don't check.",
+		"price": 0
+	},
+	"painkillers": {
+		"name": "Painkillers",
+		"desc": "Heals 20 HP. Makes the future feel optional.",
+		"price": 15,
+		"use": {
+			"heal": 20
+		}
+	},
+	"paste_ration": {
+		"name": "Paste Ration",
+		"desc": "Heals 10 HP. Or 12. The label is vague.",
+		"price": 6,
+		"use": {
+			"heal": 10
+		}
+	},
+	"paste_recipe": {
+		"name": "The Paste Recipe",
+		"desc": "Gristle's secret formula. Reading it voids your appetite.",
+		"price": 0
+	},
+	"platinum_card": {
+		"name": "Platinum Card",
+		"desc": "Unlimited credit (limited). Shopkeepers bow; muggers notice.",
+		"price": 0
+	},
+	"pre_war_coin": {
+		"name": "Pre-War Coin",
+		"desc": "Currency from before the Consortium. Collectors pay 150.",
+		"price": 150,
+		"sell": true
+	},
+	"press_pass": {
+		"name": "Lumen Press Pass",
+		"desc": "Access to anywhere a camera can go - which is everywhere.",
+		"price": 0
+	},
+	"ring_light": {
+		"name": "Ring Light",
+		"desc": "Makes any confrontation content.",
+		"price": 30
+	},
+	"scripture_chip": {
+		"name": "Scripture Chip",
+		"desc": "The Gospel of the Free Breath, 3rd edition (unlicensed).",
+		"price": 5
+	},
+	"sealed_parcel": {
+		"name": "Sealed Parcel",
+		"desc": "Undelivered. It hums. You still haven't opened it.",
+		"price": 0
+	},
+	"shiv": {
+		"name": "Prison Shiv",
+		"desc": "A toothbrush with ambitions.",
+		"price": 2
+	},
+	"spare_battery": {
+		"name": "Spare Battery",
+		"desc": "Heals 25 HP if you're synthetic. Tingles if you're not.",
+		"price": 20,
+		"use": {
+			"heal": 25
+		}
+	},
+	"stun_baton": {
+		"name": "Repo Stun Baton",
+		"desc": "Property of Halcyon. Like everything.",
+		"price": 40
+	},
+	"tin_cup": {
+		"name": "Tin Cup",
+		"desc": "Your entire business model.",
+		"price": 1
+	},
+	"union_card": {
+		"name": "Union Card",
+		"desc": "Illegal on four planets. Worth more than credits on the rest.",
+		"price": 0
+	},
+	"wedding_ring": {
+		"name": "Wedding Ring",
+		"desc": "Engraved with a name you whisper when the ship is quiet.",
+		"price": 0
+	}
 }

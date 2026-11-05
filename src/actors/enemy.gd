@@ -355,7 +355,7 @@ func _has_los(p: Vector3) -> bool:
 # --- Hostility ---------------------------------------------------------------------------------
 
 func _update_hostility(initial: bool) -> void:
-	if hostile or state == "dead":
+	if hostile or state == "dead" or state == "surrender" or has_meta("stood_down"):
 		return
 	var h: bool = force_hostile or def.get("hostility", "always") == "always"
 	if not h and faction != "":
@@ -494,6 +494,10 @@ func take_hit(info: Dictionary) -> void:
 	elif state == "stagger" or state == "down":
 		dmg *= 1.5
 	hp -= dmg
+	# Story targets (saga / planet stories / bounties) beg for their lives first.
+	var can_surrender: bool = by_player and has_meta("saga_tag") and not has_meta("surrender_asked")
+	if can_surrender and hp <= max_hp * 0.25:
+		hp = maxf(hp, 1.0)
 	var col := Color(1.0, 0.92, 0.4)
 	if is_crit:
 		col = Color(1.0, 0.35, 1.0)
@@ -518,12 +522,71 @@ func take_hit(info: Dictionary) -> void:
 			_attack_cd = maxf(_attack_cd, 0.6)
 	else:
 		_knock += push * 0.2
-	if hp <= 0.0:
+	if can_surrender and hp <= max_hp * 0.25:
+		_surrender()
+	elif hp <= 0.0:
 		_die(attacker, push)
 	else:
 		_refresh_markers()
 		if state == "idle" or state == "reporting":
 			_set_state("chase")
+
+
+## Drop to the knees and let the story decide (Saga / Stories show the choices).
+func _surrender() -> void:
+	set_meta("surrender_asked", true)
+	_set_state("surrender")
+	hostile = false
+	force_hostile = false
+	_burst_left = 0
+	_knock = Vector3.ZERO
+	velocity = Vector3.ZERO
+	sprite.play("hurt", true)
+	_show_alert("?", Color(1.0, 0.9, 0.3), 3.0)
+	FX.slowmo(get_tree(), 0.3, 0.35)
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if e != self and e.has_method("stand_down") and e.global_position.distance_to(global_position) < 14.0:
+			e.stand_down()
+	var tag := str(get_meta("saga_tag", ""))
+	if tag.begins_with("story:"):
+		Stories.on_surrender(self, tag)
+	else:
+		Saga.on_surrender(self, tag)
+
+
+## Guards stop fighting when their boss gives up.
+func stand_down() -> void:
+	if state == "dead" or has_meta("saga_tag"):
+		return
+	hostile = false
+	force_hostile = false
+	set_meta("stood_down", true)
+	_set_state("idle")
+
+
+## Called by the story after you decide: "kill" finishes them, anything else lets them walk.
+func resolve_surrender(outcome: String) -> void:
+	if state == "dead":
+		return
+	if outcome == "kill":
+		var p := get_tree().get_first_node_in_group("player")
+		_die(p, Vector3.ZERO)
+		return
+	state = "dead"
+	remove_from_group("enemy")
+	remove_from_group("damageable")
+	collision_layer = 0
+	_alert_label.visible = false
+	_set_shield_visible(false)
+	for m in _markers.values():
+		m.label.visible = false
+		m.area.queue_free()
+	_markers.clear()
+	var tw := create_tween()
+	tw.tween_interval(1.0)
+	tw.tween_callback(sprite.fade_to.bind(0.0, 0.8))
+	tw.tween_interval(0.8)
+	tw.tween_callback(queue_free)
 
 
 func _reveal_weakness(key: String) -> void:

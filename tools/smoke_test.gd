@@ -8,6 +8,11 @@ var _wait := 0
 var _planet_index := 0
 var _log: Array[String] = []
 var _saga_steps := 0
+const LIVES := 6
+var _life := 0
+var _endings := {}
+var _arng := RandomNumberGenerator.new()
+var _random_answers := false
 
 
 func _process(_delta: float) -> bool:
@@ -93,38 +98,134 @@ func _process(_delta: float) -> bool:
 			var saga = root.get_node("Saga")
 			if saga.is_complete() or _saga_steps > 12:
 				print("  saga ending: %s  twist: %s  journal: %d entries" % [saga.ending, saga.twist_choice, saga.journal.size()])
-				_step = 11
+				_step = 20
 				return false
 			var b: Dictionary = saga.current()
 			_saga_steps += 1
 			print("  beat %d/%d %s (%s) on %s: %s" % [saga.index + 1, saga.beats.size(), b.get("id", "?"), b.get("type", "?"), saga.objective_planet(), saga.objective_text().left(90)])
 			print("    spawns there: ", saga.spawns_for(saga.objective_planet()).map(func(sp): return sp.kind))
-			match str(b.get("type", "")):
-				"talk":
-					saga.on_persona_talk(saga.cast.get(b.get("who", ""), ""))
-				"retrieve":
-					saga.on_item_taken(b.id)
-				"defeat":
-					var dummy := Node.new()
-					dummy.set_meta("saga_tag", b.id)
-					root.get_node("EventBus").enemy_killed.emit(dummy, {})
-					dummy.free()
+			_play_beat(saga, b, false)
 			_wait = 6
+		20:
+			# LIFE PATHS: random characters through interactions, street events,
+			# planet stories and the branching saga, each to its own ending.
+			if _life >= LIVES:
+				print("  distinct endings in %d lives: %d" % [LIVES, _endings.size()])
+				_step = 11
+				return false
+			_new_life()
+			_step = 21
+			_wait = 5
+		21:
+			var saga = root.get_node("Saga")
+			if saga.is_complete() or _saga_steps > 40:
+				print("    -> ENDING: %s\n       id: %s" % [saga.ending_title, saga.ending])
+				_endings[saga.ending] = true
+				_life += 1
+				_step = 20
+				return false
+			_saga_steps += 1
+			_play_beat(saga, saga.current(), true)
+			_wait = 8
 		11:
+			var game = root.get_node("Game")
+			print("save ok: ", game.save_game(3), "  load ok: ", game.load_game(3))
 			print("SMOKE TEST DONE")
 			quit(0)
 	return false
 
 
-## Answers every dialogue with its first enabled choice, like an impatient player.
+## Answers every dialogue with its first (or a random) enabled choice.
 func _auto_answer(_speaker: String, _text: String, choices: Array, callback: Callable) -> void:
 	var pick := ""
-	for c in choices:
-		if not c.get("disabled", false):
-			pick = str(c.get("id", ""))
-			break
+	var enabled := choices.filter(func(c): return not c.get("disabled", false))
+	if not enabled.is_empty():
+		pick = str((enabled[_arng.randi() % enabled.size()] if _random_answers else enabled[0]).get("id", ""))
 	if callback.is_valid():
 		callback.call_deferred(pick)
+
+
+func _play_beat(saga, b: Dictionary, surrender: bool) -> void:
+	match str(saga._beat_type(b)):
+		"talk":
+			saga.on_persona_talk(saga.cast.get(b.get("who", ""), ""))
+		"retrieve":
+			saga.on_item_taken(b.id)
+		"defeat":
+			if surrender:
+				saga.on_surrender(_dummy_enemy(), b.id)
+			else:
+				var dummy := Node.new()
+				dummy.set_meta("saga_tag", b.id)
+				root.get_node("EventBus").enemy_killed.emit(dummy, {})
+				dummy.free()
+
+
+## A stand-in for a beaten elite that has surrendered.
+func _dummy_enemy() -> Node:
+	var sc := GDScript.new()
+	sc.source_code = "extends Node\nvar display_name := \"Elite\"\nfunc resolve_surrender(_o: String) -> void:\n\tqueue_free()\n"
+	sc.reload()
+	var n := Node.new()
+	n.set_script(sc)
+	root.add_child(n)
+	return n
+
+
+func _new_life() -> void:
+	_random_answers = true
+	_saga_steps = 0
+	_arng.seed = 7000 + _life * 13
+	var game = root.get_node("Game")
+	var origin = root.get_node("Origin")
+	var tags: Dictionary = origin.random_tags(_arng)
+	var age: int = origin.random_age(tags.age, _arng)
+	var look: Dictionary = load("res://src/core/character_look.gd").call("random_look", _arng, "hero")
+	var universe := 100000 + _life * 7919
+	var galaxy: Array = load("res://src/core/planet_generator.gd").call("generate_galaxy", universe, 7)
+	var start: String = "" if _arng.randf() < 0.4 else str(galaxy[_arng.randi() % galaxy.size()].id)
+	game.new_game("Life %d" % _life, tags, universe, look, start, age)
+	print(">>> LIFE %d: %s (%s)  start: %s" % [_life, origin.persona_line(), tags.motivation + "/" + tags.secret, "cryo" if start == "" else start])
+	game.credits += _arng.randi_range(0, 3000)  # some lives get rich along the way
+	# Talk to people the way this character can.
+	var npc_scene: PackedScene = load("res://scenes/actors/npc.tscn")
+	var interactions = root.get_node("Interactions")
+	var used := []
+	for i in 3:
+		var npc = npc_scene.instantiate()
+		npc.traits.assign([["poor", "worker", "artsy", "corporate", "rebel", "weird"][_arng.randi() % 6]])
+		root.add_child(npc)
+		var options: Array = interactions.choices_for(npc, "civilian") + interactions.choices_for(npc, "witness")
+		for o in options.slice(0, 3):
+			interactions.resolve(npc, str(o.id).substr(4))
+			used.append(str(o.id).substr(4))
+		npc.queue_free()
+	print("    interactions used: ", used)
+	# Planet stories + street events on a few worlds.
+	var stories = root.get_node("Stories")
+	for p in game.galaxy.slice(0, 4):
+		var s: Dictionary = stories.ensure_local(p.id)
+		if s.is_empty():
+			continue
+		var t: Dictionary = stories.templates().get(s.crisis, {})
+		var ok := (t.get("choices", []) as Array).filter(func(c): return root.get_node("Saga").choice_ok(c))
+		if ok.is_empty():
+			continue
+		var c: Dictionary = ok[_arng.randi() % ok.size()]
+		stories._on_local_choice(str(c.id), p.id)
+		if stories.local[p.id].status == "task":
+			stories._resolve_local(p.id, str(stories.local[p.id].get("pending_outcome", "")))
+		print("    planet %s: %s -> %s" % [p.name, c.id, stories.local[p.id].outcome])
+	var events: Array = root.get_node("DataDB").stories.get("street", [])
+	game.location_id = game.galaxy[0].id
+	for k in 3:
+		var e: Dictionary = events[_arng.randi() % events.size()]
+		var ch := (e.get("choices", []) as Array).filter(func(c): return root.get_node("Saga").choice_ok(c))
+		if not ch.is_empty():
+			stories._on_street_choice(str(ch[_arng.randi() % ch.size()].id), null, str(e.id))
+	var early: Dictionary = root.get_node("Saga").early_ending_available()
+	if not early.is_empty():
+		print("    early ending available: ", early.get("text", ""))
 
 
 func _next(frames: int) -> void:

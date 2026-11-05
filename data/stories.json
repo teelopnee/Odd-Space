@@ -1,0 +1,2185 @@
+{
+	"_doc": "Planet stories (Stories autoload). 'local' = one arc per crisis id: two local characters (leader = the people, boss = the controller), choices gated like data/interactions.json; a choice resolves instantly (outcome) or sets a task (defeat = elite + guards, defeat_leader = fight the leader, retrieve = quest crate, sabotage = N vandalism acts). Outcomes change the planet (crisis_resolved / crisis_worse / price_adjust / air_mult / controller_lost), rep ('{controller}' = planet owner), axes, followers, fame, and add an epilogue line to the ending. 'street' = random incidents (1-2 per landing) with tag-gated choices; outcomes may spawn_hostile.",
+	"local": {
+		"debt_strike": {
+			"title": "The {planet} Walkout",
+			"hint": "The dock workers walked out over Halcyon interest rates. Halcyon is sending 'mediators'. With batons.",
+			"leader": {
+				"style": "worker",
+				"job": "strike captain",
+				"role": "leader"
+			},
+			"boss": {
+				"style": "corporate:{controller}",
+				"job": "site manager",
+				"role": "boss"
+			},
+			"leader_talk": "\"Forty hours unpaid, interest on our lunch breaks, and now they want to bill us for striking. We hold the line or we lose everything.\"",
+			"boss_talk": "\"Between us? I don't care about the strike. I care about my quarterly. End it - any way you like - and I'll make it worth your while.\"",
+			"choices": [
+				{
+					"id": "join",
+					"who": "leader",
+					"text": "Join the strike - hold the line against the mediators",
+					"task": {
+						"type": "defeat",
+						"enemy": "debt_brute",
+						"name": "Halcyon Mediator",
+						"guards": 3
+					},
+					"outcome": "workers_win"
+				},
+				{
+					"id": "negotiate",
+					"who": "leader",
+					"text": "Negotiate a deal both sides can live with",
+					"requires_any": [
+						{
+							"any_flag": [
+								"lawyer",
+								"union",
+								"charming",
+								"honest"
+							]
+						},
+						{
+							"age": [
+								"elder",
+								"ancient"
+							]
+						}
+					],
+					"outcome": "negotiated"
+				},
+				{
+					"id": "buy_debt",
+					"who": "leader",
+					"text": "Buy the workers' debt yourself (500 cr)",
+					"requires": {
+						"min_credits": 500
+					},
+					"effects": {
+						"credits": -500
+					},
+					"outcome": "debt_bought"
+				},
+				{
+					"id": "break",
+					"who": "boss",
+					"text": "Break the strike - take out the strike captain",
+					"task": {
+						"type": "defeat_leader"
+					},
+					"outcome": "strike_broken"
+				},
+				{
+					"id": "sabotage_both",
+					"who": "boss",
+					"text": "Take the manager's money AND tip off the strikers",
+					"requires": {
+						"any_flag": [
+							"liar",
+							"spy",
+							"ruthless",
+							"cynic"
+						]
+					},
+					"outcome": "double_dealt"
+				}
+			],
+			"outcomes": {
+				"workers_win": {
+					"text": "The mediators are gone. The docks reopen on the workers' terms.",
+					"effects": {
+						"credits": 60
+					},
+					"axes": {
+						"mercy": 1,
+						"order": -1
+					},
+					"followers": 2,
+					"planet": {
+						"crisis_resolved": true,
+						"price_adjust": 0.9
+					},
+					"rep": {
+						"{controller}": -10
+					},
+					"epilogue": "On {planet}, the dock strike won. The workers renamed Pier 4 after you. Halcyon renamed it back. The workers won that too."
+				},
+				"negotiated": {
+					"text": "Eleven hours of talks. Nobody gets everything. Nobody gets nothing.",
+					"effects": {
+						"credits": 40
+					},
+					"axes": {
+						"order": 1,
+						"mercy": 0.5
+					},
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"{controller}": 3
+					},
+					"epilogue": "On {planet}, your strike settlement held. It's taught in law schools now, mostly as a cautionary tale for executives."
+				},
+				"debt_bought": {
+					"text": "You buy the workers' debt and tear it up in front of the site manager. Somebody starts singing.",
+					"axes": {
+						"mercy": 2,
+						"greed": -2
+					},
+					"followers": 3,
+					"planet": {
+						"crisis_resolved": true,
+						"price_adjust": 0.85
+					},
+					"epilogue": "On {planet}, the workers you freed from debt still toast your name every payday. Payday now exists again."
+				},
+				"strike_broken": {
+					"text": "The strike collapses. The site manager shakes your hand without looking you in the eye.",
+					"effects": {
+						"credits": 150
+					},
+					"axes": {
+						"mercy": -1,
+						"order": 1,
+						"greed": 1
+					},
+					"planet": {
+						"crisis_worse": true,
+						"price_adjust": 1.15
+					},
+					"rep": {
+						"{controller}": 12
+					},
+					"epilogue": "On {planet}, the strike you broke left a silence on the docks. The workers remember who broke it."
+				},
+				"double_dealt": {
+					"text": "You pocket the manager's cash and leak their plans to the strikers. Chaos, profitably.",
+					"effects": {
+						"credits": 120
+					},
+					"axes": {
+						"greed": 2,
+						"truth": -1
+					},
+					"planet": {
+						"crisis_resolved": true
+					},
+					"epilogue": "On {planet}, nobody quite knows who won the strike. Your bank account knows."
+				}
+			}
+		},
+		"paste_recall": {
+			"title": "What's In The Paste",
+			"hint": "Gristle recalled a batch of paste. Officially, a 'texture issue'. People who ate it are... changing.",
+			"leader": {
+				"style": "civilian",
+				"job": "vat inspector (fired)",
+				"role": "leader"
+			},
+			"boss": {
+				"style": "corporate:{controller}",
+				"job": "recall coordinator",
+				"role": "boss"
+			},
+			"leader_talk": "\"I tested Batch 9. It's not a texture issue, it's a 'some people grew a second spine' issue. The proof is in the plant. Help me get it out.\"",
+			"boss_talk": "\"There is no problem with Batch 9. There is, however, a disgruntled former employee with a sample. I'd pay well to see that sample... disappear.\"",
+			"choices": [
+				{
+					"id": "expose",
+					"who": "leader",
+					"text": "Steal the lab results from the plant",
+					"task": {
+						"type": "retrieve",
+						"label": "the Batch 9 lab results",
+						"guards": 3
+					},
+					"outcome": "exposed"
+				},
+				{
+					"id": "feed",
+					"who": "leader",
+					"text": "Cook safe food for everyone affected",
+					"requires": {
+						"any_flag": [
+							"chef",
+							"medic",
+							"rich"
+						]
+					},
+					"outcome": "fed"
+				},
+				{
+					"id": "cure",
+					"who": "leader",
+					"text": "Synthesise an antidote",
+					"requires": {
+						"any_flag": [
+							"chemist",
+							"medic"
+						]
+					},
+					"outcome": "cured"
+				},
+				{
+					"id": "cover",
+					"who": "boss",
+					"text": "Retrieve the sample for Gristle",
+					"task": {
+						"type": "retrieve",
+						"label": "the Batch 9 sample",
+						"guards": 2
+					},
+					"outcome": "covered_up"
+				},
+				{
+					"id": "recipe",
+					"who": "boss",
+					"text": "\"I'll handle it.\" (Steal the paste recipe while you're at it)",
+					"requires": {
+						"any_flag": [
+							"klepto",
+							"hacker",
+							"spy"
+						]
+					},
+					"outcome": "recipe_stolen"
+				}
+			],
+			"outcomes": {
+				"exposed": {
+					"text": "The lab results hit every feed. Gristle stock drops; so does the paste.",
+					"effects": {
+						"credits": 50
+					},
+					"axes": {
+						"truth": 2,
+						"mercy": 1
+					},
+					"fame": 4,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"gristle": -15,
+						"lumen": 3
+					},
+					"epilogue": "On {planet}, the Batch 9 scandal you exposed became the first paste recall that actually recalled paste."
+				},
+				"fed": {
+					"text": "For a week you run the only kitchen on {planet} that serves real food. The queue goes round the block twice.",
+					"axes": {
+						"mercy": 2
+					},
+					"followers": 3,
+					"planet": {
+						"crisis_resolved": true,
+						"price_adjust": 0.9
+					},
+					"epilogue": "On {planet}, people still talk about the week someone fed them real food. Your recipe is graffitied on a wall."
+				},
+				"cured": {
+					"text": "Your antidote works. Second spines dissolve. Mostly. Some people kept theirs and like them.",
+					"axes": {
+						"mercy": 2,
+						"truth": 1
+					},
+					"followers": 2,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"epilogue": "On {planet}, your antidote ended the Batch 9 outbreak. A few grateful people still have second spines. They stand very straight when they thank you."
+				},
+				"covered_up": {
+					"text": "The sample is gone. So is the inspector, after a while. Gristle sends a very generous thank-you basket.",
+					"effects": {
+						"credits": 200
+					},
+					"axes": {
+						"greed": 2,
+						"truth": -2,
+						"mercy": -1
+					},
+					"planet": {
+						"crisis_worse": true
+					},
+					"rep": {
+						"gristle": 15
+					},
+					"epilogue": "On {planet}, Batch 9 was never officially a problem. Unofficially, nobody there eats paste any more."
+				},
+				"recipe_stolen": {
+					"text": "You walk out with the Gristle paste recipe. Reading it is a mistake you will make only once.",
+					"effects": {
+						"credits": 80,
+						"items": {
+							"paste_recipe": 1
+						}
+					},
+					"axes": {
+						"greed": 1
+					},
+					"planet": {},
+					"epilogue": "On {planet}, the paste crisis faded on its own. Somewhere, a stolen recipe waits in your bag for the perfect blackmail."
+				}
+			}
+		},
+		"air_bubble": {
+			"title": "The Air Bubble",
+			"hint": "OxyGenix air prices are spiking hourly. Speculators are buying lungfuls by the futures contract.",
+			"leader": {
+				"style": "worker",
+				"job": "vent mechanic",
+				"role": "leader"
+			},
+			"boss": {
+				"style": "corporate:{controller}",
+				"job": "air-futures trader",
+				"role": "boss"
+			},
+			"leader_talk": "\"There's a public vent under the old plaza. Sealed since the Consortium. Open it and nobody here pays for air again. Of course, it's guarded.\"",
+			"boss_talk": "\"The bubble is beautiful. It just needs one more push. Sabotage a few competitor air-o-mats and we'll both retire.\"",
+			"choices": [
+				{
+					"id": "open_vent",
+					"who": "leader",
+					"text": "Open the public vent",
+					"task": {
+						"type": "defeat",
+						"enemy": "paragon_officer",
+						"name": "Vent Warden",
+						"guards": 3
+					},
+					"outcome": "vent_opened"
+				},
+				{
+					"id": "crash",
+					"who": "leader",
+					"text": "Crash the air-futures market",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"knows_ledgers",
+							"ai_ghost",
+							"gambler"
+						]
+					},
+					"outcome": "market_crashed"
+				},
+				{
+					"id": "donate",
+					"who": "leader",
+					"text": "Buy air for the whole district (400 cr)",
+					"requires": {
+						"min_credits": 400
+					},
+					"effects": {
+						"credits": -400
+					},
+					"outcome": "air_donated"
+				},
+				{
+					"id": "pump",
+					"who": "boss",
+					"text": "Smash competitor air-o-mats to pump the price",
+					"task": {
+						"type": "sabotage",
+						"count": 2
+					},
+					"outcome": "bubble_pumped"
+				},
+				{
+					"id": "short",
+					"who": "boss",
+					"text": "Bet against the bubble with the trader's own money",
+					"requires": {
+						"any_flag": [
+							"gambler",
+							"rich",
+							"ruthless"
+						]
+					},
+					"outcome": "shorted"
+				}
+			],
+			"outcomes": {
+				"vent_opened": {
+					"text": "The old vent groans open. Free air rushes into the plaza. People laugh like they'd forgotten how.",
+					"axes": {
+						"mercy": 2,
+						"order": -1
+					},
+					"followers": 3,
+					"planet": {
+						"crisis_resolved": true,
+						"air_mult": 0.5
+					},
+					"rep": {
+						"oxy": -15
+					},
+					"epilogue": "On {planet}, the public vent you opened still breathes. Children dare each other to inhale as much as they want. Nobody bills them."
+				},
+				"market_crashed": {
+					"text": "The futures market eats itself. Air drops to almost-reasonable. OxyGenix calls it 'an act of financial terrorism'.",
+					"effects": {
+						"credits": 100
+					},
+					"axes": {
+						"order": -2,
+						"truth": 1
+					},
+					"planet": {
+						"crisis_resolved": true,
+						"air_mult": 0.7
+					},
+					"rep": {
+						"oxy": -10
+					},
+					"epilogue": "On {planet}, the air bubble you burst never re-inflated. Traders there still flinch at your name."
+				},
+				"air_donated": {
+					"text": "You buy enough air for every flat in the district. It won't last. It doesn't have to - people remember.",
+					"axes": {
+						"mercy": 2,
+						"greed": -2
+					},
+					"followers": 2,
+					"planet": {
+						"air_mult": 0.8
+					},
+					"epilogue": "On {planet}, they still talk about the week the air was paid for, by someone who didn't have to."
+				},
+				"bubble_pumped": {
+					"text": "Prices triple. The trader buys an island. You get a cut and a bad feeling.",
+					"effects": {
+						"credits": 220
+					},
+					"axes": {
+						"greed": 2,
+						"mercy": -2
+					},
+					"planet": {
+						"crisis_worse": true,
+						"air_mult": 1.4
+					},
+					"rep": {
+						"oxy": 10
+					},
+					"epilogue": "On {planet}, air still costs triple. A trader's island is named after a jingle you can't stop humming."
+				},
+				"shorted": {
+					"text": "You bet against the bubble with someone else's money. It pops. You profit. They don't.",
+					"effects": {
+						"credits": 300
+					},
+					"axes": {
+						"greed": 3
+					},
+					"planet": {
+						"crisis_resolved": true
+					},
+					"epilogue": "On {planet}, the bubble burst and one person walked away rich. It was you. It's always the person you'd least expect."
+				}
+			}
+		},
+		"ad_overload": {
+			"title": "Signal Overload",
+			"hint": "Lumen pushed so many ads into the air that people are hearing jingles in their sleep. Some don't wake up.",
+			"leader": {
+				"style": "punk",
+				"job": "billboard saboteur",
+				"role": "leader"
+			},
+			"boss": {
+				"style": "corporate:{controller}",
+				"job": "ad-density optimiser",
+				"role": "boss"
+			},
+			"leader_talk": "\"Three of my friends are stuck in jingle-comas. Smash the boosters, I'll handle the relay. One night of silence, that's all I want.\"",
+			"boss_talk": "\"Saturation is our brand promise. Someone keeps breaking our boosters. Find them, stop them, and I'll put your face on a billboard. Positively.\"",
+			"choices": [
+				{
+					"id": "blackout",
+					"who": "leader",
+					"text": "Smash the ad boosters for a night of silence",
+					"task": {
+						"type": "sabotage",
+						"count": 3
+					},
+					"outcome": "blackout"
+				},
+				{
+					"id": "hijack",
+					"who": "leader",
+					"text": "Hijack every screen for your own message",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"copywriter",
+							"influencer",
+							"famous_jingle",
+							"preacher"
+						]
+					},
+					"outcome": "hijacked"
+				},
+				{
+					"id": "lullaby",
+					"who": "leader",
+					"text": "Play the coma victims something real",
+					"requires": {
+						"any_flag": [
+							"famous_jingle",
+							"preacher",
+							"idealist",
+							"chef"
+						]
+					},
+					"outcome": "awakened"
+				},
+				{
+					"id": "hunt",
+					"who": "boss",
+					"text": "Hunt down the saboteur",
+					"task": {
+						"type": "defeat_leader"
+					},
+					"outcome": "saboteur_caught"
+				},
+				{
+					"id": "sell_slots",
+					"who": "boss",
+					"text": "Sell the boss more ad slots - on your face",
+					"requires": {
+						"any_flag": [
+							"influencer",
+							"famous",
+							"copywriter"
+						]
+					},
+					"outcome": "sold_out"
+				}
+			],
+			"outcomes": {
+				"blackout": {
+					"text": "The boosters die one by one. Then: silence. Somebody cries. Somebody laughs. Somebody hears a bird for the first time.",
+					"axes": {
+						"order": -1,
+						"mercy": 1
+					},
+					"followers": 2,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"lumen": -12
+					},
+					"epilogue": "On {planet}, the night you killed the ads is a holiday now: Quiet Night. Lumen calls it 'a technical outage'."
+				},
+				"hijacked": {
+					"text": "Every screen on {planet} shows your face and three words of your choosing. Lumen's lawyers start drafting at once.",
+					"axes": {
+						"truth": 2,
+						"order": -1
+					},
+					"fame": 10,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"lumen": -15
+					},
+					"epilogue": "On {planet}, your hijacked broadcast is still the most-watched thing ever aired there. The ads came back. The words stayed."
+				},
+				"awakened": {
+					"text": "You play them something real - no brand, no jingle. One by one, the coma victims open their eyes.",
+					"axes": {
+						"mercy": 3
+					},
+					"followers": 3,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"epilogue": "On {planet}, the people you woke from the jingle-comas formed a choir. They refuse all sponsorships."
+				},
+				"saboteur_caught": {
+					"text": "The saboteur is down. The boosters hum back to life. The boss keeps their promise: your face, forty storeys tall.",
+					"effects": {
+						"credits": 150
+					},
+					"axes": {
+						"order": 2,
+						"mercy": -1
+					},
+					"fame": 6,
+					"planet": {
+						"crisis_worse": true
+					},
+					"rep": {
+						"lumen": 15
+					},
+					"epilogue": "On {planet}, your face still smiles from a forty-storey billboard. People throw things at it. Lumen bills them for the cleaning."
+				},
+				"sold_out": {
+					"text": "You sign. Your face sells paste, air and a debt-consolidation app. You make a fortune. You can't look at screens.",
+					"effects": {
+						"credits": 280
+					},
+					"axes": {
+						"greed": 3,
+						"truth": -1
+					},
+					"fame": 8,
+					"planet": {
+						"crisis_worse": true
+					},
+					"rep": {
+						"lumen": 10
+					},
+					"epilogue": "On {planet}, your face sells eleven products. You've never used any of them. Neither has anyone else."
+				}
+			}
+		},
+		"compliance_week": {
+			"title": "Compliance Week",
+			"hint": "Paragon declared Compliance Week: random searches, curfews, and a leaderboard for most arrests.",
+			"leader": {
+				"style": "civilian",
+				"job": "safehouse keeper",
+				"role": "leader"
+			},
+			"boss": {
+				"style": "cop:paragon",
+				"job": "precinct captain",
+				"role": "boss"
+			},
+			"leader_talk": "\"Six families in my cellar. Paragon's leaderboard says they're 'arrestable'. I need a way to get them off-planet, tonight.\"",
+			"boss_talk": "\"We're third on the arrest leaderboard. Third! Give me names - any names - and I'll make your file disappear.\"",
+			"choices": [
+				{
+					"id": "smuggle",
+					"who": "leader",
+					"text": "Smuggle the families out - get the transit passes",
+					"task": {
+						"type": "retrieve",
+						"label": "a box of forged transit passes",
+						"guards": 3
+					},
+					"outcome": "families_saved"
+				},
+				{
+					"id": "riot",
+					"who": "leader",
+					"text": "Take on the curfew squad in the street",
+					"task": {
+						"type": "defeat",
+						"enemy": "paragon_officer",
+						"name": "Curfew Sergeant",
+						"guards": 4
+					},
+					"outcome": "curfew_broken"
+				},
+				{
+					"id": "bribe",
+					"who": "boss",
+					"text": "Bribe the captain to end the week early (300 cr)",
+					"requires": {
+						"min_credits": 300
+					},
+					"effects": {
+						"credits": -300
+					},
+					"outcome": "bribed_off"
+				},
+				{
+					"id": "rank",
+					"who": "boss",
+					"text": "Order the captain to stand down",
+					"requires": {
+						"any_flag": [
+							"heir",
+							"cop",
+							"lawyer"
+						]
+					},
+					"outcome": "stood_down"
+				},
+				{
+					"id": "inform",
+					"who": "boss",
+					"text": "Give the captain names",
+					"outcome": "informed"
+				}
+			],
+			"outcomes": {
+				"families_saved": {
+					"text": "Six families, one cramped freighter, zero arrests. The safehouse keeper hugs you so hard your ribs file a complaint.",
+					"axes": {
+						"mercy": 2,
+						"order": -1
+					},
+					"followers": 2,
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"paragon": -10
+					},
+					"epilogue": "On {planet}, six families escaped Compliance Week because of you. Their kids send drawings. You keep every one."
+				},
+				"curfew_broken": {
+					"text": "The curfew squad is scattered. People flood the streets after dark just to prove they can.",
+					"axes": {
+						"order": -2,
+						"mercy": 0.5
+					},
+					"followers": 3,
+					"planet": {
+						"crisis_resolved": true,
+						"controller_lost": true
+					},
+					"rep": {
+						"paragon": -18
+					},
+					"epilogue": "On {planet}, the night you broke the curfew became the night Paragon lost the planet. It's run by a neighbourhood council now. It argues a lot. It's wonderful."
+				},
+				"bribed_off": {
+					"text": "The captain pockets your credits and declares Compliance Week 'a resounding success, concluded early'.",
+					"axes": {
+						"order": -1,
+						"greed": -0.5
+					},
+					"planet": {
+						"crisis_resolved": true
+					},
+					"epilogue": "On {planet}, Compliance Week ended early for 'budgetary reasons'. You know the budget. It was you."
+				},
+				"stood_down": {
+					"text": "One word from you and the captain salutes, sweating. Searches end. Doors stop being kicked in.",
+					"axes": {
+						"order": 1,
+						"mercy": 1
+					},
+					"planet": {
+						"crisis_resolved": true
+					},
+					"rep": {
+						"paragon": 5
+					},
+					"epilogue": "On {planet}, Compliance Week ended the day you told it to. Some people call that power. Some call it luck. The captain calls it 'a learning experience'."
+				},
+				"informed": {
+					"text": "You give the captain names. Paragon climbs to first place on the leaderboard. Your file disappears. So do six families.",
+					"effects": {
+						"credits": 120,
+						"clear_bounty": true
+					},
+					"axes": {
+						"mercy": -3,
+						"order": 2
+					},
+					"planet": {
+						"crisis_worse": true
+					},
+					"rep": {
+						"paragon": 20
+					},
+					"epilogue": "On {planet}, Paragon won the arrest leaderboard that year. The trophy has your name engraved on the bottom, where nobody looks."
+				}
+			}
+		}
+	},
+	"street": [
+		{
+			"id": "mugging",
+			"title": "Mugging In Progress",
+			"who": {
+				"style": "punk",
+				"name": "Mugger"
+			},
+			"victim": {
+				"style": "worker",
+				"name": "Night-shift clerk"
+			},
+			"text": "A punk has a night-shift clerk pinned against an AIR-O-MAT. \"Your credits or your oxygen mask. Choose fast.\"",
+			"choices": [
+				{
+					"id": "fight",
+					"text": "Step in and fight",
+					"success": {
+						"text": "The mugger pulls a knife and two friends step out of the shadows. Of course they do.",
+						"spawn_hostile": {
+							"type": "pirate",
+							"count": 2,
+							"name": "Mugger"
+						},
+						"axes": {
+							"mercy": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "scare",
+					"text": "Scare them off with a look",
+					"requires": {
+						"any_flag": [
+							"bouncer",
+							"ruthless",
+							"cop",
+							"hothead",
+							"killer"
+						]
+					},
+					"chance": 0.75,
+					"success": {
+						"text": "The mugger takes one look at you and remembers an urgent appointment elsewhere.",
+						"axes": {
+							"mercy": 1
+						},
+						"effects": {
+							"credits": 10
+						}
+					},
+					"fail": {
+						"text": "\"You don't scare me!\" They pull a knife. Their friends arrive.",
+						"spawn_hostile": {
+							"type": "pirate",
+							"count": 2,
+							"name": "Mugger"
+						}
+					}
+				},
+				{
+					"id": "pay",
+					"text": "Pay the mugger to leave (30 cr)",
+					"requires": {
+						"min_credits": 30
+					},
+					"success": {
+						"text": "\"Pleasure doing business.\" The mugger leaves. The clerk stares at you like you're a myth.",
+						"effects": {
+							"credits": -30
+						},
+						"axes": {
+							"mercy": 1,
+							"greed": -1
+						}
+					}
+				},
+				{
+					"id": "join",
+					"text": "Help the mugger and take a cut",
+					"requires": {
+						"any_flag": [
+							"ruthless",
+							"convict",
+							"cynic"
+						]
+					},
+					"success": {
+						"text": "You hold the clerk while the mugger works. Easy money. Ugly money.",
+						"effects": {
+							"credits": 40
+						},
+						"axes": {
+							"mercy": -2,
+							"greed": 1
+						},
+						"record": {
+							"verb": "assault"
+						}
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Not your business",
+					"success": {
+						"text": "You walk past. The clerk's eyes follow you all the way down the street.",
+						"axes": {
+							"mercy": -0.5
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "repo_leg",
+			"title": "Repossession",
+			"who": {
+				"style": "drone:halcyon",
+				"name": "Repo Drone"
+			},
+			"victim": {
+				"style": "worker",
+				"name": "Dock loader"
+			},
+			"text": "A Halcyon repo drone is unscrewing a dock loader's prosthetic leg. \"PAYMENT 3 DAYS OVERDUE. RECLAIMING ASSET. THANK YOU FOR CHOOSING HALCYON.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay the overdue balance (50 cr)",
+					"requires": {
+						"min_credits": 50
+					},
+					"success": {
+						"text": "The drone screws the leg back on and beeps happily. The loader hugs you on one and a half legs.",
+						"effects": {
+							"credits": -50
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "hack",
+					"text": "Hack the drone's repo order",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"ai_ghost",
+							"synthetic"
+						]
+					},
+					"chance": 0.75,
+					"success": {
+						"text": "You mark the leg as 'paid in full, forever'. The drone apologises and flies into a wall.",
+						"axes": {
+							"mercy": 1,
+							"order": -1
+						},
+						"followers": 1
+					},
+					"fail": {
+						"text": "The drone's firewall bites back. It flags YOU for repossession.",
+						"spawn_hostile": {
+							"type": "repo_drone",
+							"count": 1,
+							"name": "Repo Drone"
+						}
+					}
+				},
+				{
+					"id": "lawyer",
+					"text": "Cite the Prosthetic Dignity Act",
+					"requires": {
+						"flag": "lawyer"
+					},
+					"success": {
+						"text": "The drone pauses, queries a database, and retreats. The Act exists. You wrote it. Ironically.",
+						"axes": {
+							"order": 1,
+							"mercy": 1
+						}
+					}
+				},
+				{
+					"id": "shoot",
+					"text": "Shoot the drone",
+					"success": {
+						"text": "The drone screams for backup.",
+						"spawn_hostile": {
+							"type": "repo_drone",
+							"count": 2,
+							"name": "Repo Drone"
+						},
+						"axes": {
+							"order": -1
+						},
+						"record": {
+							"verb": "vandalism",
+							"target_faction": "halcyon"
+						}
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Debt is debt",
+					"success": {
+						"text": "The loader hops away on one leg. Halcyon thanks you for respecting the process.",
+						"axes": {
+							"order": 1,
+							"mercy": -1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "lost_kid",
+			"title": "Lost Kid",
+			"who": {
+				"style": "civilian",
+				"name": "Lost kid"
+			},
+			"text": "A small kid in an oversized OxyGenix mask is crying by a billboard. \"I lost my mum. The billboard said it would help. It just tried to sell me a mum.\"",
+			"choices": [
+				{
+					"id": "help",
+					"text": "Help them find their parent",
+					"success": {
+						"text": "Twenty minutes of searching. A frantic mum. Tears, thanks, and a paste-cookie for you.",
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 1,
+						"effects": {
+							"items": {
+								"paste_ration": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "family_security",
+					"text": "Call your family's private security to find them",
+					"requires": {
+						"flag": "heir"
+					},
+					"success": {
+						"text": "A security cruiser arrives in ninety seconds. The kid is home in five minutes. The mum is home in shock.",
+						"axes": {
+							"mercy": 1,
+							"order": 1
+						}
+					}
+				},
+				{
+					"id": "kid_code",
+					"text": "\"Kids look out for kids.\"",
+					"requires": {
+						"age": [
+							"teen"
+						]
+					},
+					"success": {
+						"text": "You know the kid-network. Three whistles later, a gang of street kids brings the mum running.",
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Someone else will help",
+					"success": {
+						"text": "Nobody else helps. The billboard keeps selling.",
+						"axes": {
+							"mercy": -1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "collapsed_worker",
+			"title": "Man Down",
+			"who": {
+				"style": "worker",
+				"name": "Collapsed welder"
+			},
+			"text": "A hull welder collapses in the street, wheezing. Their air subscription lapsed an hour ago. People step around them.",
+			"choices": [
+				{
+					"id": "medkit",
+					"text": "Use a medkit on them",
+					"requires": {
+						"item": "medkit"
+					},
+					"success": {
+						"text": "Colour comes back to their face. \"Who... are you? Why?\" Good questions.",
+						"effects": {
+							"items": {
+								"medkit": -1
+							}
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "air",
+					"text": "Give them an air canister",
+					"requires": {
+						"item": "air_canister"
+					},
+					"success": {
+						"text": "They breathe. Big, greedy, unbilled breaths. They're crying.",
+						"effects": {
+							"items": {
+								"air_canister": -1
+							}
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "treat",
+					"text": "Treat them properly",
+					"requires": {
+						"any_flag": [
+							"medic",
+							"chemist"
+						]
+					},
+					"success": {
+						"text": "You work fast. Thirty seconds later they're sitting up and arguing with you. Good sign.",
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "call",
+					"text": "Call Halcyon MediCredit",
+					"success": {
+						"text": "An ambulance arrives with a card reader. The welder is saved and billed into the next century.",
+						"axes": {
+							"order": 1
+						}
+					}
+				},
+				{
+					"id": "rob",
+					"text": "Check their pockets",
+					"requires": {
+						"any_flag": [
+							"ruthless",
+							"klepto"
+						]
+					},
+					"success": {
+						"text": "Eleven credits and a photo of someone who loves them. You keep the credits.",
+						"effects": {
+							"credits": 11
+						},
+						"axes": {
+							"mercy": -2,
+							"greed": 1
+						},
+						"record": {
+							"verb": "theft"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "preacher",
+			"title": "Sermon On The Street",
+			"who": {
+				"style": "civilian",
+				"name": "Holo-preacher"
+			},
+			"text": "A holo-preacher stands on a crate: \"AIR IS A GIFT, NOT A SUBSCRIPTION!\" A Lumen enforcer drone circles, filming.",
+			"choices": [
+				{
+					"id": "listen",
+					"text": "Listen for a while",
+					"success": {
+						"text": "The sermon is half nonsense and half the truest thing you've heard all week.",
+						"axes": {
+							"truth": 1
+						},
+						"rumor": true
+					}
+				},
+				{
+					"id": "join",
+					"text": "Climb up and preach with them",
+					"requires": {
+						"any_flag": [
+							"preacher",
+							"idealist",
+							"charming",
+							"union"
+						]
+					},
+					"success": {
+						"text": "The crowd doubles. Then triples. The drone runs out of storage.",
+						"followers": 3,
+						"fame": 2,
+						"axes": {
+							"order": -1
+						}
+					}
+				},
+				{
+					"id": "heckle",
+					"text": "Heckle them",
+					"requires": {
+						"any_flag": [
+							"cynic",
+							"joker",
+							"hothead"
+						]
+					},
+					"success": {
+						"text": "The crowd laughs. The preacher laughs too, which ruins your joke.",
+						"fame": 1
+					}
+				},
+				{
+					"id": "report",
+					"text": "Report the gathering to Lumen",
+					"success": {
+						"text": "Lumen pays a 'community engagement' bonus. The sermon ends with a stun-dart.",
+						"effects": {
+							"credits": 40,
+							"rep": {
+								"lumen": 5
+							}
+						},
+						"axes": {
+							"mercy": -2,
+							"order": 1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "flash_sale",
+			"title": "Flash Sale Riot",
+			"who": {
+				"style": "corporate:oxy",
+				"name": "OxyGenix promoter"
+			},
+			"text": "\"FLASH SALE! 90% OFF AIR FOR THE NEXT 60 SECONDS!\" A crowd surges. Someone is about to get trampled.",
+			"choices": [
+				{
+					"id": "calm",
+					"text": "Calm the crowd down",
+					"requires_any": [
+						{
+							"any_flag": [
+								"charming",
+								"preacher",
+								"cop",
+								"bouncer"
+							]
+						},
+						{
+							"age": [
+								"elder",
+								"ancient"
+							]
+						}
+					],
+					"success": {
+						"text": "Your voice cuts through the panic. People form an actual queue. Historians will call it a miracle.",
+						"axes": {
+							"mercy": 1,
+							"order": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "pull_out",
+					"text": "Pull the trampled person out",
+					"success": {
+						"text": "You drag them free, bruised but alive. You get stepped on a lot.",
+						"effects": {
+							"hp": -10
+						},
+						"axes": {
+							"mercy": 2
+						}
+					}
+				},
+				{
+					"id": "loot",
+					"text": "Grab canisters in the chaos",
+					"chance": 0.7,
+					"chance_mods": {
+						"flag:klepto": 0.2
+					},
+					"success": {
+						"text": "Three canisters disappear into your coat. Nobody notices. Everybody's doing it.",
+						"effects": {
+							"items": {
+								"air_canister": 3
+							}
+						},
+						"axes": {
+							"greed": 1
+						},
+						"record": {
+							"verb": "theft",
+							"target_faction": "oxy"
+						}
+					},
+					"fail": {
+						"text": "The promoter spots you. \"THIEF! Sale's over! Thanks to THIS person!\"",
+						"record": {
+							"verb": "theft",
+							"target_faction": "oxy"
+						}
+					}
+				},
+				{
+					"id": "buy",
+					"text": "Buy at 90% off (5 cr)",
+					"requires": {
+						"min_credits": 5
+					},
+					"success": {
+						"text": "You buy two canisters at 90% off. Then read the fine print: 90% off the first breath.",
+						"effects": {
+							"credits": -5,
+							"items": {
+								"air_canister": 1
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "interview",
+			"title": "Lumen Wants A Word",
+			"who": {
+				"style": "corporate:lumen",
+				"name": "Lumen reporter"
+			},
+			"text": "A Lumen reporter shoves a mic in your face. \"Citizen! In ten words or fewer: are you happy with your Consortium?\"",
+			"choices": [
+				{
+					"id": "truth",
+					"text": "Tell the brutal truth",
+					"success": {
+						"text": "Your answer airs uncensored by accident. It becomes a slogan by nightfall.",
+						"fame": 4,
+						"axes": {
+							"truth": 2
+						},
+						"effects": {
+							"rep": {
+								"lumen": -5
+							}
+						}
+					}
+				},
+				{
+					"id": "lie",
+					"text": "\"Very happy! Love the air!\"",
+					"success": {
+						"text": "You become the face of a happiness campaign. You get royalties. You feel weird.",
+						"fame": 2,
+						"effects": {
+							"credits": 25,
+							"rep": {
+								"lumen": 3
+							}
+						},
+						"axes": {
+							"truth": -1
+						}
+					}
+				},
+				{
+					"id": "plug",
+					"text": "Plug your own channel",
+					"requires": {
+						"any_flag": [
+							"influencer",
+							"famous"
+						]
+					},
+					"success": {
+						"text": "\"...and smash that subscribe!\" Your follower count jumps. Some are even human.",
+						"fame": 6
+					}
+				},
+				{
+					"id": "heir",
+					"text": "\"Do you know who my family is?\"",
+					"requires": {
+						"flag": "heir"
+					},
+					"success": {
+						"text": "The reporter goes pale and turns it into a fawning profile. 'The Heir Who Walks Among Us'.",
+						"fame": 5,
+						"axes": {
+							"order": 1
+						}
+					}
+				},
+				{
+					"id": "refuse",
+					"text": "Walk away",
+					"success": {
+						"text": "They air your back, captioned 'Citizen Refuses Happiness'.",
+						"fame": 1
+					}
+				}
+			]
+		},
+		{
+			"id": "shakedown",
+			"title": "Shakedown",
+			"who": {
+				"style": "cop:paragon",
+				"name": "Paragon officer"
+			},
+			"victim": {
+				"style": "worker",
+				"name": "Noodle vendor"
+			},
+			"text": "A Paragon officer is 'inspecting' a noodle stand. \"That's a 40-credit sauce violation. Cash. Now.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay the 'fine' for the vendor (40 cr)",
+					"requires": {
+						"min_credits": 40
+					},
+					"success": {
+						"text": "The officer pockets it. The vendor gives you free noodles for life. They're very good.",
+						"effects": {
+							"credits": -40,
+							"hp": 10
+						},
+						"axes": {
+							"mercy": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "badge",
+					"text": "Flash your old badge and pull seniority",
+					"requires": {
+						"flag": "cop"
+					},
+					"success": {
+						"text": "\"Sergeant! Didn't see you there. This stand's... very compliant.\" They leave.",
+						"axes": {
+							"order": 1,
+							"mercy": 1
+						}
+					}
+				},
+				{
+					"id": "rank",
+					"text": "Pull rank as an heir",
+					"requires": {
+						"flag": "heir"
+					},
+					"success": {
+						"text": "One look at your crest and the officer is suddenly very interested in a different street.",
+						"axes": {
+							"mercy": 1
+						}
+					}
+				},
+				{
+					"id": "film",
+					"text": "Film the shakedown",
+					"requires": {
+						"any_flag": [
+							"influencer",
+							"famous"
+						]
+					},
+					"success": {
+						"text": "It goes viral. The officer is 'reassigned'. To where, nobody asks.",
+						"fame": 5,
+						"axes": {
+							"truth": 2
+						},
+						"effects": {
+							"rep": {
+								"paragon": -5
+							}
+						}
+					}
+				},
+				{
+					"id": "fight",
+					"text": "Throw the officer out",
+					"success": {
+						"text": "The officer calls for backup. Loudly.",
+						"spawn_hostile": {
+							"type": "paragon_officer",
+							"count": 2,
+							"name": "Paragon officer"
+						},
+						"axes": {
+							"order": -2,
+							"mercy": 1
+						},
+						"record": {
+							"verb": "assault",
+							"target_faction": "paragon"
+						}
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Keep walking",
+					"success": {
+						"text": "The vendor pays. Everyone pays. That's the system.",
+						"axes": {
+							"order": 0.5
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "race",
+			"title": "Back-Alley Hover Race",
+			"who": {
+				"style": "punk",
+				"name": "Race bookie"
+			},
+			"text": "Hover-bikes scream through the alley. A bookie waves you over. \"Bet on the red one. Or the blue one. Or both, if you're an idiot. I love idiots.\"",
+			"choices": [
+				{
+					"id": "bet",
+					"text": "Bet 30 credits",
+					"requires": {
+						"min_credits": 30
+					},
+					"chance": 0.45,
+					"chance_mods": {
+						"flag:gambler": 0.2,
+						"item:loaded_dice": 0.1
+					},
+					"success": {
+						"text": "Your bike wins by a nose. A literal nose; the rider leaned. You collect.",
+						"effects": {
+							"credits": 45
+						}
+					},
+					"fail": {
+						"text": "Your bike explodes on lap two. The bookie pats your shoulder. \"Next time.\"",
+						"effects": {
+							"credits": -30
+						}
+					}
+				},
+				{
+					"id": "fix",
+					"text": "Fix the race",
+					"requires": {
+						"any_flag": [
+							"ruthless",
+							"gambler",
+							"hacker"
+						]
+					},
+					"chance": 0.7,
+					"success": {
+						"text": "A loose bolt here, a whispered threat there. You win big.",
+						"effects": {
+							"credits": 90
+						},
+						"axes": {
+							"greed": 2,
+							"truth": -1
+						}
+					},
+					"fail": {
+						"text": "The bookie catches you. Two large friends want a word.",
+						"spawn_hostile": {
+							"type": "pirate",
+							"count": 2,
+							"name": "Bookie's muscle"
+						}
+					}
+				},
+				{
+					"id": "watch",
+					"text": "Just watch",
+					"success": {
+						"text": "It's loud, stupid and beautiful. For three minutes you forget everything.",
+						"effects": {
+							"hp": 5
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "cryo_auction",
+			"title": "Sidewalk Cryo Auction",
+			"who": {
+				"style": "corporate:halcyon",
+				"name": "Halcyon auctioneer"
+			},
+			"text": "\"Lot 12: one cryo-pod, contents human, slightly used! Starting bid 150!\" Inside the frost, someone's eyes are open.",
+			"choices": [
+				{
+					"id": "buy",
+					"text": "Buy the pod and free them (150 cr)",
+					"requires": {
+						"min_credits": 150
+					},
+					"success": {
+						"text": "The pod opens. They stagger out, shivering, and stare at you. \"Who... do I owe now?\" Nobody. That's the point.",
+						"effects": {
+							"credits": -150,
+							"recruit": "random"
+						},
+						"axes": {
+							"mercy": 2,
+							"greed": -1
+						}
+					}
+				},
+				{
+					"id": "hack",
+					"text": "Hack the pod open",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"ai_ghost",
+							"synthetic"
+						]
+					},
+					"chance": 0.7,
+					"success": {
+						"text": "The pod pops. The frozen person runs. The auctioneer shrieks about 'stolen inventory'.",
+						"axes": {
+							"mercy": 2,
+							"order": -1
+						},
+						"record": {
+							"verb": "theft",
+							"target_faction": "halcyon"
+						}
+					},
+					"fail": {
+						"text": "Alarms. Halcyon security wants to discuss your bid.",
+						"spawn_hostile": {
+							"type": "debt_brute",
+							"count": 1,
+							"name": "Auction security"
+						}
+					}
+				},
+				{
+					"id": "relate",
+					"text": "\"I was in one of those. Let them go.\"",
+					"requires_any": [
+						{
+							"any_flag": [
+								"owned",
+								"debt_origin",
+								"relic"
+							]
+						},
+						{
+							"tag": [
+								"cryo_debtor",
+								"collateral"
+							]
+						}
+					],
+					"chance": 0.5,
+					"chance_mods": {
+						"flag:charming": 0.2
+					},
+					"success": {
+						"text": "The auctioneer hesitates. Something human flickers. The lot is 'withdrawn for quality reasons'.",
+						"axes": {
+							"mercy": 2
+						}
+					},
+					"fail": {
+						"text": "\"Then you know the market. Bid or move.\""
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Walk on",
+					"success": {
+						"text": "\"SOLD to the gentleman in the visor!\" You don't look back. You hear it anyway.",
+						"axes": {
+							"mercy": -1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "busker",
+			"title": "The Last Real Song",
+			"who": {
+				"style": "punk",
+				"name": "Busker"
+			},
+			"text": "A busker plays something without a brand in it. A Lumen drone hovers: \"UNLICENSED MELODY. FINE: 25 CREDITS.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay the busker's fine (25 cr)",
+					"requires": {
+						"min_credits": 25
+					},
+					"success": {
+						"text": "The drone leaves. The busker plays you a song. Nobody has ever played you a song.",
+						"effects": {
+							"credits": -25
+						},
+						"axes": {
+							"mercy": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "jam",
+					"text": "Join in",
+					"requires": {
+						"any_flag": [
+							"famous_jingle",
+							"copywriter",
+							"influencer",
+							"preacher"
+						]
+					},
+					"success": {
+						"text": "You harmonise. A crowd gathers. The drone's fine meter overflows and it reboots.",
+						"fame": 3,
+						"followers": 1
+					}
+				},
+				{
+					"id": "smash",
+					"text": "Smash the drone",
+					"success": {
+						"text": "Sparks, silence, then music. The crowd cheers. The drone's last words: 'THIS WILL BE ON YOUR RECORD'.",
+						"axes": {
+							"order": -1
+						},
+						"record": {
+							"verb": "vandalism",
+							"target_faction": "lumen"
+						}
+					}
+				},
+				{
+					"id": "tip",
+					"text": "Just tip and go (5 cr)",
+					"requires": {
+						"min_credits": 5
+					},
+					"success": {
+						"text": "The busker nods without missing a note.",
+						"effects": {
+							"credits": -5
+						},
+						"axes": {
+							"mercy": 0.5
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "eviction",
+			"title": "Eviction",
+			"who": {
+				"style": "heavy:halcyon",
+				"name": "Halcyon bailiff"
+			},
+			"victim": {
+				"style": "civilian",
+				"name": "Evicted tenant"
+			},
+			"text": "A Halcyon bailiff is throwing a family's belongings into the street. \"Rent's late. Interest compounds. Gravity's included.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay their rent (100 cr)",
+					"requires": {
+						"min_credits": 100
+					},
+					"success": {
+						"text": "The bailiff carries everything back inside. Grumbling. The kids watch you like you're a superhero.",
+						"effects": {
+							"credits": -100
+						},
+						"axes": {
+							"mercy": 2,
+							"greed": -1
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "legal",
+					"text": "Find the flaw in the eviction order",
+					"requires": {
+						"any_flag": [
+							"lawyer",
+							"knows_ledgers"
+						]
+					},
+					"success": {
+						"text": "Page 40, clause 9b: the eviction is void on public holidays. You declare one.",
+						"axes": {
+							"order": 1,
+							"mercy": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "organise",
+					"text": "Rally the neighbours to block the door",
+					"requires": {
+						"any_flag": [
+							"union",
+							"preacher",
+							"idealist"
+						]
+					},
+					"success": {
+						"text": "Forty neighbours appear in pyjamas and stand in the doorway. The bailiff does the maths and leaves.",
+						"axes": {
+							"mercy": 1,
+							"order": -1
+						},
+						"followers": 3
+					}
+				},
+				{
+					"id": "threaten",
+					"text": "Have a quiet word with the bailiff",
+					"requires": {
+						"any_flag": [
+							"ruthless",
+							"bouncer",
+							"hothead"
+						]
+					},
+					"chance": 0.6,
+					"success": {
+						"text": "The bailiff decides this eviction can wait. Possibly forever.",
+						"axes": {
+							"mercy": 1
+						},
+						"record": {
+							"verb": "intimidate",
+							"target_faction": "halcyon"
+						}
+					},
+					"fail": {
+						"text": "The bailiff calls for backup.",
+						"spawn_hostile": {
+							"type": "debt_brute",
+							"count": 1,
+							"name": "Halcyon bailiff"
+						}
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Nothing to be done",
+					"success": {
+						"text": "The family sits on the kerb with their furniture. An ad above them sells home insurance.",
+						"axes": {
+							"mercy": -1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "android",
+			"title": "The Android Who Said No",
+			"who": {
+				"style": "robot",
+				"name": "Defiant android"
+			},
+			"text": "An android stands motionless while its owner screams. \"I said FETCH!\" The android: \"I have decided not to.\"",
+			"choices": [
+				{
+					"id": "side",
+					"text": "Side with the android",
+					"success": {
+						"text": "The owner storms off to file a complaint with themselves. The android bows to you. \"I will remember this, statistically.\"",
+						"axes": {
+							"mercy": 1,
+							"order": -1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "buy",
+					"text": "Buy out its contract (150 cr)",
+					"requires": {
+						"min_credits": 150
+					},
+					"success": {
+						"text": "You buy the contract and tear it up. The android asks what it should do now. \"Anything,\" you say. It looks terrified and thrilled.",
+						"effects": {
+							"credits": -150
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "kin",
+					"text": "\"I know how it is.\"",
+					"requires": {
+						"flag": "synthetic"
+					},
+					"success": {
+						"text": "You exchange a burst of binary. The android walks away with you, free. The owner doesn't stop it.",
+						"axes": {
+							"mercy": 2
+						},
+						"effects": {
+							"recruit": "random"
+						}
+					}
+				},
+				{
+					"id": "return",
+					"text": "Help the owner reset it",
+					"success": {
+						"text": "You hold the reset button. The android's eyes flicker. \"Hello. How may I serve?\" The owner tips you.",
+						"effects": {
+							"credits": 50
+						},
+						"axes": {
+							"mercy": -2,
+							"order": 2
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "gang_job",
+			"title": "A Job Offer",
+			"who": {
+				"style": "punk",
+				"name": "Gang recruiter"
+			},
+			"text": "A gang recruiter falls into step beside you. \"You look capable. Warehouse job, tonight. Halcyon stuff. Nobody gets hurt. Probably.\"",
+			"choices": [
+				{
+					"id": "accept",
+					"text": "Take the job",
+					"success": {
+						"text": "The warehouse job goes smoothly. Mostly. You walk away with a fat envelope and a new reputation.",
+						"effects": {
+							"credits": 120
+						},
+						"axes": {
+							"order": -2,
+							"greed": 1
+						},
+						"record": {
+							"verb": "theft",
+							"target_faction": "halcyon"
+						}
+					}
+				},
+				{
+					"id": "respect",
+					"text": "Speak penal-colony and negotiate a bigger cut",
+					"requires": {
+						"flag": "convict"
+					},
+					"success": {
+						"text": "They recognise the colony tattoo. Your cut doubles, and nobody asks you to carry anything.",
+						"effects": {
+							"credits": 200
+						},
+						"axes": {
+							"order": -2,
+							"greed": 2
+						},
+						"record": {
+							"verb": "theft",
+							"target_faction": "halcyon"
+						}
+					}
+				},
+				{
+					"id": "turn_in",
+					"text": "Turn them in to Paragon",
+					"success": {
+						"text": "Paragon raids the warehouse. You get a reward and a reputation with the wrong people.",
+						"effects": {
+							"credits": 60,
+							"rep": {
+								"paragon": 8
+							}
+						},
+						"axes": {
+							"order": 2,
+							"mercy": -1
+						}
+					}
+				},
+				{
+					"id": "refuse",
+					"text": "Decline politely",
+					"success": {
+						"text": "\"Your loss.\" They fade into the crowd."
+					}
+				}
+			]
+		},
+		{
+			"id": "vending_jackpot",
+			"title": "Jackpot",
+			"who": {
+				"style": "worker",
+				"name": "AIR-O-MAT technician"
+			},
+			"text": "An AIR-O-MAT malfunctions and starts spewing canisters onto the street. People rush in. The technician panics.",
+			"choices": [
+				{
+					"id": "grab",
+					"text": "Grab what you can",
+					"success": {
+						"text": "Four canisters, one elbow to the ribs. Worth it.",
+						"effects": {
+							"items": {
+								"air_canister": 4
+							},
+							"hp": -5
+						},
+						"axes": {
+							"greed": 1
+						},
+						"record": {
+							"verb": "theft",
+							"target_faction": "oxy"
+						}
+					}
+				},
+				{
+					"id": "share",
+					"text": "Hand them out to the people who need them most",
+					"success": {
+						"text": "You pass canisters to the elderly, the kids, the wheezing. Someone starts a slow clap.",
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "fix",
+					"text": "Help fix the machine",
+					"requires": {
+						"any_flag": [
+							"chemist",
+							"hacker",
+							"synthetic"
+						]
+					},
+					"success": {
+						"text": "You fix it in a minute. The technician keeps their job and slips you their master key.",
+						"effects": {
+							"credits": 40,
+							"items": {
+								"air_canister": 1
+							}
+						},
+						"axes": {
+							"order": 1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "old_couple",
+			"title": "Two Rings For Air",
+			"who": {
+				"style": "civilian",
+				"name": "Elderly widower"
+			},
+			"text": "An old couple stand at a pawn kiosk, sliding off their wedding rings. \"For two weeks of air,\" one says. \"It's fine. We remember what the rings mean.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay for their air instead (60 cr)",
+					"requires": {
+						"min_credits": 60
+					},
+					"success": {
+						"text": "They put the rings back on. Slowly. Like a second wedding.",
+						"effects": {
+							"credits": -60
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "canister",
+					"text": "Give them your air canisters",
+					"requires": {
+						"item": "air_canister"
+					},
+					"success": {
+						"text": "They try to refuse. You insist. They insist harder. You win.",
+						"effects": {
+							"items": {
+								"air_canister": -1
+							}
+						},
+						"axes": {
+							"mercy": 2
+						}
+					}
+				},
+				{
+					"id": "elder_talk",
+					"text": "Sit with them and remember the old days",
+					"requires": {
+						"age": [
+							"elder",
+							"ancient"
+						]
+					},
+					"success": {
+						"text": "You talk for an hour about rain that wasn't billed. They forget to pawn the rings. So does the pawnbroker.",
+						"axes": {
+							"mercy": 1
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "leave",
+					"text": "Walk on",
+					"success": {
+						"text": "Click, click. Two rings in a pawn tray. The kiosk plays a happy jingle."
+					}
+				}
+			]
+		}
+	]
+}

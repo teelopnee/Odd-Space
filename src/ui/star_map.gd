@@ -73,6 +73,14 @@ func _ready() -> void:
 	_warp_btn.disabled = true
 	_warp_btn.pressed.connect(_warp)
 	rv.add_child(_warp_btn)
+	var early := Saga.early_ending_available()
+	if not early.is_empty():
+		var end_btn := Button.new()
+		end_btn.text = "END YOUR STORY: " + Saga.fill(str(early.get("text", "")))
+		end_btn.custom_minimum_size = Vector2(0, 52)
+		end_btn.add_theme_color_override("font_color", Color(1.0, 0.82, 0.24))
+		end_btn.pressed.connect(_take_early_ending)
+		rv.add_child(end_btn)
 	_build_planet_buttons()
 	_build_modal()
 	_refresh_side()
@@ -172,6 +180,13 @@ func _select(p: Dictionary) -> void:
 	if not known.is_empty():
 		text += "\n[color=#ff3ec8]They've heard about you:[/color] %d crime(s) on the Lumen feed." % known.size()
 	text += "\n[color=#3ee6ff]AIR COST:[/color] x%.1f" % float(p.get("air_mult", 1.0))
+	var li := Stories.local_info(p.get("id", ""))
+	if not li.is_empty():
+		text += "\n\n[color=#c07dff][b]LOCAL STORY:[/b] %s[/color] - %s" % [li.title, "resolved" if li.status == "done" else ("in progress" if li.status == "task" else li.hint)]
+	elif p.get("visited", false) == false:
+		text += "\n\n[color=#c07dff][i]Unvisited. Every world has its own trouble.[/i][/color]"
+	if p.get("liberated", false):
+		text += "\n[color=#7dff4a]LIBERATED - run by its own people now.[/color]"
 	if p.get("id", "") == Saga.objective_planet():
 		text += "\n\n[color=#ffd23e][b]STORY:[/b][/color] " + Saga.objective_text()
 	var jobs := 0
@@ -186,6 +201,22 @@ func _select(p: Dictionary) -> void:
 	_warp_btn.text = "WARP TO %s" % str(p.name).to_upper()
 	if Router.input_device == "gamepad":
 		_safe_focus.call_deferred(_warp_btn)
+
+
+func _take_early_ending() -> void:
+	var early := Saga.early_ending_available()
+	if early.is_empty():
+		return
+	var pick := await _ask("END YOUR STORY?", "Your Motivation can come true right now - before the finale.\n\n[i]%s[/i]\n\nThe rest of the saga will go on without you." % Saga.fill(str(early.get("text", ""))),
+		[{"id": "yes", "text": "Yes. End it here."}, {"id": "no", "text": "Not yet."}])
+	if pick.get("id", "") != "yes":
+		return
+	var e := Saga.commit_early_ending()
+	for line in e.get("slides", []):
+		await _show_message(str(e.get("title", "EPILOGUE")), line)
+	Game.save_game()
+	await _show_message("THE END", "%s\n\nThe Sprawl keeps going. So can you - keep flying, or start a new life from the title screen." % e.get("title", ""))
+	Router.goto(Router.STAR_MAP)
 
 
 func _refresh_side() -> void:

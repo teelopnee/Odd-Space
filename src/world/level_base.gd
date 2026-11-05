@@ -364,9 +364,9 @@ func refresh_quests() -> void:
 	if builder == null or not is_inside_tree():
 		return
 	var planet_id := Game.location_id
-	for spec in Saga.spawns_for(planet_id):
-		var key := "%s:%s" % [spec.kind, spec.get("persona_id", spec.get("tag", ""))]
-		if spec.kind == "guards":
+	for spec in Saga.spawns_for(planet_id) + Stories.spawns_for(planet_id):
+		var key: String = spec.get("key", "%s:%s" % [spec.kind, spec.get("persona_id", spec.get("tag", ""))])
+		if spec.kind == "guards" and not spec.has("key"):
 			key = "guards:%d" % Saga.index
 		if _quest_spawned.has(key):
 			continue
@@ -401,13 +401,53 @@ func refresh_quests() -> void:
 				if spec.tag == Saga.current().get("id", ""):
 					_spawn_guards(pos, 2, Saga.world.get("faction", ""))
 			"elite":
-				var p: Dictionary = Saga.personas.get(spec.persona_id, {})
+				var p: Dictionary = Saga.personas.get(spec.get("persona_id", ""), {})
 				var pos := random_floor_position(14.0)
-				var e := spawn_enemy(spec.get("enemy_type", "pirate"), pos, {"name": p.get("name", "Elite"), "look": p.get("look", {}),
+				var e := spawn_enemy(spec.get("enemy_type", "pirate"), pos, {"name": spec.get("name", p.get("name", "Elite")), "look": spec.get("look", p.get("look", {})),
 					"hostile": true, "elite": true, "boss": spec.get("boss", false), "tag": spec.tag})
 				attach_marker(e, "X", Color(1.0, 0.3, 0.3))
+			"story_npc":
+				var p: Dictionary = spec.get("persona", {})
+				var n := spawn_npc("civilian", random_floor_position(5.0))
+				n.story_id = spec.story_id
+				n.npc_name = p.get("name", "?")
+				n.look = p.get("look", {})
+				n.sprite.set_look(n.look)
+				n.faction = p.get("faction", "")
+				n.name_label.text = n.npc_name + "\n<%s>" % str(p.get("job", "")).to_upper()
+				n.add_to_group("story_npc")
+				if str(spec.get("marker", "")) != "":
+					attach_marker(n, spec.marker, spec.get("color", Color(0.75, 0.5, 1.0)))
+			"street":
+				var ev: Dictionary = spec.get("event", {})
+				var center := random_floor_position(7.0)
+				var who: Dictionary = ev.get("who", {})
+				var n := spawn_npc("civilian", center)
+				n.story_id = spec.story_id
+				n.npc_name = str(who.get("name", "Stranger"))
+				n.look = CharacterLook.random_look(rng, str(who.get("style", "civilian")))
+				n.sprite.set_look(n.look)
+				n.name_label.text = n.npc_name + "\n<%s>" % str(ev.get("title", "")).to_upper()
+				n.add_to_group("story_npc")
+				attach_marker(n, "!", spec.get("color", Color(1.0, 0.55, 0.2)))
+				var victim: Dictionary = ev.get("victim", {})
+				if not victim.is_empty():
+					var v := spawn_npc("civilian", center + Vector3(1.4, 0, 0.4))
+					v.npc_name = str(victim.get("name", "Bystander"))
+					v.look = CharacterLook.random_look(rng, str(victim.get("style", "civilian")))
+					v.sprite.set_look(v.look)
+					v.name_label.text = v.npc_name
+					v.set_meta("street_victim", spec.story_id)
 			"guards":
 				_spawn_guards(random_floor_position(12.0), int(spec.get("count", 2)), str(spec.get("faction", "")))
+
+
+## Street events that turn violent.
+func spawn_story_hostiles(type_id: String, count: int, display: String, near: Vector3) -> void:
+	for i in count:
+		var p := near + Vector3(rng.randf_range(-3, 3), 0, rng.randf_range(-3, 3))
+		var e := spawn_enemy(type_id, p, {"hostile": true, "name": display})
+		e.call_deferred("provoke")
 
 
 func _spawn_guards(center: Vector3, count: int, faction: String) -> void:

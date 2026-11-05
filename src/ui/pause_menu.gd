@@ -110,6 +110,13 @@ func _tab_journal() -> void:
 	var obj := Saga.objective_text()
 	if obj != "":
 		v.add_child(_rich("[color=#ffd23e][b]CURRENT:[/b][/color] " + obj))
+	var ax := Saga.axes
+	v.add_child(_rich("[color=#3ee6ff]YOU:[/color] %s\n[color=#3ee6ff]LEGEND:[/color] mercy %+.1f  order %+.1f  greed %+.1f  truth %+.1f   [color=#ff3ec8]fame %d[/color]   [color=#7dff4a]followers %d[/color]   intel %d   ally trust %d" % [
+		Origin.persona_line(), float(ax.get("mercy", 0)), float(ax.get("order", 0)), float(ax.get("greed", 0)), float(ax.get("truth", 0)),
+		Saga.fame(), Saga.followers(), int(Saga.state.get("intel", 0)), int(Saga.state.get("ally_trust", 0))]))
+	var early := Saga.early_ending_available()
+	if not early.is_empty():
+		v.add_child(_rich("[color=#ffd23e]An early ending is open: %s (from the star map)[/color]" % Saga.fill(str(early.get("text", "")))))
 	v.add_child(_rich("[color=#3ee6ff]CAST[/color]"))
 	var cast_row := HBoxContainer.new()
 	cast_row.add_theme_constant_override("separation", 10)
@@ -120,6 +127,12 @@ func _tab_journal() -> void:
 		if p.is_empty():
 			continue
 		cast_row.add_child(_cast_card(p, role, known.get(role, false)))
+	var ps := Stories.summary_lines()
+	if not ps.is_empty():
+		v.add_child(_rich("[color=#c07dff]PLANET STORIES[/color]\n- " + "\n- ".join(PackedStringArray(ps))))
+	var seen: Array = Game.flags.get("endings_seen", [])
+	if not seen.is_empty():
+		v.add_child(_rich("[color=#ffd23e]ENDINGS REACHED: %d[/color]  (last: %s)" % [seen.size(), Saga.ending_title]))
 	var sq := "[color=#3ee6ff]SIDE JOBS[/color]\n"
 	var any := false
 	for pid in Saga.side:
@@ -174,7 +187,7 @@ func _tab_status() -> void:
 	for cat in Origin.CATEGORIES:
 		var t := Origin.get_tag(cat, Game.tags.get(cat, ""))
 		tag_lines += "[color=#ff3ec8]%s:[/color] [b]%s[/b] - %s\n" % [cat.to_upper(), t.get("name", "?"), t.get("desc", "")]
-	v.add_child(_rich("[b]%s[/b]   Play time %d min\n\n%s\n[i]%s[/i]" % [Game.player_name.to_upper(), int(Game.play_time / 60.0), tag_lines, Origin.origin_story()]))
+	v.add_child(_rich("[b]%s[/b], %d years old   Play time %d min\n\n%s\n[i]%s[/i]" % [Game.player_name.to_upper(), Game.age, int(Game.play_time / 60.0), tag_lines, Origin.origin_story()]))
 	var stats := ["max_hp", "move_speed", "damage", "fire_rate", "accuracy", "parry_window", "roll_cooldown", "air_cost_mult", "price_mult", "bribe_mult", "witness_time_mult", "loot_mult"]
 	var s := "[color=#3ee6ff]STATS[/color]\n"
 	for st in stats:
