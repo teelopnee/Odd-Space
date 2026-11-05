@@ -53,7 +53,9 @@ void fragment() {
 	// Vignette.
 	float v = smoothstep(0.25, 0.95, length(dir * vec2(1.15, 1.0)));
 	c *= 1.0 - v * vignette;
-	// Grain.
-	c += (hash(uv * 900.0 + fract(TIME) * 37.0) - 0.5) * grain;
+	// Grain: like film, strongest in the mid-tones and nearly absent in deep shadow
+	// (uniform grain turns dark night scenes into speckle).
+	float g_amt = grain * smoothstep(0.04, 0.45, lum) * (1.0 - 0.5 * smoothstep(0.7, 1.0, lum));
+	c += (hash(uv * 900.0 + fract(TIME) * 37.0) - 0.5) * g_amt;
 	COLOR = vec4(c, 1.0);
 }

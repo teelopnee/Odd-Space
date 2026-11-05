@@ -1657,8 +1657,8 @@ func _landing_markings(p: Vector3) -> void:
 		"STAND HERE TO BE SCANNED", "SMILE: CONSORTIUM CAMERAS ACTIVE"]
 	var lbl := Label3D.new()
 	lbl.text = msgs[rng.randi() % msgs.size()]
-	lbl.font_size = 72
-	lbl.pixel_size = 0.012
+	lbl.font_size = 64
+	lbl.pixel_size = 0.0065
 	lbl.modulate = Color(1.0, 0.82, 0.25, 0.8)
 	lbl.outline_size = 0
 	lbl.shaded = true
