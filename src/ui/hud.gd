@@ -499,9 +499,13 @@ func _build_modal() -> void:
 	_death_panel.add_child(dv)
 	var title := make_label("SUBSCRIPTION TO LIFE: EXPIRED", 30, Color(1.0, 0.3, 0.45))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.name = "DeathTitle"
 	dv.add_child(title)
 	var sub := make_label("Halcyon has repossessed your remaining organs.\nThe Causality Log keeps everything you did up to your last save.", 16)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.name = "DeathLine"
 	dv.add_child(sub)
 	var reload := Button.new()
 	reload.text = "RELOAD LAST SAVE"
@@ -954,7 +958,10 @@ func show_death_screen() -> void:
 	_menu.visible = false
 	_open_modal()
 	_death_panel.visible = true
-	for c in _death_panel.get_child(0).get_children():
+	var box := _death_panel.get_child(0)
+	(box.get_node("DeathTitle") as Label).text = Copy.make("death_title")
+	(box.get_node("DeathLine") as Label).text = Copy.make("death_line") + "\nThe Causality Log keeps everything you did up to your last save."
+	for c in box.get_children():
 		if c is Button:
 			_safe_focus.call_deferred(c)
 			break

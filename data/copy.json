@@ -1334,6 +1334,25 @@
 			"A message from #faction#: '#slogan#'",
 			"#product#. #disclaimer#",
 			"Now on Lumen: #media_product#. #show_opinion#"
+		],
+		"death_title": [
+			"SUBSCRIPTION TO LIFE: EXPIRED",
+			"ACCOUNT CLOSED",
+			"YOUR LUNGS HAVE BEEN RECALLED",
+			"LIFE: PAYMENT DECLINED",
+			"THANK YOU FOR LIVING WITH #faction.upper#",
+			"BREATHING LIMIT REACHED",
+			"GAME OVER (FEES APPLY)"
+		],
+		"death_line": [
+			"Halcyon has repossessed your remaining organs.",
+			"Your body is now listed on the #faction# marketplace. Bidding starts at #small_num# CR.",
+			"Lumen will air your final moments on #media_product#. Ratings look good.",
+			"Your next of kin has been invoiced.",
+			"Gristle thanks you for your generous donation to Paste Classic.",
+			"Paragon has filed your death as 'unlicensed'.",
+			"Oxygenix notes you stopped breathing without notice. A cancellation fee applies.",
+			"Your funeral is sponsored by #brand#. #cta#"
 		]
 	}
 }
