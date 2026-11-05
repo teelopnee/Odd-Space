@@ -1,0 +1,539 @@
+{
+	"_doc": "Bystander reactions + memory lines (NPCVoice). Kinds/stances: data/reactions.json. {target} = who/what it was done to.",
+	"rules": {
+		"now_charity": [
+			"Did you just... give {target} money?",
+			"Whoa. Free credits. On {planet}.",
+			"Somebody just helped somebody. Call Lumen.",
+			"Was that charity? Is that still legal?",
+			"{target} just got lucky.",
+			"Credits for nothing? Who ARE you?",
+			"Look at that. Kindness. In public."
+		],
+		"now_threat": [
+			"Easy! Easy!",
+			"Leave {target} alone!",
+			"Oh, here we go.",
+			"Don't look. Don't look.",
+			"Somebody's getting leaned on.",
+			"That's no way to talk to {target}.",
+			"Whoa, whoa - personal space!"
+		],
+		"now_theft": [
+			"Hey! I saw that!",
+			"Did you just rob {target}?!",
+			"Thief! ...Quietly. Thief.",
+			"Hands! I saw your hands!",
+			"That wasn't yours!",
+			"Pockets! Watch your pockets!",
+			"Somebody check on {target}!"
+		],
+		"now_fight": [
+			"FIGHT! Fight fight fight!",
+			"Not on my street!",
+			"Somebody stop them!",
+			"Oh, they're really going at it.",
+			"Get back, get back!",
+			"Ow. That looked expensive.",
+			"And there goes the insurance premium."
+		],
+		"now_murder": [
+			"NO! No no no!",
+			"You KILLED {target}!",
+			"Oh god. Oh god.",
+			"Somebody call - no. Nobody call. Run.",
+			"{target}! Get up! ...Get up.",
+			"Murderer!",
+			"I didn't see anything! I didn't see anything!"
+		],
+		"now_mercy": [
+			"You let {target} go?",
+			"Huh. Mercy.",
+			"You could have finished it. You didn't.",
+			"Well. That's new."
+		],
+		"now_kill_cop": [
+			"You dropped a cop!",
+			"Paragon's going to burn the block for this.",
+			"An officer! Down!",
+			"That's a whole pension gone.",
+			"Did you just... in front of everyone?",
+			"Ohhh, the paperwork."
+		],
+		"now_kill_repo": [
+			"Scrap! Pure scrap!",
+			"One less repo drone!",
+			"Halcyon's gonna bill somebody for that.",
+			"That collector won't collect again.",
+			"Somebody grab the parts!",
+			"Ha! Repossess THAT!"
+		],
+		"now_kill_other": [
+			"Got it!",
+			"Nice. Clean.",
+			"That's one less problem.",
+			"Whoa. Sorted.",
+			"Somebody's handy in a fight."
+		],
+		"now_skill": [
+			"Did you SEE that?!",
+			"How did you dodge that?!",
+			"That's not human.",
+			"Whoa! Do it again!",
+			"That move should be illegal.",
+			"I blinked and missed it!",
+			"Slow-motion! I swear it went slow-motion!"
+		],
+		"now_show": [
+			"Oh, there's a show.",
+			"Everyone's looking.",
+			"Is this a street performance?",
+			"Somebody's making a scene.",
+			"Ha! Look at them go.",
+			"Is that legal? It looks fun."
+		],
+		"now_beg": [
+			"Begging? Here?",
+			"Times are hard, huh.",
+			"Spare change for the drifter, anyone?",
+			"Oof. That's a rough ask."
+		],
+		"now_deal": [
+			"Money's changing hands.",
+			"Ooh, a deal.",
+			"I didn't see that. Unless I get a cut.",
+			"Business, huh?",
+			"Credits! I smell credits."
+		],
+		"now_weird": [
+			"What was THAT?",
+			"Huh?",
+			"Okay, that was strange.",
+			"I'm going to pretend that was normal.",
+			"Is that... allowed?"
+		],
+		"now_vice": [
+			"Going in, huh?",
+			"Fun's in there, apparently.",
+			"There they go.",
+			"Leave some for the rest of us!"
+		],
+		"now_shady": [
+			"In THERE? Brave.",
+			"Careful in there.",
+			"Nobody comes out of there richer.",
+			"Ooh. Shady."
+		],
+		"now_shopping": [
+			"Spending, huh?",
+			"The economy thanks you.",
+			"Credits go in, happiness... nope."
+		],
+		"now_dance": [
+			"Look at those moves!",
+			"Dance! DANCE!",
+			"Somebody's having a good day.",
+			"Free show!",
+			"Ha! Go on!",
+			"Is that the jingle? Are you dancing to the JINGLE?"
+		],
+		"now_hurt": [
+			"You're bleeding!",
+			"Whoa, you okay?",
+			"That's a lot of red.",
+			"Somebody get them a medkit!",
+			"Ouch. Ouch ouch ouch."
+		],
+		"judge_approve": [
+			"Respect.",
+			"Good on you.",
+			"About time somebody did.",
+			"That's the spirit.",
+			"I like you.",
+			"Ha! Yes!",
+			"Somebody finally did it.",
+			"The Sprawl needs more of that.",
+			"Now THAT's a story.",
+			"Hope looks like that, apparently.",
+			"My nan would've liked you.",
+			"I'm buying you a noodle."
+		],
+		"judge_disapprove": [
+			"Not cool.",
+			"Shameful.",
+			"I'm telling my nan.",
+			"That's not how we do things here.",
+			"Unbelievable.",
+			"You should be embarrassed.",
+			"And people wonder why the air's so bad.",
+			"Real classy.",
+			"I'll remember that.",
+			"#faction# would be proud. That's not a compliment.",
+			"Do better."
+		],
+		"judge_fear": [
+			"Please don't look at me.",
+			"I'm leaving. I'm leaving.",
+			"I didn't see anything.",
+			"Stay away from me.",
+			"Oh no. Oh no.",
+			"I've got kids. Probably.",
+			"Not me. Please, not me.",
+			"I'm just going to... back away.",
+			"My heart can't afford this."
+		],
+		"judge_amused": [
+			"Ha! Classic.",
+			"Best thing I've seen all week.",
+			"I'd pay to see that again.",
+			"{planet} never gets boring.",
+			"Heh.",
+			"I'm telling everyone.",
+			"Somebody record that!",
+			"Ten out of ten.",
+			"Better than #media_product#.",
+			"I laughed. Is that bad?"
+		],
+		"judge_hurt_approve": [
+			"Sit down before you fall down.",
+			"Want me to call someone? Anyone?",
+			"Hang in there.",
+			"Here - lean on the wall."
+		],
+		"judge_hurt_amused": [
+			"Shouldn't have picked that fight.",
+			"Walk it off, champ.",
+			"That's going to bruise in interesting colours."
+		],
+		"judge_hurt_disapprove": [
+			"That's what you get.",
+			"Bleed somewhere else, please.",
+			"Don't drip on the merchandise."
+		],
+		"judge_hurt_fear": [
+			"Is it contagious?",
+			"Keep that away from me.",
+			"I don't do blood."
+		],
+		"judge_charity_disapprove": [
+			"Sets a bad precedent.",
+			"Now they'll ALL want some.",
+			"Charity is market interference.",
+			"That's not how the economy works."
+		],
+		"judge_threat_approve": [
+			"Efficient.",
+			"Somebody's got leadership potential.",
+			"That's how you close a negotiation."
+		],
+		"judge_deal_approve": [
+			"Good business.",
+			"Love a closer.",
+			"That's the market working."
+		],
+		"judge_dance_disapprove": [
+			"Dancing is billed by the minute, you know.",
+			"Some of us are working.",
+			"Unlicensed joy. Disgusting."
+		],
+		"act_charity": [
+			"gave {target} credits for nothing",
+			"helped {target} out when nobody else would",
+			"spent real money on {target}",
+			"looked after {target}",
+			"did something kind for {target}",
+			"fed {target} with your own credits"
+		],
+		"act_threat": [
+			"leaned on {target}",
+			"scared {target} half to death",
+			"threw your weight around with {target}",
+			"made {target} an offer with teeth in it",
+			"got in the face of {target}",
+			"squeezed {target} till they squeaked"
+		],
+		"act_theft": [
+			"lifted a wallet off {target}",
+			"robbed {target} in broad daylight",
+			"helped yourself to the stuff of {target}",
+			"went through the pockets of {target}",
+			"took something from {target}",
+			"pulled a five-finger discount on {target}"
+		],
+		"act_fight": [
+			"started swinging at {target}",
+			"picked a fight with {target}",
+			"put {target} on the pavement",
+			"turned the street into a boxing ring",
+			"got into it with {target}"
+		],
+		"act_murder": [
+			"killed {target}",
+			"put {target} in the ground",
+			"ended {target}. Just like that",
+			"left {target} on the pavement for good"
+		],
+		"act_mercy": [
+			"let {target} walk away",
+			"spared {target}",
+			"showed {target} mercy",
+			"gave {target} a second chance"
+		],
+		"act_kill_cop": [
+			"dropped a Paragon officer",
+			"took down a cop in the street",
+			"left a Paragon pension unclaimed",
+			"put {target} down. A cop. In the street"
+		],
+		"act_kill_repo": [
+			"scrapped a Halcyon repo unit",
+			"turned a repo drone into spare parts",
+			"took apart {target}",
+			"put a debt collector out of business"
+		],
+		"act_kill_other": [
+			"dealt with {target}",
+			"cleared out some trouble",
+			"took care of {target}",
+			"handled {target} like a pro"
+		],
+		"act_skill": [
+			"dodged {target} like it owed you money",
+			"moved like a hologram on fast-forward",
+			"made {target} look slow",
+			"pulled a move I've only seen on #media_product#",
+			"danced around {target} like it was nothing"
+		],
+		"act_show": [
+			"made a whole scene with {target}",
+			"put on a show for {target}",
+			"worked the crowd",
+			"got everyone looking",
+			"gave {target} a speech and a half"
+		],
+		"act_beg": [
+			"begged {target} for credits",
+			"asked {target} for a handout",
+			"worked {target} for spare change",
+			"pleaded with {target}"
+		],
+		"act_deal": [
+			"cut a deal with {target}",
+			"threw money around with {target}",
+			"did business with {target}",
+			"haggled {target} into the ground"
+		],
+		"act_weird": [
+			"did something very strange with {target}",
+			"had the oddest conversation with {target}",
+			"freaked out {target}",
+			"said things to {target} that nobody understood"
+		],
+		"act_vice": [
+			"went into {target}",
+			"spent a while in {target}",
+			"had a night at {target}",
+			"blew some credits at {target}"
+		],
+		"act_shady": [
+			"walked into {target}",
+			"had business at {target}",
+			"went to {target}. Voluntarily",
+			"came out of {target}"
+		],
+		"act_shopping": [
+			"went shopping at {target}",
+			"spent good credits at {target}",
+			"fed the economy at {target}"
+		],
+		"act_dance": [
+			"danced in the street",
+			"danced like nobody was billing you",
+			"busted moves by the hologram",
+			"danced to the jingle"
+		],
+		"act_hurt": [
+			"got knocked around",
+			"took a beating",
+			"came out of a fight bleeding",
+			"staggered past like a wreck"
+		],
+		"recall_open": [
+			"So you",
+			"Wait - you're the one who",
+			"Hey. Earlier, you",
+			"Don't think I didn't see. You",
+			"I was right there when you",
+			"I saw it. You",
+			"Everybody saw it: you",
+			"Remember me? I watched you",
+			"Huh. You're the one who",
+			"Hold on. You",
+			"Oh, it's you. You",
+			"Funny seeing you again. You"
+		],
+		"gossip_open": [
+			"Word is you",
+			"People say you",
+			"Heard you",
+			"My cousin says you",
+			"{planet}'s talking - apparently you",
+			"Lumen didn't air it, but everyone knows you",
+			"The noodle stall says you",
+			"Rumour on the street: you",
+			"Somebody told me you",
+			"They're saying in the queue that you",
+			"A drone told me you"
+		],
+		"aside_open": [
+			"Psst - you're the one who",
+			"Hey. You",
+			"Oi! I saw you. You",
+			"I know you. You",
+			"Don't think I forgot. You",
+			"Still thinking about how you",
+			"Hey, celebrity. You",
+			"You there - you"
+		],
+		"rep_open": [
+			"Mostly? That you",
+			"Honestly, people mostly say you",
+			"The street's favourite story is how you",
+			"If you ask the queue at the noodle stall: you",
+			"Lumen hasn't caught on, but the street knows you"
+		],
+		"rep_count": [
+			"That's #small_num# stories and counting.",
+			"There are {stories} versions going round. They get bigger every time.",
+			"I've heard it {stories} times today.",
+			"Everyone tells it differently."
+		],
+		"rep_nothing": [
+			"People? About you? Nothing. You're nobody yet. Enjoy it.",
+			"Never heard of you. That's a compliment on {planet}.",
+			"Nobody's said a word. Either you're careful or you're boring.",
+			"Clean slate. Don't waste it."
+		],
+		"after_charity_ok": [
+			"I won't forget this.",
+			"I'm going to tell everyone about you.",
+			"Nobody's done that for me in years.",
+			"I'll pay it forward. Probably. Eventually.",
+			"You're not like the others on {planet}.",
+			"Thank you. Really."
+		],
+		"after_charity_fail": [
+			"Keep it. I don't take charity.",
+			"What's the catch?",
+			"Don't pity me.",
+			"I'm fine. FINE."
+		],
+		"after_threat_ok": [
+			"Okay. Okay. I hear you.",
+			"Whatever you say.",
+			"I don't want trouble.",
+			"You've made your point.",
+			"I'm going to remember your face. From very far away."
+		],
+		"after_threat_fail": [
+			"You don't scare me. Much.",
+			"I've been threatened by #faction#. You're nothing.",
+			"Nice try.",
+			"Is that supposed to be scary?",
+			"My landlord's scarier."
+		],
+		"after_theft_ok": [
+			"Hey... where's my...?",
+			"Did I just get lighter?",
+			"Something feels missing."
+		],
+		"after_theft_fail": [
+			"Hands OFF.",
+			"I felt that!",
+			"Thief! THIEF!",
+			"Try that again and lose the hand."
+		],
+		"after_fight_ok": [
+			"Ow. Okay. You win.",
+			"I yield! I yield!",
+			"That's going on your record. Somewhere."
+		],
+		"after_fight_fail": [
+			"Ha! That all you got?",
+			"Come on then!",
+			"My nan hits harder."
+		],
+		"after_show_ok": [
+			"Okay, that was something.",
+			"Do it again! Do it again!",
+			"I'm telling my friends.",
+			"You should have a show on Lumen.",
+			"Best thing I've seen on {planet} all week."
+		],
+		"after_show_fail": [
+			"...Are you done?",
+			"Tough crowd. I'm the crowd.",
+			"Don't quit your day job.",
+			"Lumen wouldn't air that."
+		],
+		"after_beg_ok": [
+			"Here. Don't tell anyone I'm soft.",
+			"Times are hard. I get it.",
+			"Don't spend it on paste."
+		],
+		"after_beg_fail": [
+			"Get a job. Oh, wait.",
+			"I'm two payments from begging myself.",
+			"Not today."
+		],
+		"after_deal_ok": [
+			"Pleasure doing business.",
+			"You drive a hard bargain.",
+			"Don't tell #faction# about this.",
+			"We should do this again."
+		],
+		"after_deal_fail": [
+			"No deal.",
+			"You can't afford me.",
+			"Come back with better numbers."
+		],
+		"after_weird_ok": [
+			"...Okay. I think I get it.",
+			"That was the strangest thing that's happened to me today. And I live here.",
+			"I'm going to need a minute."
+		],
+		"after_weird_fail": [
+			"I'm going to walk away now.",
+			"Nope.",
+			"Was that a cult thing?"
+		],
+		"after_talk_ok": [
+			"Nice talking to you. Really.",
+			"Come by again.",
+			"You're alright.",
+			"Stay safe on {planet}."
+		],
+		"wave_hi": [
+			"Hey! It's you!",
+			"Looking good, friend.",
+			"Stay safe out there!",
+			"Thanks for before!",
+			"{name}! Over here!",
+			"Hey hey! My favourite drifter!",
+			"Good to see you breathing!",
+			"Back on {planet}, huh?",
+			"You again! Good!",
+			"Oi! {name}!"
+		],
+		"merchant_ask": [
+			"Buying, selling, or wasting my billable time?",
+			"Everything's for sale. Including advice.",
+			"Cash, credit or collateral?",
+			"Take a look. Touching is extra.",
+			"Prices are fair. Fair-ish.",
+			"Today only: prices. Tomorrow: higher prices.",
+			"Got something to sell? I've got something to sell you back.",
+			"What'll it be, {name}?"
+		]
+	}
+}

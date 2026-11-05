@@ -14,13 +14,25 @@ static var _tidy_re: RegEx
 static var _rng := RandomNumberGenerator.new()
 
 
+## Grammar files, merged in order (later files may extend a symbol: alternatives are appended).
+const FILES := ["res://data/copy.json", "res://data/copy_people.json", "res://data/copy_reactions.json"]
+
+
 static func rules() -> Dictionary:
 	if _rules.is_empty():
-		var path := "res://data/copy.json"
-		if FileAccess.file_exists(path):
+		for path in FILES:
+			if not FileAccess.file_exists(path):
+				continue
 			var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-			if parsed is Dictionary:
-				_rules = parsed.get("rules", {})
+			if not parsed is Dictionary:
+				push_error("Copy: bad JSON in %s" % path)
+				continue
+			var more: Dictionary = parsed.get("rules", {})
+			for k in more:
+				if _rules.has(k):
+					(_rules[k] as Array).append_array(more[k])
+				else:
+					_rules[k] = (more[k] as Array).duplicate()
 		_rng.randomize()
 	return _rules
 
@@ -99,6 +111,8 @@ static func _fill(text: String, vars: Dictionary) -> String:
 	if not v.has("player"):
 		var pn := str(game.player_name) if game else ""
 		v["player"] = pn if pn != "" else "you"
+	if not v.has("name"):
+		v["name"] = v["player"]
 	for k in v:
 		text = text.replace("{%s}" % k, str(v[k])).replace("{%s}" % str(k).to_upper(), str(v[k]).to_upper())
 	return text

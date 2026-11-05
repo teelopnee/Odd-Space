@@ -1811,6 +1811,414 @@
 					"npc": "angry"
 				}
 			}
+		},
+		"explain_yourself": {
+			"text": "Explain what they saw",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"npc_saw": [
+					"threat",
+					"theft",
+					"fight",
+					"kill_cop",
+					"murder"
+				]
+			},
+			"once": true,
+			"chance": 0.45,
+			"chance_mods": {
+				"flag:honest": 0.25,
+				"flag:charming": 0.2,
+				"flag:ruthless": -0.15,
+				"attitude": 0.004
+			},
+			"success": {
+				"lines": [
+					"\"...Fine. Maybe it wasn't what it looked like. #after_talk_ok#\"",
+					"They listen. Really listen. \"Okay. I'll let it go. This once.\"",
+					"\"Self-defence, huh? On {planet} everything's self-defence. Alright.\""
+				],
+				"effects": {
+					"attitude": 15,
+					"forget": [
+						"threat",
+						"theft",
+						"fight",
+						"kill_cop",
+						"murder"
+					]
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I know what I saw.\"",
+					"\"Save it for Paragon.\" #judge_disapprove#",
+					"\"Explanations are cheap. #faction# taught me that.\""
+				],
+				"effects": {
+					"attitude": -10
+				}
+			}
+		},
+		"hush_money": {
+			"text": "Slip them {cost} credits to forget it",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"cost": 20,
+			"verb": "bribe",
+			"record_on": "never",
+			"requires": {
+				"npc_saw": [
+					"threat",
+					"theft",
+					"fight",
+					"kill_cop",
+					"murder",
+					"deal"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"The credits vanish. So does the memory. \"Saw what? I've been staring at a billboard all day.\"",
+					"\"Forget what? I've got a terrible memory. It's a medical condition. Thanks for the treatment.\"",
+					"\"#small_num# seconds ago? I was asleep. Standing up. It's a talent.\""
+				],
+				"effects": {
+					"npc": "silenced",
+					"forget": "all"
+				}
+			}
+		},
+		"spread_the_word": {
+			"text": "Ask them to tell people what they saw",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"npc_saw": [
+					"charity",
+					"mercy",
+					"kill_repo",
+					"kill_cop",
+					"skill",
+					"show"
+				],
+				"npc_mood": [
+					"warm",
+					"neutral"
+				]
+			},
+			"once": true,
+			"chance": 0.7,
+			"chance_mods": {
+				"attitude": 0.005,
+				"flag:famous": 0.1
+			},
+			"success": {
+				"lines": [
+					"\"Oh, I'm telling EVERYONE. My cousin has #small_num# followers.\"",
+					"\"By tonight the whole queue at the noodle stall will know.\"",
+					"\"Leave it with me. Gossip is the one thing #faction# can't tax.\""
+				],
+				"effects": {
+					"fame": 2,
+					"followers": 1
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"And get on Paragon's list? No thanks.\"",
+					"\"I'll keep that one to myself, if it's all the same.\""
+				],
+				"effects": {}
+			}
+		},
+		"teach_moves": {
+			"text": "Teach them that move",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"npc_saw": [
+					"skill",
+					"dance"
+				]
+			},
+			"once": true,
+			"chance": 0.6,
+			"chance_mods": {
+				"age:teen": 0.1,
+				"age:elder": -0.2,
+				"attitude": 0.004
+			},
+			"success": {
+				"lines": [
+					"They try it. They nail it. \"I'm going to dodge my landlord so hard.\"",
+					"\"Like this? LIKE THIS?\" Close enough. They're delighted.",
+					"Two tries, one bruise, one triumph. \"Teach me more next time!\""
+				],
+				"effects": {
+					"attitude": 12,
+					"fame": 1
+				}
+			},
+			"fail": {
+				"lines": [
+					"They try it. They fall over. \"...I'll stick to standing still.\"",
+					"\"My knees are on a payment plan. Maybe later.\""
+				],
+				"effects": {
+					"attitude": 3
+				}
+			}
+		},
+		"ask_reputation": {
+			"text": "Ask what people say about you",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"once": true,
+			"requires": {
+				"npc_heard": [
+					"charity",
+					"threat",
+					"theft",
+					"fight",
+					"murder",
+					"mercy",
+					"kill_cop",
+					"kill_repo",
+					"kill_other",
+					"skill",
+					"show",
+					"beg",
+					"deal",
+					"weird",
+					"vice",
+					"shady",
+					"shopping",
+					"dance",
+					"hurt"
+				]
+			},
+			"success": {
+				"lines": [
+					"They lean in.",
+					"\"You want the truth? Okay.\"",
+					"They glance at the nearest drone, then whisper."
+				],
+				"effects": {
+					"street_rep": true
+				}
+			}
+		},
+		"apologise": {
+			"text": "Apologise for the scene earlier",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"npc_saw": [
+					"threat",
+					"fight",
+					"theft",
+					"show",
+					"weird"
+				]
+			},
+			"once": true,
+			"chance": 0.6,
+			"chance_mods": {
+				"flag:honest": 0.2,
+				"flag:ruthless": -0.3,
+				"flag:hothead": -0.1,
+				"attitude": 0.003
+			},
+			"success": {
+				"lines": [
+					"\"An apology? On {planet}? I need to sit down.\"",
+					"\"...Okay. Thanks. Nobody says sorry here. It's not in the contract.\"",
+					"They soften. \"We all have bad days. Yours are just louder.\""
+				],
+				"effects": {
+					"attitude": 12,
+					"forget": [
+						"threat",
+						"fight",
+						"theft",
+						"show",
+						"weird"
+					]
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Sorry doesn't pay for the damage.\"",
+					"\"Tell it to #faction#.\""
+				],
+				"effects": {
+					"attitude": -3
+				}
+			}
+		},
+		"dance_with_them": {
+			"text": "Pull them into the dance",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"npc_saw": [
+					"dance"
+				]
+			},
+			"once": true,
+			"chance": 0.65,
+			"chance_mods": {
+				"npc:artsy": 0.2,
+				"npc:corporate": -0.4,
+				"npc:weird": 0.15
+			},
+			"success": {
+				"lines": [
+					"For one song, nobody's billing anybody. \"#judge_amused#\"",
+					"They spin, you spin, a drone films it. \"Worth it.\"",
+					"\"I haven't danced since #time#... last year.\" They're laughing."
+				],
+				"effects": {
+					"attitude": 15,
+					"hp": 5
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"Dancing is billed by the minute here.\"",
+					"They step back. \"I'll watch. Watching is free.\""
+				],
+				"effects": {}
+			}
+		},
+		"ask_patch_up": {
+			"text": "Ask them to help patch you up",
+			"roles": [
+				"civilian",
+				"merchant"
+			],
+			"requires": {
+				"npc_saw": [
+					"hurt"
+				],
+				"npc_mood": [
+					"warm",
+					"neutral"
+				]
+			},
+			"once": true,
+			"chance": 0.6,
+			"chance_mods": {
+				"npc:poor": 0.15,
+				"npc:corporate": -0.4,
+				"attitude": 0.005
+			},
+			"success": {
+				"lines": [
+					"They tear a strip off a promo banner. \"Hold still. #brand# makes great bandages.\"",
+					"\"My mum was a medic. Sort of. She watched a lot of #media_product#.\" It helps anyway.",
+					"A spray of something minty, a bandage, a pat. \"Don't bleed on my street again.\""
+				],
+				"effects": {
+					"hp": 15,
+					"attitude": 5
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I faint at blood. And at medical bills.\"",
+					"\"Clinic's that way. I'm not liable.\""
+				],
+				"effects": {}
+			}
+		},
+		"swap_war_stories": {
+			"text": "Swap war stories",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"npc_saw": [
+					"kill_cop",
+					"kill_repo",
+					"kill_other",
+					"fight"
+				],
+				"npc_trait": [
+					"rebel",
+					"worker",
+					"weird"
+				]
+			},
+			"once": true,
+			"success": {
+				"lines": [
+					"\"You think THAT was something? Let me tell you about the paste riot of '#small_num#.\"",
+					"They roll up a sleeve: a scar shaped like a #brand# logo. \"Repo drone. Long story.\"",
+					"\"Respect. My grandad took down a #faction# convoy with a shopping trolley.\""
+				],
+				"effects": {
+					"attitude": 10,
+					"rumor": true
+				}
+			}
+		},
+		"ask_cover": {
+			"text": "Ask them to cover for you",
+			"roles": [
+				"civilian"
+			],
+			"requires": {
+				"npc_saw": [
+					"theft",
+					"murder",
+					"kill_cop",
+					"fight"
+				],
+				"npc_mood": [
+					"warm"
+				]
+			},
+			"once": true,
+			"chance": 0.7,
+			"chance_mods": {
+				"npc:rebel": 0.2,
+				"npc:corporate": -0.5
+			},
+			"success": {
+				"lines": [
+					"\"Paragon asks, you were at the noodle stall with me. All night.\"",
+					"\"Cover for you? I'll lie to their faces. It's my hobby.\"",
+					"\"We look after our own here. You're our own now.\""
+				],
+				"effects": {
+					"npc": "informant",
+					"witness_slow": 0.3
+				}
+			},
+			"fail": {
+				"lines": [
+					"\"I like you. I don't like you THAT much.\"",
+					"\"I've got a family. Sort of. No.\""
+				],
+				"effects": {
+					"attitude": -2
+				}
+			}
 		}
 	},
 	"npc": {

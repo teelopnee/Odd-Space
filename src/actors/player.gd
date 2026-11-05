@@ -488,7 +488,10 @@ func _update_animation() -> void:
 				# Stand around long enough and you check your wristpad (or dance near a hologram).
 				_idle_time += get_physics_process_delta_time()
 				if _idle_time > 9.0 and state == State.NORMAL and target == null:
-					sprite.play("dance" if _near_dance_floor() else "phone")
+					var dancing := _near_dance_floor()
+					if dancing and sprite.current != "dance":
+						EventBus.player_act.emit("dance", "")
+					sprite.play("dance" if dancing else "phone")
 				else:
 					sprite.play("idle")
 			if hspeed > 0.35 or _shoot_pose > 0.0 or _charge > 0.0:
@@ -674,7 +677,10 @@ func _on_parry_success(attacker, kind: String) -> void:
 
 
 func _apply_damage(dmg: float, push_dir: Vector3) -> void:
+	var was_ok := Game.hp >= Game.max_hp() * 0.35
 	Game.hp = maxf(0.0, Game.hp - dmg)
+	if was_ok and Game.hp > 0.0 and Game.hp < Game.max_hp() * 0.35:
+		EventBus.player_act.emit("hurt", "")  # bystanders notice you bleeding
 	EventBus.player_hp_changed.emit(Game.hp, Game.max_hp())
 	FX.damage_number(get_parent(), global_position + Vector3(0, 1.9, 0), str(roundi(dmg)), Color(1.0, 0.3, 0.4))
 	sprite.flash(Color(3.0, 0.6, 0.6), 0.12)

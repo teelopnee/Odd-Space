@@ -44,6 +44,15 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   Modifiers: `.cap` `.upper` `.lower` `.a`; vars `{planet}`/`{PLANET}`, `{player}`, barks also `{name}`.
 - Barks: `pair` lines `"A -- B -- C"` alternate between two NPCs (`NPC._converse`); enemies talk via
   `Enemy.bark()` from `<taunt|hurt|yield|standdown>:<enemy_type>` keys (throttled across the fight).
+- NPC eyes & memory + voices: `src/core/npc_voice.gd` (`NPCVoice`). Acts in an NPC's line of sight (`NPC.witness_act`,
+  fed by `interaction_done`, `action_recorded`, `enemy_killed`, `perfect_dodge`, `player_parried`, `EventBus.player_act`
+  for dance/hurt) map to an act KIND and a STANCE per NPC voice (`data/reactions.json`), shift attitude, are remembered
+  (`NPC.memories`) and gossiped planet-wide (`Game.flags["street_<planet>"]`, saved). Talking opens with a memory, gossip
+  or a remark about who you are (`pc_class_/pc_age_/pc_bg_/pc_pers_/pc_goal_/pc_secret_<tag>`, wounds, money, bounty,
+  fame, crew, saga, planet) voiced by mood (`open_<mood>`) + voice (`close_<voice>`) + the NPC's own `tic`. Grammar:
+  `data/copy_people.json`, `data/copy_reactions.json` (merged into Copy). Memory-driven verbs use the requirement keys
+  `npc_saw` / `npc_heard` / `npc_mood` and effects `forget`, `street_rep`. Test: `tools/voice_test.gd -- <class> <age> <bg>`;
+  size of the line space: `python3 tools/count_copy.py`.
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

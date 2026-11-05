@@ -75,7 +75,7 @@ func fill(text: String, npc: Node = null) -> String:
 		"faction": DataDB.faction_name(npc.faction) if npc else "",
 	}
 	var out := text.format(vars)
-	return Copy.expand(out, _rng) if out.contains("#") else out
+	return Copy.expand(out, _rng) if out.contains("#") or out.contains("{") else out
 
 
 # --- Availability -------------------------------------------------------------------------
@@ -155,6 +155,24 @@ func requirements_met(d: Dictionary, npc: Node) -> bool:
 				ok3 = true
 		if not ok3:
 			return false
+	# Memory: what this NPC saw you do / what the planet says / how they feel (NPCVoice).
+	if req.has("npc_saw") and npc != null:
+		var ok5 := false
+		for m in npc.memories:
+			if (req["npc_saw"] as Array).has(str(m.get("kind", ""))):
+				ok5 = true
+		if not ok5:
+			return false
+	if req.has("npc_heard"):
+		var street := NPCVoice.street_memory()
+		var ok6 := false
+		for k in req["npc_heard"]:
+			if int(street.get(k, 0)) > 0:
+				ok6 = true
+		if not ok6:
+			return false
+	if req.has("npc_mood") and npc != null and not (req["npc_mood"] as Array).has(NPCVoice.mood(npc)):
+		return false
 	if d.has("requires_item_any"):
 		var ok4 := false
 		for it in d["requires_item_any"]:
@@ -222,6 +240,10 @@ func resolve(npc: Node, verb_id: String) -> bool:
 	var result_lines := Encounters.apply_effects(_dsl_only(effects))
 	var extra := _apply_npc_effects(npc, effects)
 	text += extra
+	if _rng.randf() < 0.6:
+		var after := NPCVoice.afterword(npc, verb_id, success, _rng)
+		if after != "":
+			text += "\n" + after
 	var record_on := str(d.get("record_on", "success"))
 	if d.has("verb") and (record_on == "always" or (record_on == "success" and success) or (record_on == "fail" and not success)):
 		var info := {"target": npc.npc_name, "target_faction": npc.faction, "position": (npc as Node3D).global_position}
@@ -270,6 +292,15 @@ func _apply_npc_effects(npc: Node, e: Dictionary) -> String:
 		extra += "\n\n" + rumor(npc)
 	if e.get("rumor2", false):
 		extra += "\n" + rumor(npc)
+	if e.get("street_rep", false):
+		extra += "\n\n" + NPCVoice.street_rep(npc, _rng)
+	if e.has("forget"):
+		# They let go of what they saw ("forget" = kinds, or "all").
+		var keep: Array = []
+		for m in npc.memories:
+			if str(e["forget"]) != "all" and not (e["forget"] as Array).has(str(m.get("kind", ""))):
+				keep.append(m)
+		npc.memories = keep
 	if e.get("need_hint", false):
 		extra += "\n[i](They'd remember anyone who helped with that.)[/i]"
 	match str(e.get("npc", "")):

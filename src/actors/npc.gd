@@ -50,6 +50,10 @@ var _bubble: Label3D
 var _player: Node3D
 var _partner: Node3D = null
 static var _barks: Dictionary = {}
+## What they saw you do (NPCVoice): [{kind, stance, target, t}], newest first.
+var memories: Array = []
+var tic := ""  ## personal verbal tic ("Swear on my lungs.") - see NPCVoice.say
+static var _act_seen := {}  # "frame:kind" -> how many bystanders already reacted out loud
 
 
 func _ready() -> void:
@@ -87,11 +91,17 @@ func _ready() -> void:
 	add_child(_bubble)
 	_act_check = _rng.randf_range(0.5, 6.0)
 	EventBus.story_event.connect(func(_k, _i): react_cheer())
-	EventBus.interaction_done.connect(func(_v, ok, _n): if ok and _rng.randf() < 0.4: react_cheer())
+	EventBus.interaction_done.connect(_on_interaction_seen)
+	EventBus.action_recorded.connect(_on_action_seen)
+	EventBus.enemy_killed.connect(_on_kill_seen)
+	EventBus.perfect_dodge.connect(func(): witness_act("skill", "a bullet"))
+	EventBus.player_parried.connect(func(a): witness_act("skill", str(a.get("display_name")) if a and is_instance_valid(a) and "display_name" in a else "someone"))
+	EventBus.player_act.connect(func(k, t): witness_act(k, t))
 	EventBus.enemy_killed.connect(func(_e, _i): _on_combat_nearby())
 	EventBus.subsystem_broken.connect(func(_e, _s, _f): _on_combat_nearby())
 	if role != "recruit":
 		Interactions.setup_npc(self, _rng)
+	tic = Copy.make("tic", _rng) if _rng.randf() < 0.7 else ""
 	name_label.text = npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
 	_update_prompt()
 
@@ -418,7 +428,7 @@ func _talk_merchant() -> void:
 	var choices := [{"id": "shop", "text": "Browse the goods%s" % ("  (-%d%%)" % roundi(discount * 100) if discount > 0.01 else ("  (+%d%%)" % roundi(-discount * 100) if discount < -0.01 else ""))}]
 	choices.append_array(Interactions.choices_for(self, "merchant"))
 	choices.append({"id": "leave", "text": "Leave"})
-	EventBus.dialogue_requested.emit(npc_name, Interactions.greeting(self) + "\n\"Buying, selling, or wasting my billable time?\"", choices, _on_merchant_choice)
+	EventBus.dialogue_requested.emit(npc_name, _opening_line() + "\n" + Copy.expand("\"#merchant_ask#\"", _rng), choices, _on_merchant_choice)
 
 
 func _on_merchant_choice(choice: String) -> void:
@@ -469,7 +479,9 @@ func _talk_civilian() -> void:
 		lines.append("\"Wait... you're the one from the news! The %s at %s!\"" % [str(worst.label).to_lower(), worst.location_name])
 		attitude -= 10
 	else:
-		lines.append(Interactions.greeting(self))
+		lines.append(_opening_line())
+		if _rng.randf() < 0.55:
+			lines.append(NPCVoice.remark(self, _rng))
 	if job != "":
 		lines.append("[i](%s - %s, %s)[/i]" % [npc_name, job, "friendly" if attitude >= 15 else ("hostile" if attitude <= -15 else "wary")])
 	var crisis := PlanetGenerator.layer(Game.current_planet, "crises") if not Game.current_planet.is_empty() else {}
@@ -488,6 +500,84 @@ func _on_civilian_choice(choice: String) -> void:
 	if choice == "rumor":
 		var text := Interactions.rumor(self) if attitude > -25 else "\"Rumours cost extra for people like you.\""
 		EventBus.dialogue_requested.emit(npc_name, text, [], Callable())
+
+
+## First thing they say: what they saw you do, what the street says about you, or who you are.
+func _opening_line() -> String:
+	if not memories.is_empty() and _rng.randf() < 0.85:
+		return NPCVoice.recall(self, memories[0], _rng)
+	if not NPCVoice.street_memory().is_empty() and _rng.randf() < 0.35:
+		return NPCVoice.gossip(self, _rng)
+	return Interactions.greeting(self) if _rng.randf() < 0.4 else NPCVoice.remark(self, _rng)
+
+
+# --- Eyes and memory -------------------------------------------------------------------------
+
+## Something the player did. If it happened in this NPC's line of sight they remember it,
+## change their opinion by their stance, and the first couple of bystanders say so out loud.
+func witness_act(kind: String, target: String = "", victim: Node = null) -> void:
+	if kind == "" or state == "dead" or not is_inside_tree():
+		return
+	if _player == null or not is_instance_valid(_player):
+		_player = get_tree().get_first_node_in_group("player") as Node3D
+		if _player == null:
+			return
+	var me := victim == self
+	if not me and not witness.can_witness(_player.global_position):
+		return
+	if not memories.is_empty() and memories[0]["kind"] == kind and absf(float(memories[0]["t"]) - Game.play_time) < 0.5:
+		return  # same act reported twice (verb + Causality record)
+	var st := NPCVoice.stance_for(self, kind)
+	var stamp := "%d:%s" % [Engine.get_process_frames(), kind]
+	if not _act_seen.has(stamp):
+		_act_seen = {stamp: 0}
+		NPCVoice.add_street_memory(kind)
+	memories.push_front({"kind": kind, "stance": st, "target": "me" if me else target, "t": Game.play_time})
+	if memories.size() > NPCVoice.MAX_MEMORIES:
+		memories.resize(NPCVoice.MAX_MEMORIES)
+	var shift: int = {"approve": 6, "amused": 3, "disapprove": -8, "fear": -5}.get(st, 0)
+	attitude = clampi(attitude + shift, -100, 100)
+	if me or state != "idle" or int(_act_seen[stamp]) >= 2:
+		return
+	_act_seen[stamp] = int(_act_seen[stamp]) + 1
+	var line := NPCVoice.react_now(self, kind, st, target, _rng)
+	var t := get_tree().create_timer(_rng.randf_range(0.25, 1.1) + 0.9 * float(_act_seen[stamp] - 1))
+	t.timeout.connect(func():
+		if is_instance_valid(self) and state != "dead":
+			say(line, 2.8))
+	if st == "approve" and _rng.randf() < 0.5:
+		react_cheer()
+
+
+func _on_interaction_seen(verb_id: String, success: bool, target: Node) -> void:
+	var kinds: Dictionary = NPCVoice.reactions().get("verb_kind", {})
+	if verb_id.begins_with("venue:"):
+		var vid := verb_id.split(":")[1]
+		var vk := str(NPCVoice.reactions().get("venue_kind", {}).get(vid, ""))
+		witness_act(vk, str(Interactions._venue_ctx.get("sign", "that place")).capitalize())
+		return
+	var kind := str(kinds.get(verb_id, "talk"))
+	if kind == "talk" or (not success and kind in ["charity", "show", "deal"]):
+		return
+	if target != null and is_instance_valid(target):
+		witness_act(kind, str(target.npc_name), target)
+
+
+func _on_action_seen(node: Dictionary) -> void:
+	if str(node.get("actor", "player")) != "player":
+		return
+	var kind := str(NPCVoice.reactions().get("record_kind", {}).get(str(node.get("verb", "")), ""))
+	if kind != "":
+		var tgt := str(node.get("target", "someone"))
+		witness_act(kind, tgt, self if tgt == npc_name else null)
+
+
+func _on_kill_seen(enemy: Node, info: Dictionary) -> void:
+	if not info.get("by_player", false) or enemy == null or not is_instance_valid(enemy):
+		return
+	var kmap: Dictionary = NPCVoice.reactions().get("kill_kind", {})
+	var kind := str(kmap.get(str(enemy.get("faction")), kmap.get("default", "kill_other")))
+	witness_act(kind, str(enemy.get("display_name")))
 
 
 ## Bought, charmed or scared into loyalty: they stop reporting you.
@@ -547,12 +637,19 @@ func _life(delta: float) -> void:
 		activity = "wave"
 		_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1)
 		_act_time = 2.2
-		say(["Hey! It's you!", "Looking good, friend.", "Stay safe out there!", "Thanks for before!"][_rng.randi() % 4], 2.2)
+		say(Copy.expand("#wave_hi#", _rng, {"name": Game.player_name}), 2.2)
 	if _bark_timer > 0.0 or state != "idle" or _player == null:
 		return
 	_bark_timer = _rng.randf_range(9.0, 22.0)
 	var d := global_position.distance_to(_player.global_position)
 	if d > 11.0:
+		return
+	# Muttering about you as you pass: who you are, what you did.
+	if d < 6.5 and role == "civilian" and _rng.randf() < 0.3:
+		if not memories.is_empty() and _rng.randf() < 0.5:
+			say(NPCVoice.aside(self, memories[0], _rng))
+		else:
+			say(NPCVoice.remark(self, _rng, true))
 		return
 	# Small talk with a neighbour?
 	_partner = null

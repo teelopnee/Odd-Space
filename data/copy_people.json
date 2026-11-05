@@ -1,0 +1,738 @@
+{
+	"_doc": "How people talk about YOU (NPCVoice.remark): open_<mood> + pc_<topic> + close_<voice>. Topics: pc_class_/pc_age_/pc_bg_/pc_pers_/pc_goal_/pc_secret_<tag id>, pc_<state>, npc_life. Vars: {name} {years} {credits} {debt} {bounty} {fame} {followers} {crew} {controller} {crisis} {antagonist} {ally} {macguffin} {scheme} {objective_planet} {other_planet} {local_name} {job} {need}.",
+	"rules": {
+		"open_warm": [
+			"Hey, you!",
+			"Oh, good - it's you.",
+			"There you are.",
+			"Look who it is!",
+			"Friend!",
+			"Ah, my favourite stranger.",
+			"Hey hey.",
+			"You came back!",
+			"Good to see a face that isn't an ad.",
+			"Pull up a crate."
+		],
+		"open_neutral": [
+			"Huh.",
+			"Hm.",
+			"Oh. Hi.",
+			"Can I help you?",
+			"Yeah?",
+			"Hey.",
+			"Listen.",
+			"Not to be rude, but -",
+			"Okay, so.",
+			"Right."
+		],
+		"open_cold": [
+			"You again.",
+			"What.",
+			"Make it quick.",
+			"Ugh.",
+			"Don't get comfortable.",
+			"I'm busy.",
+			"Keep your distance.",
+			"Oh, great.",
+			"Whatever you're selling - no.",
+			"I know your type."
+		],
+		"open_afraid": [
+			"P-please -",
+			"I don't want any trouble.",
+			"Okay. Okay. Stay calm.",
+			"I'll talk! I'll talk.",
+			"D-don't come closer.",
+			"I'm nobody. I'm nobody.",
+			"Whatever you want, it's yours.",
+			"Easy... easy..."
+		],
+		"close_poor": [
+			"Anyway. Rent's due.",
+			"Spare a credit? No? Worth asking.",
+			"That's life down here.",
+			"Breathe slow. It's cheaper.",
+			"Don't tell my landlord I talked.",
+			"I've got a queue to stand in.",
+			"Ugh. My lungs.",
+			"Same as every day."
+		],
+		"close_worker": [
+			"Back to the grind.",
+			"Shift starts in #small_num# minutes.",
+			"My break's almost over.",
+			"They dock us for talking, you know.",
+			"Gotta clock in.",
+			"Don't tell my supervisor.",
+			"Overtime calls. Unpaid."
+		],
+		"close_artsy": [
+			"I'm putting you in a song.",
+			"That's the vibe, anyway.",
+			"Stay weird.",
+			"Art is dead. Long live art.",
+			"Very cinematic.",
+			"I'm painting this later.",
+			"Anyway - come to my gig."
+		],
+		"close_corporate": [
+			"Let's circle back.",
+			"Per my last breath.",
+			"I'll loop in compliance.",
+			"Synergy.",
+			"Let's take this offline.",
+			"I have a #time# meeting.",
+			"Think about your personal brand.",
+			"My calendar is fully monetised."
+		],
+		"close_rebel": [
+			"Burn it all down.",
+			"The Consortium's days are numbered.",
+			"Stay free.",
+			"Don't trust the jingle.",
+			"Power to the lungs.",
+			"Meet you at the barricades.",
+			"Remember: they need us more than we need them."
+		],
+		"close_weird": [
+			"The pigeons agree with me.",
+			"My other self says hi.",
+			"Anyway. The moon is listening.",
+			"Don't eat the blue paste.",
+			"I've said too much. Or not enough.",
+			"Tell the walls I said hello.",
+			"That's what the static told me."
+		],
+		"close_merchant": [
+			"Now - buying anything?",
+			"Cash only. Mostly.",
+			"That advice is free. Everything else isn't.",
+			"Special price for you. Same as everyone.",
+			"Business is business."
+		],
+		"close_robot": [
+			"END OF SMALL TALK.",
+			"BEEP.",
+			"THIS OPINION IS NOT ENDORSED BY MY MANUFACTURER.",
+			"HAVE A COMPLIANT DAY.",
+			"PROCESSING... DONE.",
+			"I AM SMILING. INTERNALLY."
+		],
+		"pc_class_heir_paragon": [
+			"Your family's cops arrested my cousin for coughing. Nothing personal.",
+			"A Paragon heir walking without bodyguards? Bold.",
+			"Does daddy know you're slumming it on {planet}?",
+			"Every badge on this street answers to your family. Must be nice.",
+			"They say Paragon heirs learn to salute before they learn to walk.",
+			"Your family's slogan is on every baton on {planet}.",
+			"Somebody said a Paragon heir walked in. I assumed it was a raid."
+		],
+		"pc_class_heir_halcyon": [
+			"Halcyon owns the debt on my bed. So, technically, you're standing on my mattress.",
+			"A Halcyon heir. My whole family's in your ledger.",
+			"Your family repossessed my uncle's kidney. He wants it back.",
+			"Interest compounds, they say. So does resentment.",
+			"Do you get a discount on your own debt? Asking for {planet}.",
+			"My whole street owes your surname money.",
+			"Halcyon heir on {planet}? Collecting in person now?"
+		],
+		"pc_class_heir_gristle": [
+			"Gristle heir, huh? I've eaten your family's paste every day for #small_num# years.",
+			"Is it true Gristle heirs never eat the paste?",
+			"Your family's factory smells reach the whole block.",
+			"Tell your family the Mystery Paste has a tooth in it. Again.",
+			"Heir to the paste empire. Do you dream in beige?",
+			"My lunch has your family name on it. Literally. It's stamped in.",
+			"Does the paste taste better when you own it?"
+		],
+		"pc_class_heir_oxy": [
+			"An OxyGenix heir! I'm breathing your merchandise right now.",
+			"Your family sells the air. I just rent it.",
+			"Do OxyGenix heirs breathe for free? Seems unfair.",
+			"Every breath I take, your family takes a cut.",
+			"My lungs are on your family's payment plan.",
+			"Breathe in. That one's on your family. Breathe out. That one's on me.",
+			"Your family's ad wakes me up every morning. Through the wall."
+		],
+		"pc_class_heir_lumen": [
+			"Lumen heir. Your family decides what I believe every morning.",
+			"Are we on camera right now? With you we're always on camera.",
+			"Your family cancelled my favourite show for being 'too true'.",
+			"Lumen said it was sunny. Your family lies about the weather.",
+			"Can you get me on #media_product#? I can cry on cue.",
+			"Are you here to make a documentary about us poor folk?",
+			"Say hi to your family's cameras. They're always here anyway."
+		],
+		"pc_class_old_money": [
+			"Old money. You can smell it - it smells like real wood.",
+			"Your family was rich before the air was sold. Must be peaceful.",
+			"Nice coat. Real fabric? I could live a month on one sleeve.",
+			"People like you don't come down here unless they're buying the street.",
+			"Inherited, right? Nobody earns that posture.",
+			"Your great-grandparents bought this street, didn't they? Twice.",
+			"You've never queued for anything, have you?"
+		],
+		"pc_class_executive": [
+			"Executive type, huh? Here to 'experience the street'?",
+			"You've got that corner-office walk.",
+			"Let me guess - you restructured somebody today.",
+			"Do executives breathe the same air? Asking for my lungs.",
+			"Your shoes cost more than my block.",
+			"You've got 'quarterly results' written all over you.",
+			"Is this a site visit? Should I look productive?"
+		],
+		"pc_class_middle_manager": [
+			"Middle manager. I can see the spreadsheets in your eyes.",
+			"You look like you approve expense reports. Approve mine?",
+			"Squeezed from above, squeezing below, right?",
+			"Another middle-tier soul. Hanging on, like the rest of us.",
+			"Let me guess: you have a performance review on Monday.",
+			"Your lanyard's showing. Old habit?",
+			"You look like you've survived #small_num# restructures."
+		],
+		"pc_class_gig_worker": [
+			"Gig worker? Me too. #job.cap# on weekdays, #job# on weekends.",
+			"Five-star rating, zero-star life, huh?",
+			"How many apps are you on? I'm on nine.",
+			"You look like you're mid-delivery. You're always mid-delivery.",
+			"Don't tip, they take it anyway.",
+			"Your wristpad keeps buzzing with offers, doesn't it?",
+			"Rate me five stars and I'll rate you five stars."
+		],
+		"pc_class_working_poor": [
+			"Working poor, like the rest of us. Welcome to the club. Membership is mandatory.",
+			"Three jobs? Four? You look like four.",
+			"You smell like overtime.",
+			"Another day, another credit short.",
+			"We're the ones who keep {planet} running. Nobody says thanks.",
+			"Payday's Friday. The money's gone by Thursday.",
+			"We should unionise. Quietly. With snacks."
+		],
+		"pc_class_indebted": [
+			"You've got the debt look. Eyes that count interest in their sleep.",
+			"How deep are you in? Me, I can't see the surface.",
+			"Halcyon's been asking about you. They ask about everyone. But they ask about you more.",
+			"Debt's a ghost that follows you, huh?",
+			"I know that face. That's a #big_num#-credit face.",
+			"Got a collector following you? Third drone on the left.",
+			"Debt-to-breath ratio? Don't answer that."
+		],
+		"pc_class_street_beggar": [
+			"You've been sleeping rough. I can tell. No judgement - so have I.",
+			"The shelter on the corner has heat on Wednesdays.",
+			"Here. Half a ration. It's the good half.",
+			"The ad-bridge is warmest after midnight. Trust me.",
+			"Rough out there. Rougher in here. Stay close to the vents.",
+			"Corner by the noodle stall is warm. Don't tell the others.",
+			"If you need a blanket, the pawn shop throws out the stained ones at #time#."
+		],
+		"pc_class_collateral": [
+			"That's a barcode on your neck. Who owns you?",
+			"Collateral, huh? My sister was collateral. Then she was a factory.",
+			"Somebody's paying interest on YOU. Must feel strange.",
+			"Owned and still walking around. Respect.",
+			"Does your owner know you're on {planet}?",
+			"Do they let you keep the barcode when you pay it off?",
+			"Owned? Me too, kind of. My landlord thinks so."
+		],
+		"pc_class_off_grid": [
+			"You don't show up on the scanners. How?",
+			"No wristpad, no barcode, no record. You're a ghost.",
+			"The drones look right through you. Teach me.",
+			"Off-grid on {planet}? That's practically a superpower.",
+			"I can't even find you on Lumen. Nobody's not on Lumen.",
+			"How do you buy anything without a face scan?",
+			"The drones went quiet when you walked past. Creepy. Good creepy."
+		],
+		"pc_age_teen": [
+			"Shouldn't you be in a learning-subscription?",
+			"Aren't you a bit young for {planet}?",
+			"Kids these days. Already in debt. Respect.",
+			"How old are you? {years}? I was paying air tax at {years} too.",
+			"Go home, kid. Oh. This is home. Sorry.",
+			"{years}? I had three jobs at {years}. Kidding. Four.",
+			"Does your mum know you're on {planet}?"
+		],
+		"pc_age_young": [
+			"Young and broke. Classic {planet} combo.",
+			"You've still got that hope in your eyes. Give it a month.",
+			"You look like you still think things get better.",
+			"Enjoy your knees while they're original.",
+			"You'll get used to the smog. Or it'll get used to you.",
+			"Young people still believe the ads. Don't."
+		],
+		"pc_age_prime": [
+			"You look like you've seen a few things.",
+			"Prime of life, they say. Prime for billing.",
+			"You've got that 'survived a recession' look.",
+			"Not young, not old. Just tired, right?",
+			"You've got good years left. Billable years.",
+			"Old enough to know better, young enough to do it anyway."
+		],
+		"pc_age_middle": [
+			"Middle-aged and still out here. Respect.",
+			"Your back hurts too, doesn't it? It's the gravity tax.",
+			"You've paid for a lot of air in your time.",
+			"Kids? Debts? Both? Both.",
+			"Mid-life crisis? Buy a sky-bike. Everyone does.",
+			"{years}, huh? The knees go next."
+		],
+		"pc_age_elder": [
+			"Respect, grandparent. You survived this long.",
+			"My nan says air used to be free. You'd know - was it?",
+			"You've outlived three ad campaigns. Teach me.",
+			"Elders get a discount on Tuesdays. It's 1%.",
+			"Still walking at {years}? Teach me your secret. Is it spite?",
+			"Respect your elders, they told me. Nobody told the landlord."
+		],
+		"pc_age_ancient": [
+			"How old ARE you? You remember the world before the Consortium?",
+			"You've got the eyes of someone who saw real trees.",
+			"{years} years old? On {planet}? That's a miracle or a clerical error.",
+			"Tell me about the old world. Was there sky? Real sky?",
+			"They should put you in a museum. Respectfully.",
+			"{years} years... you remember free air, don't you?",
+			"You're older than the Consortium. Does it scare them? It should."
+		],
+		"pc_bg_cryo_debtor": [
+			"You've got frost burns. Cryo-sleeper, right? What year did they freeze you?",
+			"Woke up in a debt freezer, huh? Welcome to the future. It's worse.",
+			"Cryo-debtor. Your interest kept growing while you slept."
+		],
+		"pc_bg_ex_auditor": [
+			"Ex-auditor? You've got that 'I've seen the real numbers' look.",
+			"Auditors know where the bodies are budgeted.",
+			"You used to count #faction#'s money? Is there really that much?"
+		],
+		"pc_bg_asteroid_miner": [
+			"Rock dust in your hair. Asteroid miner?",
+			"Miners have the best grip on {planet}. And the worst lungs.",
+			"Did you dig up anything good out there? Besides a cough?"
+		],
+		"pc_bg_jingle_composer": [
+			"Wait - did you write the #brand# jingle? It's been in my head for a decade.",
+			"You're the jingle composer! I hate you. I hum you every day.",
+			"Disgraced jingle writer, right? What did you do, rhyme 'debt' with 'regret'?"
+		],
+		"pc_bg_street_medic": [
+			"You've got that medic look. Tired and sticky.",
+			"Street medic? My neighbour owes you her life. And #small_num# credits.",
+			"If I faint, you're catching me. Professional duty."
+		],
+		"pc_bg_clone_reject": [
+			"Clone reject? Which number are you? I've met a #num#.",
+			"You look like somebody. Somebody expensive.",
+			"Rejected clone, huh? Their loss. You've got a good face. Somebody's face."
+		],
+		"pc_bg_corp_lawyer": [
+			"Lawyer. I can tell. You're reading the small print on my face.",
+			"Corporate lawyer on {planet}? Who are you suing?",
+			"Is talking to you billable? Am I being billed right now?"
+		],
+		"pc_bg_ad_copywriter": [
+			"Ad copywriter? You wrote '#slogan#', didn't you?",
+			"You people wrote the jingle that lives in my skull rent-free.",
+			"Copywriter. Say something persuasive. ...Wow. I almost bought it."
+		],
+		"pc_bg_repo_agent": [
+			"You've got repo eyes. Pricing everything you look at.",
+			"Ex-repo? You took my neighbour's door once. Just the door.",
+			"Please don't repossess my shoes. They're all I have."
+		],
+		"pc_bg_paste_worker": [
+			"You smell like the vats. Paste worker?",
+			"Vat crew! What's really in the Mystery Paste?",
+			"Paste under your fingernails. That never washes out, does it?"
+		],
+		"pc_bg_smuggler": [
+			"Smuggler. You've got that 'pockets inside pockets' coat.",
+			"Anything good in the cargo hold? Asking for nobody.",
+			"Smugglers keep {planet} alive. Don't tell #faction#."
+		],
+		"pc_bg_holo_preacher": [
+			"Holo-preacher! Say the thing! Say 'Free Breath'!",
+			"You preach on the feeds, right? My nan watches you.",
+			"Preach to me. I could use a sermon that isn't an ad."
+		],
+		"pc_bg_bouncer": [
+			"Big shoulders. Bouncer?",
+			"You've thrown people out of better clubs than this street.",
+			"I feel safer just standing next to you."
+		],
+		"pc_bg_netrunner": [
+			"Netrunner. Your eyes keep scrolling things I can't see.",
+			"Can you delete my debt? Asking very quietly.",
+			"Jacked in, aren't you? Right now. While we talk."
+		],
+		"pc_bg_union_organiser": [
+			"Union? Here? Say it louder - they hate that.",
+			"You're the organiser! The vat crew talks about you.",
+			"Workers of {planet}, unite... and then what? Tell me the 'then what'."
+		],
+		"pc_bg_ex_paragon": [
+			"You stand like a cop. Ex-Paragon?",
+			"Old Paragon habits. You checked the exits when you walked up.",
+			"Ex-cop, huh? Did you quit or did they quit you?"
+		],
+		"pc_bg_influencer": [
+			"Wait - you're on Lumen! #small_num#k followers!",
+			"Influencer, right? Is this a stream? Am I content?",
+			"Do I look okay? Are we live?"
+		],
+		"pc_bg_air_chemist": [
+			"Air chemist. Can you tell what's in what we're breathing?",
+			"Is it true the 'Mountain Fresh' blend is just vent air with perfume?",
+			"Chemist, huh? Make us something that doesn't cost per breath."
+		],
+		"pc_bg_gambler": [
+			"Gambler. You've got lucky-dice twitch.",
+			"Want to bet on how long this conversation lasts?",
+			"I'll bet you #small_num# credits you lose that bet."
+		],
+		"pc_bg_street_chef": [
+			"You smell like real garlic. Chef?",
+			"Street chef! What's the secret to making paste taste like food?",
+			"Cook something for me sometime. Something with colour."
+		],
+		"pc_bg_escaped_convict": [
+			"That's a penal-colony tattoo. Don't worry, I won't tell.",
+			"Escaped, huh? From where? The ice moons? Respect.",
+			"Hide your wrists. Paragon checks wrists."
+		],
+		"pc_bg_android": [
+			"You're synthetic, aren't you? Your blinks are too regular.",
+			"Do synths dream? Do they dream of billboards too?",
+			"You're more human than my landlord. That's a compliment."
+		],
+		"pc_bg_courier": [
+			"Courier legs. You've run every alley on {planet}.",
+			"Got anything for me? A package? A message? A life?",
+			"Couriers know every shortcut. Where's the one out of here?"
+		],
+		"pc_pers_charming": [
+			"You smile like you're selling something. I'd probably buy it.",
+			"Stop being charming, I'm trying to be miserable.",
+			"How do you do that? Make people like you? Teach me."
+		],
+		"pc_pers_ruthless": [
+			"You've got cold eyes. Calculating.",
+			"I bet you never say sorry.",
+			"Something about you says 'don't owe them money'."
+		],
+		"pc_pers_honest": [
+			"You've got an honest face. Rare. Probably illegal.",
+			"You actually listen. Nobody listens.",
+			"You'd make a terrible salesperson. I mean that kindly."
+		],
+		"pc_pers_coward": [
+			"You flinch at the drones too. It's okay. We all do.",
+			"Nervous type? Smart. Nervous people live longer here.",
+			"You keep looking for the exits. Good instinct."
+		],
+		"pc_pers_hothead": [
+			"You look like you want to punch a billboard. Do it.",
+			"Easy, tiger. The street's watching.",
+			"Your jaw's clenched. Mine too. It's {planet}."
+		],
+		"pc_pers_cynic": [
+			"You've got that 'seen it all, hated it all' look.",
+			"Let me guess: you don't believe a word Lumen says either.",
+			"You're not smiling at the ads. Good. Never smile at the ads."
+		],
+		"pc_pers_idealist": [
+			"You still believe things can change, don't you? It's all over your face.",
+			"Hope looks good on you. Dangerous, but good.",
+			"You're one of those dreamers. {planet} eats dreamers. Be careful."
+		],
+		"pc_pers_joker": [
+			"You've got a laugh in you. I can tell. Let it out, it's free. For now.",
+			"Tell me a joke. Please. I need it.",
+			"You look like you'd make the drones laugh."
+		],
+		"pc_goal_pay_debt": [
+			"You count every credit twice. Debt?",
+			"Paying something off, aren't you? I know the walk."
+		],
+		"pc_goal_burn_consortium": [
+			"You look at the billboards like you want them on fire. Same.",
+			"You've got a match-in-the-pocket look."
+		],
+		"pc_goal_find_sibling": [
+			"You're looking for someone. Everyone who looks like that is looking for someone.",
+			"Lost somebody? You keep checking faces."
+		],
+		"pc_goal_get_famous": [
+			"You want to be on the feeds. I can tell. You keep checking for cameras.",
+			"Future celebrity? Remember me when you're famous."
+		],
+		"pc_goal_buy_a_planet": [
+			"You've got big plans. Planet-sized plans.",
+			"Someone said you want to buy a whole planet. Can I rent a room?"
+		],
+		"pc_goal_revenge": [
+			"There's someone you want to hurt. It's all over you.",
+			"You look like a grudge with legs."
+		],
+		"pc_goal_find_cure": [
+			"You're looking for a cure, aren't you? I hope you find it.",
+			"Clinics, labs, black markets - you've been to all of them, right?"
+		],
+		"pc_goal_protect_family": [
+			"You've got family somewhere. You keep your hand near your wristpad, waiting for their call.",
+			"Somebody depends on you. I can tell."
+		],
+		"pc_goal_become_ceo": [
+			"You walk like you're going to run a company one day.",
+			"Future CEO? Then remember this street when you're up there."
+		],
+		"pc_goal_escape_sprawl": [
+			"You're trying to get out, aren't you? Off-world.",
+			"You look at the sky like it's an exit."
+		],
+		"pc_goal_find_love": [
+			"You lost someone you love. It's in your eyes.",
+			"Looking for someone special? Hope they're looking for you too."
+		],
+		"pc_goal_redemption": [
+			"You're trying to make something right. I can tell.",
+			"Whatever you did, you're carrying it."
+		],
+		"pc_secret_wanted_alias": [
+			"That's not your real name, is it? Your face says another one.",
+			"I've seen your face on a poster. Different name though."
+		],
+		"pc_secret_synth_air_allergy": [
+			"You sneeze every time the vents breathe. Allergic to the good stuff?",
+			"Your eyes go red near the canisters. Interesting."
+		],
+		"pc_secret_compulsive_liar": [
+			"Everything you say has a little echo of 'not quite'.",
+			"I believe you. That's the scary part."
+		],
+		"pc_secret_sleeper_agent": [
+			"Your shadow moves a second late. Just saying.",
+			"Sometimes you stop mid-step like you're listening to orders."
+		],
+		"pc_secret_kleptomaniac": [
+			"Your hands keep drifting toward my pockets. I see them.",
+			"Your fingers twitch near anything shiny."
+		],
+		"pc_secret_secret_heir": [
+			"You've got blue blood. Hidden, but blue. I can smell it.",
+			"Somebody important is your parent. Somebody VERY important."
+		],
+		"pc_secret_terminal_illness": [
+			"You're running out of time. I can feel it. Spend it well.",
+			"You look at everything like it's the last time."
+		],
+		"pc_secret_ai_in_head": [
+			"You're talking to somebody when nobody's there. Who is it?",
+			"There's two of you behind your eyes."
+		],
+		"pc_secret_killed_someone": [
+			"You've got blood on you. Old blood. I won't ask.",
+			"The dead follow you. Three steps behind."
+		],
+		"pc_secret_double_agent": [
+			"You work for two people. Maybe three.",
+			"You lie with both hands."
+		],
+		"pc_secret_stolen_identity": [
+			"That face isn't yours. It fits, but it isn't yours.",
+			"Your name doesn't sit right on you."
+		],
+		"pc_secret_mob_debt": [
+			"The Syndicate's ledger has your name in red ink.",
+			"Someone very unfriendly wants their money from you."
+		],
+		"pc_hurt": [
+			"You're bleeding on my shoes.",
+			"You look terrible. Clinic's two streets down. Bring credits.",
+			"Sit down before you fall down.",
+			"Who did that to you? #faction#?",
+			"You need a medkit, friend. Or a priest.",
+			"That's a lot of red for one person.",
+			"Lean on me. Not too hard, I'm rented.",
+			"There's a bandage in the vending machine. #small_num# credits."
+		],
+		"pc_wanted": [
+			"There's a bounty on you. {bounty} credits. That's more than my building.",
+			"Paragon's been asking about you all week.",
+			"If they ask, I was never here. If they pay, I was totally here.",
+			"Your face is on the posters. You look shorter in person.",
+			"{bounty} credits on your head. Tempting. Kidding. Mostly.",
+			"Paragon put your face on the ad screens. Between the paste and the loans.",
+			"I'd turn you in, but I hate Paragon more."
+		],
+		"pc_famous": [
+			"{name}! From the feeds!",
+			"Can I get a selfie? I'll pay. Three credits?",
+			"You're famous! Fame {fame}, Lumen says.",
+			"My cousin's a big fan. Also a big Paragon informant.",
+			"Sign my air canister!",
+			"Is it true what Lumen says about you?",
+			"My kid has your poster. A bootleg one. Sorry.",
+			"You were on #media_product#! Or someone who looks like you."
+		],
+		"pc_flush": [
+			"You're carrying {credits} credits? Put that away before someone sees.",
+			"You've got money. I can hear it jingle.",
+			"Rich today, huh? Buy something for the street.",
+			"With that many credits you could buy this whole corner.",
+			"Careful flashing that. Pickpockets on {planet} have pickpockets.",
+			"That's a lot of credits for one coat pocket."
+		],
+		"pc_broke": [
+			"Broke? Me too. Let's be broke together.",
+			"Empty pockets. I know that sound. That's no sound.",
+			"No credits? The noodle stand gives leftovers after midnight.",
+			"Don't worry, everyone's broke. The rich just call it 'liquidity'.",
+			"Want some advice? It's free. It's the only free thing here.",
+			"Broke is just rich without the credits."
+		],
+		"pc_debt": [
+			"Your air debt's at {debt}? Halcyon will come knocking.",
+			"{debt} in air debt. They'll repossess your breath.",
+			"I can hear your debt growing from here.",
+			"Air debt like that, you should hold your breath. Literally."
+		],
+		"pc_crew": [
+			"You travel with {crew}, right? Good people. Weird, but good.",
+			"Heard {crew} is on your ship. Tell them hi.",
+			"A crew, huh? On the Odd Duck? That ship's a legend. A bad legend.",
+			"Your crew looks out for you. Hold on to that."
+		],
+		"pc_upgraded": [
+			"Nice ink. Or is that chrome? Both?",
+			"You've had work done. Good work. Expensive work.",
+			"That implant's humming. Hear it?",
+			"New tattoo? It suits you."
+		],
+		"pc_killer": [
+			"People die around you. I've noticed.",
+			"They say you've got a body count. They say a lot of things.",
+			"Stay back. I heard what you did.",
+			"Murderer. That's what they call you on {planet}."
+		],
+		"pc_saint": [
+			"You're the one who helps people. Everybody's talking.",
+			"They call you the Sprawl Saint. Don't let it go to your head.",
+			"You give credits away. Are you okay? Medically?",
+			"Kindness is rare here. People notice."
+		],
+		"pc_leader": [
+			"{followers} people follow you now. That's a movement.",
+			"Your people are everywhere. I see the stickers.",
+			"Are you starting something? Count me in. Quietly."
+		],
+		"pc_planet": [
+			"{controller} runs {planet}. Runs it into the ground.",
+			"This {crisis} is killing us. Slowly. With fees.",
+			"Over on {other_planet} they've got {other_crisis}. At least ours is familiar.",
+			"{local_name} is the only one fighting for {planet}.",
+			"{controller} put a tax on queuing. I'm queuing to complain.",
+			"{planet} used to be nice. Before {controller}. Before me.",
+			"They say {crisis} will be over by spring. They said that last spring."
+		],
+		"pc_saga": [
+			"They say {antagonist} wants to {scheme}. Lumen calls it 'a bold vision'.",
+			"Heard {ally} is looking for someone like you.",
+			"Everyone's talking about {macguffin}. Nobody knows what it is.",
+			"{antagonist}. The {antagonist_title}. Don't say the name too loud.",
+			"{lieutenant} came through here last week. Smiling. Never a good sign.",
+			"If you're headed to {objective_planet}, bring a coat. And a lawyer.",
+			"{ally} said someone like you would come through. I thought they were drunk.",
+			"People whisper about {macguffin} like it's a ghost story."
+		],
+		"npc_life": [
+			"My #kin# just started as #job.a#. So proud. So poor.",
+			"I've got #pet_desc# #pet_kind# called #pet_name#. Best thing in my life.",
+			"I'm saving up for #aspiration#. #small_num# more years.",
+			"My #kin# wants to be #dream.a# when they grow up.",
+			"I used to #hobby#. Before the fees.",
+			"Don't tell anyone, but I #secret_habit#.",
+			"Honestly? My big worry is #worry#.",
+			"Today's my day off. I'm spending it standing here. It's free.",
+			"I'm {job}. It's a job. That's the best thing I can say about it.",
+			"You know what I need? {need}. Same as everyone."
+		],
+		"kin": [
+			"daughter",
+			"son",
+			"kid",
+			"nephew",
+			"niece",
+			"cousin",
+			"little brother",
+			"little sister",
+			"nan",
+			"grandad",
+			"neighbour's kid"
+		],
+		"dream": [
+			"shareholder",
+			"billboard",
+			"hologram",
+			"repo drone",
+			"Lumen anchor",
+			"air sommelier",
+			"pilot",
+			"free person",
+			"paste taster"
+		],
+		"hobby": [
+			"paint",
+			"sing in a band",
+			"grow real tomatoes",
+			"race sky-bikes",
+			"collect tapes",
+			"write poetry",
+			"fix old radios",
+			"keep bees"
+		],
+		"secret_habit": [
+			"talk back to the billboards",
+			"skip the ads with my eyes closed",
+			"hum songs that aren't jingles",
+			"feed the stray drones",
+			"sleep through curfew",
+			"breathe through my nose to save credits"
+		],
+		"worry": [
+			"the air bill",
+			"my kid's debt",
+			"the next recall",
+			"Paragon's new curfew",
+			"my lungs",
+			"the rent",
+			"what's really in the paste",
+			"being repossessed in my sleep"
+		],
+		"tic": [
+			"You know?",
+			"Honestly.",
+			"Like I always say.",
+			"Mark my words.",
+			"No offence.",
+			"Just saying.",
+			"Swear on my lungs.",
+			"For real.",
+			"Heh.",
+			"Anyway.",
+			"...Right?",
+			"Bless.",
+			"Allegedly.",
+			"Don't quote me.",
+			"Trust me.",
+			"Between us.",
+			"On my nan's debt.",
+			"Look it up.",
+			"Write that down.",
+			"Ask anyone.",
+			"Ugh.",
+			"Classic {planet}.",
+			"Hand on heart.",
+			"No refunds."
+		]
+	}
+}

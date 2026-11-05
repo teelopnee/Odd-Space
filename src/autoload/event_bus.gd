@@ -62,4 +62,6 @@ signal game_loaded
 signal cutscene_started
 signal cutscene_ended
 signal speech_bubble(speaker: Node, text: String)
+## Something the player did that bystanders may see (NPC memory): "dance", "hurt", ...
+signal player_act(kind: String, target: String)
 signal input_device_changed(device: String)  # "touch" | "keyboard" | "gamepad"
