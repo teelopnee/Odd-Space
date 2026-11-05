@@ -1,0 +1,112 @@
+{
+	"_doc": "Hand-written act bookends (Saga._bookend): the authored anchors around the procedural saga (the Wildermyth model). open.<act>: title + frame + one line per motivation + one per wealth band (rich/middle/poor). close.<act>: frame + one line per dominant moral axis (mercy/order/greed/truth/none) + crew line. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {lieutenant} {personal} {macguffin} {scheme} {planet} {next_planet} {age} {heir}.",
+	"open": {
+		"1": {
+			"title": "ACT I - THE STATIC",
+			"frame": "The Odd Duck hums like a fridge that has seen things. Out past the billboards, a signal keeps repeating your name - not the name on your debt file, the other one. Someone called {ally} wants to talk. Nobody in the Consortium makes contact for free.",
+			"motivation": {
+				"pay_debt": "Your debt counter ticks in the corner of your eye. Every breath since you woke has a price, and somewhere out there is a way to make the number stop.",
+				"burn_consortium": "You have a list. It is short, it is specific, and every name on it signs its emails 'warm regards'.",
+				"find_sibling": "There is a photo in your pocket, folded so many times the face is mostly crease. The last place they were seen is a rumour. Rumours are where you start.",
+				"get_famous": "Nobody knows your name yet. That is the problem. That is also the plan.",
+				"buy_a_planet": "Somewhere out there is a rock with no owner, or an owner who can be talked down. You intend to be the last person who ever pays rent on it.",
+				"revenge": "You remember the face. You remember the date. You do not remember forgiving anyone.",
+				"find_cure": "The cough comes back at night. The clinics quote prices with too many zeroes. Someone, somewhere, has the formula they are not selling.",
+				"protect_family": "Back home, someone is counting on you to come back with more than you left with. Failing is not on the list of options you can afford.",
+				"become_ceo": "Every tower has a top floor. Every top floor has a chair. You have been measuring chairs since you were {age}.",
+				"escape_sprawl": "The Sprawl is a cage with good lighting. You are going to find the door, even if you have to build one.",
+				"find_love": "You still dream about them. The dreams are the only thing in your life nobody has found a way to bill.",
+				"redemption": "You did something once. The universe has not forgotten, and neither have you. Maybe this time the ledger balances."
+			},
+			"wealth": {
+				"rich": "Your family name opens doors. Out here it also paints a target on your back - and the people behind the doors have long memories.",
+				"middle": "Not rich enough to be safe, not poor enough to be invisible. The middle of the ladder is where the rungs are thinnest.",
+				"poor": "You own the clothes you woke up in and a debt with your name on it. That is more freedom than it sounds like: you have nothing left they can repossess."
+			}
+		},
+		"2": {
+			"title": "ACT II - THE LEDGER",
+			"frame": "The paper trail is real. {antagonist} - the {antagonist_title} - wants to {scheme}, and {macguffin} is the key to it. Every door you open now opens back onto you. People are starting to say your name in rooms you have never been in.",
+			"motivation": {
+				"pay_debt": "For the first time, you can see the shape of the number going down. It turns out the fastest way to clear a debt is to learn who is lending.",
+				"burn_consortium": "The list got longer. That is fine. You brought matches for everyone.",
+				"find_sibling": "Someone recognised the photo. They went quiet, then they asked how much you would pay to forget it. You are getting close.",
+				"get_famous": "Lumen ran your face on a slow news cycle. Now strangers stop you in the street. Some want selfies. Some want you dead. Both count as fans.",
+				"buy_a_planet": "You have found the planet you want. Unfortunately, so has {antagonist}.",
+				"revenge": "The face from your memory has a name now, and an office, and security. Revenge has paperwork too.",
+				"find_cure": "The formula exists. It is filed under 'assets', in a vault, under {antagonist}'s signature.",
+				"protect_family": "A message from home: 'They came asking about you.' You read it twice. Then you check your weapon.",
+				"become_ceo": "You have stopped measuring chairs. You are measuring the people sitting in them.",
+				"escape_sprawl": "You have seen the edge of the map. It is guarded. Of course it is guarded.",
+				"find_love": "A voice on a pirate channel, saying a phrase only the two of you knew. It might be a trap. You are going anyway.",
+				"redemption": "Someone you wronged is out here too. The Sprawl is small. Debts like yours always find their way home."
+			},
+			"wealth": {
+				"rich": "The family has heard what you are doing. Their message is short, polite and contains the word 'disinherit'.",
+				"middle": "You have more credits than when you started and fewer friends. That is the usual exchange rate.",
+				"poor": "The street has started looking after you. A free noodle here, a warning there. Nobody did that before."
+			}
+		},
+		"3": {
+			"title": "ACT III - THE FINE PRINT",
+			"frame": "There is always a clause you did not read. {ally} has been honest with you about almost everything. {antagonist} is on {planet}, ready to {scheme}. Whatever you do next, the Sprawl will be living in it for a very long time.",
+			"motivation": {
+				"pay_debt": "If this goes right, the number hits zero. If it goes wrong, it will not matter what the number says.",
+				"burn_consortium": "This is it. The tower, the boardroom, the person at the end of the list. Make it count.",
+				"find_sibling": "They are on {planet}. You know it the way you know your own heartbeat.",
+				"get_famous": "Every camera in the Sprawl is pointed at {planet}. History is about to pick a headline. You are going to write it.",
+				"buy_a_planet": "One signature stands between you and owning the sky over your head. One very well-guarded signature.",
+				"revenge": "You have imagined this moment a thousand times. In none of them did your hands shake. They are shaking.",
+				"find_cure": "The formula is close enough to read. The question is whether you will be alive to use it.",
+				"protect_family": "Whatever happens on {planet}, they will be safe. You promised. You have never broken that one.",
+				"become_ceo": "The top floor. The chair. The view. All you have to do is decide what kind of person sits in it.",
+				"escape_sprawl": "Past {planet} there is dark, and in the dark there are no bills. Almost there.",
+				"find_love": "If they are there, you will know what to say. You have been rehearsing it for years.",
+				"redemption": "The ledger is open on the table. One last entry to write."
+			},
+			"wealth": {
+				"rich": "Your name will be on whatever happens next, in the family history or in the court records. Possibly both.",
+				"middle": "Nobody from the middle ever changed anything, they said. Nobody ever checked.",
+				"poor": "The street is watching. If someone like you can do this, so can they."
+			}
+		}
+	},
+	"close": {
+		"1": {
+			"title": "END OF ACT I",
+			"frame": "The static has a voice now, and it knows yours. You are in this, whether the Consortium has billed you for it yet or not.",
+			"axis": {
+				"mercy": "You have been kinder than this place deserves. People have noticed. Some of them are waiting to see if it lasts.",
+				"order": "You played it straight, by the rules, by the book. Somewhere a compliance officer just sighed with relief.",
+				"greed": "Your pockets are heavier than when you started. So, someone on the street mutters, is your shadow.",
+				"truth": "You kept digging when it would have been easier to look away. Lumen hates that. Good.",
+				"none": "Nobody can tell yet what kind of person you are. Including you."
+			},
+			"crew": "Back on the Odd Duck, {crew} pours two cups of something brown. 'So. That happened.'"
+		},
+		"2": {
+			"title": "END OF ACT II",
+			"frame": "{macguffin} has changed hands, and so have you. Some doors are closed for good now. Others are open that never should have been.",
+			"axis": {
+				"mercy": "You spared people who would not have spared you. That will either save you or cost you. Maybe both.",
+				"order": "The system bent for you because you never broke it. You are starting to wonder who that really benefits.",
+				"greed": "You are rich enough now that people lie to you for free. That is a new kind of poverty.",
+				"truth": "You know things now that powerful people would kill to keep quiet. They know you know.",
+				"none": "You have walked the middle line all this way. It is getting very narrow."
+			},
+			"crew": "{crew} watches the stars through the cracked viewport. 'Whatever you choose next, captain - I'm in.'"
+		},
+		"3": {
+			"title": "END OF ACT III",
+			"frame": "It is done. The Sprawl will tell this story a hundred different ways, and none of them will be quite right.",
+			"axis": {
+				"mercy": "You chose people over profit, again and again. In a universe that bills for breathing, that might be the most radical thing anyone ever did.",
+				"order": "You kept the machine running. Maybe you made it run better. Maybe you just made it run.",
+				"greed": "You came out on top. The view is excellent. The air up here is free, of course - you own it.",
+				"truth": "You dragged it all into the light. Whatever comes next, nobody can say they did not know.",
+				"none": "You never let anyone decide who you were. The Sprawl will be arguing about you for years."
+			},
+			"crew": "{crew} raises a cup. 'To the worst decisions we ever made together.'"
+		}
+	}
+}

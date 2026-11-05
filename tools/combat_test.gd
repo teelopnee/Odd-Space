@@ -27,6 +27,7 @@ func _process(_delta: float) -> bool:
 				"motivation": "revenge", "secret": "mob_debt"}
 			var g = root.get_node("Game")
 			g.new_game("Combat Tester", tags, 31337)
+			g.flags["bookend_open_1"] = true  # no story popup pausing the tree mid-test
 			_check(g.flags.get("weapons", {}).get("melee", []).has("hammer"), "a bouncer starts with the Repo Hammer")
 			root.get_node("Router").params = {"planet_id": g.galaxy[0].id}
 			change_scene_to_file("res://scenes/world/planet_surface.tscn")

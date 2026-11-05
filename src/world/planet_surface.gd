@@ -186,6 +186,7 @@ func _landing() -> void:
 	await get_tree().create_timer(1.2).timeout
 	hud.cinematic(false)
 	player.set_cutscene(false)
+	Saga.play_bookend("open", "1")  # the hand-written opening of the story (once per life)
 	Tips.show("first_planet")
 
 

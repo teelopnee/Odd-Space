@@ -814,8 +814,10 @@ func _next_slide() -> void:
 
 
 func _advance() -> void:
+	var prev_act := ""
 	if index < beats.size():
 		beats[index].status = "done"
+		prev_act = str(int(float(beats[index].get("act", 0))))
 		_log("DONE: " + str(beats[index].title), "")
 	index += 1
 	if index < beats.size():
@@ -825,8 +827,68 @@ func _advance() -> void:
 		_log(b.title, intro)
 		EventBus.toast.emit("NEW OBJECTIVE: %s" % b.title, Color(1.0, 0.82, 0.24))
 		EventBus.ai_say.emit(intro, "saga")
+		var act := str(int(float(b.get("act", 0))))
+		if prev_act != "" and act != prev_act:
+			play_bookend("close", prev_act)
+			play_bookend("open", act)
 	objective_changed.emit()
 	get_tree().call_group("level", "refresh_quests")
+
+
+# --- Bookends: hand-written act openings and closings (data/bookends.json) --------------------
+# The procedural saga is the middle; these are the authored anchors around it, written around
+# who the player is (motivation, wealth) and what they did (dominant moral axis, crew).
+
+var _bookends: Dictionary = {}
+
+
+func bookends() -> Dictionary:
+	if _bookends.is_empty():
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://data/bookends.json"))
+		_bookends = parsed if parsed is Dictionary else {}
+	return _bookends
+
+
+func play_bookend(kind: String, act: String) -> void:
+	var flag := "bookend_%s_%s" % [kind, act]
+	if Game.flags.get(flag, false):
+		return
+	var d: Dictionary = bookends().get(kind, {}).get(act, {})
+	if d.is_empty():
+		return
+	Game.flags[flag] = true
+	var beat: Dictionary = beats[index] if index < beats.size() else {}
+	var parts: Array[String] = [fill(str(d.get("frame", "")), beat)]
+	if kind == "open":
+		var mot := str(Game.tags.get("motivation", ""))
+		if d.get("motivation", {}).has(mot):
+			parts.append(fill(str(d.motivation[mot]), beat))
+		var w := Origin.wealth()
+		var band := "rich" if w >= 4 else ("poor" if w <= 1 else "middle")
+		parts.append(fill(str(d.get("wealth", {}).get(band, "")), beat))
+	else:
+		parts.append(fill(str(d.get("axis", {}).get(dominant_axis(), "")), beat))
+		if not Crew.members.is_empty():
+			var crew_name := str(Crew.def(str(Crew.members.keys()[0])).get("name", "your crew"))
+			parts.append(fill(str(d.get("crew", "")), beat).replace("{crew}", crew_name))
+	var text := "\n\n".join(parts.filter(func(p): return p != ""))
+	_log(str(d.get("title", "")), text)
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("title_card"):
+		hud.title_card(str(d.get("title", "")), "", 2.0)
+	EventBus.dialogue_requested.emit(str(d.get("title", "")), text, [], Callable())
+
+
+## The moral axis the player has leaned into most so far ("none" if they haven't).
+func dominant_axis() -> String:
+	var best := "none"
+	var best_v := 1.0
+	for k in ["mercy", "order", "greed", "truth"]:
+		var v := float(axes.get(k, 0.0))
+		if v > best_v:
+			best_v = v
+			best = k
+	return best
 
 
 func _log(title: String, text: String) -> void:

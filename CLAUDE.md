@@ -101,6 +101,9 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   Title "CREDITS & LICENSES" (Godot + third-party licence texts - required for distribution). PC: Windows/Linux presets,
   mouse (LMB melee, RMB fire; touch-emulated mouse ignored), F11 fullscreen. Critique log: `docs/REVIEW.md` - update it
   every pass (score, open issues, fix log).
+- Authored act bookends: `data/bookends.json` -> `Saga.play_bookend(open|close, act)` (once per life, flag
+  `bookend_<kind>_<act>`): openings by motivation + wealth band, closings by `Saga.dominant_axis()` + crew. Act numbers in
+  saga beats are floats ("1.0") - normalise with int(). Test: `tools/story_test.gd`.
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

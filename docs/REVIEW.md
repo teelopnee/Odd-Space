@@ -24,17 +24,17 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 | Combat | 4 | 5 | Tokens, dash strike, 10 weapons, difficulty settings. Still unplaytested by humans. |
 | Onboarding | 2 | 5 | Just-in-time tips for 14 situations. Needs a guided first mission. |
 | UI / readability | 3 | 5 | Contextual touch buttons, capped result text, UI scale. HUD still busy. |
-| Writing | 5 | 5 | Funny lines, template feel. Needs authored bookends. |
+| Writing | 5 | 6 | Hand-written act openings/closings now frame the procedural saga (Wildermyth model). Middle still template-heavy. |
 | Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
 | Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
-| Tech / platforms | ? | 6 | Graphics presets, Back button, pause on leave, Windows + Linux builds, mouse, F11. Unmeasured on real devices. |
+| Tech / platforms | ? | 6 | Graphics presets, Back button, pause on leave, Windows + Linux builds (CI, verified), mouse, F11. Unmeasured on real devices. |
 | Commercial readiness | 2 | 5 | Credits/licences screen, parody names cleaned, trademarked terms out of store copy. Repo still public. |
 
 ## Open issues (P0 = a buyer would refund)
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
 - P1 No guided first mission: the opening should teach move -> talk -> fight -> witness -> shop in order.
-- P1 Authored bookends for every act (Wildermyth model), written around class / motivation tags.
+- P1 (partly done) Authored bookends exist for acts I-III; next: authored mid-act scenes for the ally and the antagonist.
 - P1 HUD density on phones: status panel is 6-7 lines; consider auto-hiding when not in combat.
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
@@ -49,3 +49,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   leaving the app pauses and autosaves; save format v2; Credits & Licenses screen (Godot + third-party texts);
   parody TV titles renamed; "HD-2D" (a Square Enix trademark) removed from store-facing text; Windows + Linux export
   presets and CI builds; mouse controls (left = melee, right = fire); F11 / Alt+Enter fullscreen.
+- v0.13: hand-written act bookends (data/bookends.json): every act opens with an authored scene written around the
+  player's motivation (12) and wealth (3), and closes with a reflection on their dominant moral axis and their crew;
+  Act I plays after the first landing. tools/story_test.gd checks four very different lives see every bookend with no
+  unfilled tokens. Windows + Linux zips now ship next to the APK on the "latest" release.
