@@ -137,6 +137,27 @@ func _process(_delta: float) -> bool:
 			paused = false
 			_shot(_current)
 			_step = 10
+			if OS.get_cmdline_user_args().has("--street"):
+				_step = 12
+				_wait = 2
+		12:
+			# Walk the hero up to a shop front: signs, flyers, graffiti, menus, queues.
+			_step = 13
+			_wait = 120
+			var pl = get_first_node_in_group("player")
+			var spots: Array = []
+			for n in current_scene.find_children("*", "", true, false):
+				if "venue_id" in n and str(n.venue_id) != "":
+					spots.append(n)
+			if pl and not spots.is_empty():
+				var best = spots[0]
+				for v in spots:
+					if v.global_position.distance_to(pl.global_position) < best.global_position.distance_to(pl.global_position):
+						best = v
+				pl.global_position = best.global_position + Vector3(0, 0.2, 2.2)
+		13:
+			_shot(_current + "_street")
+			_step = 10
 		30:
 			_shot("02b_character_creation_background")
 			current_scene._show_category("age")

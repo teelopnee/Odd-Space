@@ -119,7 +119,7 @@ func _build_drone() -> void:
 	_label.modulate = col * 1.8
 	_label.outline_size = 0
 	_label.position = Vector3(0, 0.55, 0)
-	_label.text = PITCHES[_rng.randi() % PITCHES.size()]
+	_label.text = Copy.make("drone_pitch", _rng) if _rng.randf() < 0.75 else PITCHES[_rng.randi() % PITCHES.size()]
 	add_child(_label)
 	_speed = _rng.randf_range(1.5, 2.6)
 
@@ -236,7 +236,7 @@ func _process(delta: float) -> void:
 		else:
 			_wait = _rng.randf_range(0.5, 3.0)
 			if _label:
-				_label.text = PITCHES[_rng.randi() % PITCHES.size()]
+				_label.text = Copy.make("drone_pitch", _rng) if _rng.randf() < 0.75 else PITCHES[_rng.randi() % PITCHES.size()]
 		_pick_target()
 		return
 	position += to.normalized() * minf(_speed * delta, to.length())

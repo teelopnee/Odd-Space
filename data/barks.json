@@ -1,5 +1,5 @@
 {
-	"_doc": "Ambient one-liners NPCs say out loud (speech bubbles). Keys: role, 'infamous' (when the Causality Graph says they've heard of you), 'crisis:<id>', 'station', 'combat', 'pair' (NPC-to-NPC small talk).",
+	"_doc": "Ambient one-liners (speech bubbles). Lines may use the copy grammar from data/copy.json (#product#, #dish#, #faction_short.cap#, {planet}) and {name} = the player. Keys: role, 'infamous', 'crisis:<id>', 'station', 'combat', 'pair' (NPC-to-NPC: 'A -- B -- C' alternates speakers), reactive keys (famous, wanted, rich_player, biome:<env> ...), and enemy lines '<kind>:<enemy_type>' with kind = taunt / hurt / yield / standdown.",
 	"civilian": [
 		"Is it just me or did the air get pricier?",
 		"My lungs are on a payment plan.",
@@ -20,30 +20,89 @@
 		"Rain's free. For now. Drink up.",
 		"Heard the Consortium patented Mondays.",
 		"Don't make eye contact with the drones. They upsell.",
-		"I miss the old ads. They only lied a little."
+		"I miss the old ads. They only lied a little.",
+		"I'm not crying. The smog has a promotional flavour today.",
+		"My rent went up because my window faces a better ad.",
+		"They put a toll on the stairs. I live on the stairs now.",
+		"Lumen says I'm in the top ten percent of happy. I never filled in the survey.",
+		"Tried to complain. The complaint line has a waiting list for the waiting list.",
+		"My horoscope came with terms and conditions.",
+		"I put my savings into #brand#. Now my savings are a jingle.",
+		"Smell that? That's {planet}. It's always {planet}.",
+		"Somebody stole my umbrella. Then billed me for the rain.",
+		"#thing.cap# used to be free. My nan told me. She's in collections now.",
+		"I'd leave {planet}, but the exit fee is my whole skeleton.",
+		"My job is watching ads so the ads feel watched.",
+		"Ever notice the drones hum the jingle? Now you can't un-notice it.",
+		"Got a raise! It's paid in coupons for #product#.",
+		"Don't step on the yellow tiles. Those are premium tiles.",
+		"The vending machine said 'thank you'. I've never felt so seen.",
+		"Paid off my debt yesterday. They found more of it this morning.",
+		"My fridge unionised. Now it only opens on weekdays.",
+		"I've been on hold with #faction# since spring.",
+		"Every time I sneeze I get a 'Bless You' invoice.",
+		"Who keeps feeding the repo drones? They're getting bold.",
+		"The noodle guy knows my name. He's the only one who does.",
+		"Heard there's a street on {planet} where the ads stop. Nobody's come back to confirm.",
+		"I counted the stars last night. Two. Both satellites.",
+		"#weather.cap#, they said. They were right, for once.",
+		"I'm a #job#. It's a real job. It's on my debt statement.",
+		"My therapist is an ad for a better therapist.",
+		"Is it Tuesday? Everything tastes like Tuesday."
 	],
 	"merchant": [
 		"Fresh medkits! Barely expired!",
 		"Air canisters! Bottled at the source! The source is a vent!",
 		"Everything must go! Including me, if Halcyon finds out.",
-		"Bribe vouchers, 2-for-1, no questions asked!"
+		"Bribe vouchers, 2-for-1, no questions asked!",
+		"#dish.cap#! Hot! Mostly hot!",
+		"#product.cap#! #price#!",
+		"Fresh from the vat! Very fresh! Still moving!",
+		"Get your #dish# here, before the inspectors do!",
+		"Two-for-one on everything nobody wants!",
+		"Real fruit! Okay, real-ish! Okay, a picture of fruit!",
+		"Umbrellas! Rain-proof! Tax-proof!",
+		"Cheaper than #brand#! Probably safer! No promises!",
+		"Bootleg tapes of #media_product#! Ending NOT censored!",
+		"Spare filters! Your lungs will thank you! In instalments!",
+		"Lucky charms! Protects against debt, drones and Tuesdays!",
+		"Come closer, I don't bite. The paste does, a little.",
+		"Best prices on {planet}! Ask anyone! Don't ask anyone!"
 	],
 	"recruit": [
 		"Anyone hiring? I'll work for air.",
 		"I need off this rock. Like, yesterday.",
-		"Looking for a crew that isn't a cult. Or is a fun cult."
+		"Looking for a crew that isn't a cult. Or is a fun cult.",
+		"I can fix anything with tape and spite. Hire me.",
+		"I'm cheap, I'm loyal, and I'm only a little bit wanted.",
+		"Got a ship? I'll scrub it. I'll scrub YOU. Just get me off {planet}.",
+		"Ex-#faction#. Long story. Short pension.",
+		"I don't need pay. I need a window that isn't an ad."
 	],
 	"infamous": [
 		"That's them. From the news.",
 		"Don't look. Just... don't look.",
 		"I hear they rob vending machines for fun.",
-		"Hide your credits, the drifter's here."
+		"Hide your credits, the drifter's here.",
+		"Is that the one who did the thing? With the... the thing?",
+		"My cousin saw what you did. He hasn't slept since. Thanks?",
+		"Paragon said not to talk to you. So: hi.",
+		"Lock up the vending machines!",
+		"Please don't do whatever it is you do. To me."
 	],
 	"combat": [
 		"AAAH! Not again!",
 		"I'm calling Paragon! ...Their hold music is so long!",
 		"Somebody bill them for this!",
-		"My insurance doesn't cover this!"
+		"My insurance doesn't cover this!",
+		"Not in front of the noodle stand!",
+		"I just bought these shoes on credit!",
+		"Run! Running's still free!",
+		"Is this an ad?! Tell me this is an ad!",
+		"Why is it always MY street?!",
+		"Somebody call #faction#! No, wait, don't!",
+		"Great. Now the rent's going up.",
+		"I'm too in debt to die!"
 	],
 	"pair": [
 		"...and then the billboard ASKED me how my day was.",
@@ -55,27 +114,70 @@
 		"Did you pay your air this week? -- Define 'pay'.",
 		"Paste or noodles? -- Noodles are paste with ambition.",
 		"I got promoted! -- To what? -- Unpaid senior intern.",
-		"You hear about the new tax? -- Which one? -- Exactly."
+		"You hear about the new tax? -- Which one? -- Exactly.",
+		"Did you vote? -- For what? -- Exactly. They didn't say.",
+		"My kid wants to be a hologram. -- That's ambitious. -- She wants to be the ad, not the actor.",
+		"I think the billboard's flirting with me. -- It flirts with everyone. -- Don't ruin this for me.",
+		"Lend me five? -- For what? -- Air. -- ...Fine. Breathe slowly.",
+		"Have you tried #product#? -- #review#",
+		"Did you watch #media_product#? -- #show_opinion#",
+		"I'm saving up for #aspiration#. -- Same. -- We're never getting it, are we? -- Nope.",
+		"Is it raining? -- It's always raining. -- I meant indoors.",
+		"They fired #first#. -- Why? -- Unlicensed smiling.",
+		"What's for dinner? -- #dish#. -- Again? -- It's always #dish#.",
+		"The #team# won! -- They lost. -- They won in my heart. -- Your heart's in collections.",
+		"Who's that? -- Don't stare. -- I'm not staring, I'm admiring with my eyes.",
+		"My cousin works for #faction# now. -- #job_complaint# -- Yeah, that's the one.",
+		"Did your rent go up? -- Twice. -- Twice? -- Once for the rent, once for asking.",
+		"I had a dream last night. -- Was it sponsored? -- ...It was, actually.",
+		"Heard they're going to #absurd_policy_lower#. -- They can't do that. -- They did it on {planet} last year.",
+		"How's the new job? -- I'm a #job# now. -- Is that... good? -- It's a job.",
+		"Shh. Drone. -- Act natural. -- I AM natural. -- Too natural. Buy something."
 	],
 	"station": [
 		"This station's been dead since the repo drones moved in.",
 		"Cryo-bay's full of collateral. Some of them still snore.",
-		"Halcyon's drones are scanning everything. Even the rats."
+		"Halcyon's drones are scanning everything. Even the rats.",
+		"Somebody's still paying rent on cryo-pod 9. Forty years of rent.",
+		"The lights flicker in code. I think they're asking for a raise.",
+		"Don't take the left corridor. It bills by the step.",
+		"Old station, old debts. Even the rust owes money.",
+		"The vending machine here only takes coins from before the war."
 	],
 	"crisis:air_bubble": [
-		"Breathing futures are up again. I'm shorting my lungs."
+		"Breathing futures are up again. I'm shorting my lungs.",
+		"My air canister was worth more than my flat this morning. Now it's worth a sandwich.",
+		"Analysts say breathing is overvalued. I say breathing is breathing.",
+		"I'm holding my breath until prices drop. Day three.",
+		"Sold my lungs at the peak. Bought them back at the peak. Don't ask."
 	],
 	"crisis:debt_strike": [
-		"We're not paying! They can't repossess ALL of us. ...Can they?"
+		"We're not paying! They can't repossess ALL of us. ...Can they?",
+		"Solidarity! Also, does anyone have a spare filter?",
+		"My landlord tried to evict me. I evicted him back. It's legal now. I think.",
+		"The repo drones are confused. Nobody's answering the door.",
+		"First proper sleep in years. Turns out debt is loud."
 	],
 	"crisis:paste_recall": [
-		"They found a tooth in Batch 88. Not a human tooth. Not an animal tooth."
+		"They found a tooth in Batch 88. Not a human tooth. Not an animal tooth.",
+		"Batch 88 is fine, they said. Batch 88 blinked at me.",
+		"I've eaten paste every day for twenty years and I'm FINE. I'm fine. I'm fine.",
+		"Recall notice says 'return unused portions'. What about the used portions?",
+		"Gristle's offering a coupon for the next batch. As compensation."
 	],
 	"crisis:ad_overload": [
-		"Even my dreams have unskippable ads now."
+		"Even my dreams have unskippable ads now.",
+		"I blinked and an ad played behind my eyelids.",
+		"My shadow has a sponsor now.",
+		"I tried to scream and it came out as a jingle.",
+		"They're selling ad space on the rain. Every drop."
 	],
 	"crisis:compliance_week": [
-		"Report a neighbour, win a toaster! I already reported myself twice."
+		"Report a neighbour, win a toaster! I already reported myself twice.",
+		"I smiled at a stranger. Got a commendation AND a fine.",
+		"My neighbour reported my neighbour. I reported them both. We're all getting toasters.",
+		"Compliance week: they check your pockets, your heart and your search history.",
+		"Be compliant. Be visible. Be home by curfew. Be quiet about it."
 	],
 	"famous": [
 		"That's {name}! From the feeds!",
@@ -83,72 +185,208 @@
 		"My cousin's a big fan. Also a big Paragon informant.",
 		"You look shorter in real life.",
 		"Sign my air canister!",
-		"Is it true what Lumen says about you?"
+		"Is it true what Lumen says about you?",
+		"{name}! I named my pet drone after you!",
+		"Can you say my name? It's for my funeral playlist.",
+		"Is it true you punched a billboard once?",
+		"Lumen's doing a series on you. It's mostly lies. I love it."
 	],
 	"wanted": [
 		"That's the face from the posters...",
 		"Don't look. DON'T LOOK. Okay, look a little.",
 		"There's a reward for you, you know. A big one.",
 		"Paragon's been asking about you all week.",
-		"I didn't see you. I don't see anybody. I'm blind on Thursdays."
+		"I didn't see you. I don't see anybody. I'm blind on Thursdays.",
+		"Paragon says you're armed and handsome. Or dangerous. I forget which.",
+		"If they ask, I was never here. If they pay, I was totally here."
 	],
 	"rich_player": [
 		"Nice coat. Real fabric? Must be nice.",
 		"Rich people don't come down here unless they're buying the street.",
 		"Smells like money. Old money.",
-		"Spare a credit, your highness?"
+		"Spare a credit, your highness?",
+		"Did your shoes cost more than my block?",
+		"Are you lost, boss? The rich part is upwards.",
+		"Look, a shareholder in the wild!"
 	],
 	"poor_player": [
 		"You look like you slept under the ad-bridge too.",
 		"Hang in there. Nobody else will.",
-		"Need a tip? The noodle stand gives leftovers after midnight."
+		"Need a tip? The noodle stand gives leftovers after midnight.",
+		"The shelter on the corner has heat on Wednesdays.",
+		"You look hungry. I'm hungry too. Let's be hungry together.",
+		"Want half my paste? It's the bad half."
 	],
 	"old_player": [
 		"Respect, grandparent. You survived this long.",
-		"My nan says air used to be free. She's a liar, right? Right?"
+		"My nan says air used to be free. She's a liar, right? Right?",
+		"Back in your day, was the sky blue? Mine's billed monthly.",
+		"You've got stories. I can tell. Most of them illegal."
 	],
 	"young_player": [
 		"Shouldn't you be in a learning-subscription?",
-		"Kids these days. Already in debt. Respect."
+		"Kids these days. Already in debt. Respect.",
+		"Aren't you a bit young for {planet}?",
+		"Go home, kid. Oh. This is home. Sorry."
 	],
 	"liberated": [
 		"No owners here anymore. Just us. It's chaos. It's wonderful.",
 		"We vote on things now. Mostly about noise. But we VOTE.",
-		"Paragon left. The air smells different. Better? Different."
+		"Paragon left. The air smells different. Better? Different.",
+		"We painted over the billboards. Now it's just walls. Lovely, quiet walls.",
+		"Free air on Fridays! Every day is Friday now!"
 	],
 	"story_good": [
 		"Things got better around here. Someone actually helped.",
 		"Did you hear? Someone stood up for us.",
-		"I don't know who fixed it, but I'd buy them a drink."
+		"I don't know who fixed it, but I'd buy them a drink.",
+		"My kid laughed today. Out loud. For free.",
+		"Feels lighter around here. Must be the air. Or the people."
 	],
 	"story_bad": [
 		"Things got worse. Somebody sold us out.",
 		"Ever since that 'deal', nothing's been right here.",
-		"If I find who broke the strike..."
+		"If I find who broke the strike...",
+		"They doubled the curfew. Then they doubled it again.",
+		"Don't trust anyone with a clipboard. Not anymore."
 	],
 	"biome:neon_sprawl": [
 		"The sky is ads all the way up.",
 		"Watch out for low-flying cars. They don't stop for pedestrians. Or physics.",
-		"Rain again. It's always raining here. They bill by the drop."
+		"Rain again. It's always raining here. They bill by the drop.",
+		"If you're lost, follow the noodle smell.",
+		"The puddles reflect the ads. Even the ground is selling."
 	],
 	"biome:toxic_swamp": [
 		"Don't drink the water. Don't touch the water. Don't LOOK at the water.",
 		"The mushrooms are singing again.",
-		"My boots dissolved last week. Good boots."
+		"My boots dissolved last week. Good boots.",
+		"The frogs here have three eyes. Two of them are cameras.",
+		"Smells like money. Wet, rotting money."
 	],
 	"biome:ad_desert": [
 		"That billboard's been playing the same jingle for a hundred years.",
 		"It's not snow. It's shredded plastic. Breathe through your scarf.",
-		"Cold enough to freeze your debt. Almost."
+		"Cold enough to freeze your debt. Almost.",
+		"The dunes are made of old flyers. Read one, it's a coupon.",
+		"Out here the jingle is the only weather."
 	],
 	"biome:rust_canyon": [
 		"Seventy percent of the planet's gone. The other thirty is on layaway.",
 		"Hear that rumble? That's either the mine or the planet giving up.",
-		"Rust in your teeth, rust in your lungs. Home."
+		"Rust in your teeth, rust in your lungs. Home.",
+		"The canyon echoes. They charge for the echo.",
+		"My pickaxe is on lease. So is my back."
 	],
 	"biome:crystal_moon": [
 		"The crystals hum at night. Halcyon says it's 'asset noise'.",
 		"Don't touch the glowing ones. They're collateral.",
-		"Pretty, isn't it? Repossessed, but pretty."
+		"Pretty, isn't it? Repossessed, but pretty.",
+		"Listen. The crystals are humming the jingle.",
+		"Low gravity, high rent."
+	],
+	"taunt:paragon_officer": [
+		"Halt! Your loitering fee is overdue!",
+		"Stop resisting! It's billed by the minute!",
+		"You have the right to remain profitable!",
+		"Citizen! You're in breach of the new rule to #absurd_policy_lower#!",
+		"Hands where my bodycam can monetise them!",
+		"Paragon! Freeze! And smile for the feed!",
+		"This arrest is brought to you by #brand#!",
+		"Suspect sighted. Uploading your face to the ad network."
+	],
+	"hurt:paragon_officer": [
+		"Assaulting an officer is a premium offence!",
+		"Ow! That's going on your file! And your credit score!",
+		"Requesting backup! And a co-pay!",
+		"My armour was rented!"
+	],
+	"yield:paragon_officer": [
+		"Okay! Okay! I'm off the clock!",
+		"Don't! I've got a pension! Almost!",
+		"I just work here! I barely work here!"
+	],
+	"standdown:paragon_officer": [
+		"...Not my shift anymore.",
+		"Copy. Standing down. Billing someone else."
+	],
+	"taunt:repo_drone": [
+		"ASSET LOCATED.",
+		"PLEASE HOLD STILL FOR REPOSSESSION.",
+		"YOUR LUNGS ARE 3 PAYMENTS OVERDUE.",
+		"SCANNING... COLLATERAL DETECTED.",
+		"THANK YOU FOR CHOOSING HALCYON.",
+		"RESISTANCE WILL BE ADDED TO YOUR BALANCE.",
+		"THIS REPOSSESSION IS RECORDED FOR QUALITY PURPOSES."
+	],
+	"hurt:repo_drone": [
+		"DAMAGE INVOICED.",
+		"WARRANTY VOID.",
+		"ERROR: CUSTOMER NOT SATISFIED.",
+		"FEE APPLIED: #small_num# CR."
+	],
+	"yield:repo_drone": [
+		"ERROR. REQUESTING... MERCY.EXE",
+		"DEBT FORGIVEN. JOKE. PLEASE DO NOT SHOOT."
+	],
+	"standdown:repo_drone": [
+		"RETURNING TO DOCK.",
+		"CONTRACT PAUSED."
+	],
+	"taunt:debt_brute": [
+		"Time to pay up!",
+		"I collect. Debts, teeth, whatever's loose.",
+		"You owe! Everybody owes!",
+		"Interest is compounding, and so am I!",
+		"Halcyon sends regards. And knuckles."
+	],
+	"hurt:debt_brute": [
+		"That's gonna cost you extra!",
+		"Rude!",
+		"My chiropractor's gonna hear about this!"
+	],
+	"yield:debt_brute": [
+		"Fine! FINE! Your account's... settled!",
+		"I got kids! Well, I got debts shaped like kids!"
+	],
+	"standdown:debt_brute": [
+		"Boss says leave it. Lucky you."
+	],
+	"taunt:gristle_grub": [
+		"*gurgle* ...BUY...",
+		"*squelch*",
+		"*hungry paste noises*",
+		"skrrrrk!",
+		"...nom..."
+	],
+	"hurt:gristle_grub": [
+		"*splorch*",
+		"*indignant gurgle*"
+	],
+	"yield:gristle_grub": [
+		"*sad little bubble*"
+	],
+	"standdown:gristle_grub": [
+		"*bloop*"
+	],
+	"taunt:pirate": [
+		"Your cargo or your credit score!",
+		"Nice ship. Shame if it got repossessed. By me.",
+		"We're not pirates, we're freelance logistics!",
+		"Ha! Another tourist!",
+		"Hand it over! All of it! The paste too!",
+		"No Consortium out here, friend. Just us."
+	],
+	"hurt:pirate": [
+		"Argh! That was my good arm!",
+		"You'll pay for that! In actual money!",
+		"That's coming out of your share!"
+	],
+	"yield:pirate": [
+		"Parley! Parley! That's still a thing, right?",
+		"Take it! Take the loot! I was gonna fence it anyway!"
+	],
+	"standdown:pirate": [
+		"Captain says we're done here."
 	]
 }

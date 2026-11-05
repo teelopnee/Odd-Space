@@ -74,6 +74,10 @@ var _orbit := 1.0
 var _orbit_timer := 0.0
 var _lunge_dir := Vector3.ZERO
 var _telegraph: FXSprite
+var _speech: Label3D
+var _speech_tw: Tween
+var _bark_ready_ms := 0
+static var _last_bark_ms := 0
 
 
 func _ready() -> void:
@@ -367,6 +371,7 @@ func _update_hostility(initial: bool) -> void:
 		if not initial:
 			_show_alert("!!", Color(1, 0.2, 0.2), 1.2)
 			Audio.play_sfx("alert")
+			bark("taunt", 0.7)
 
 
 func provoke() -> void:
@@ -374,6 +379,7 @@ func provoke() -> void:
 		return
 	hostile = true
 	_show_alert("!!", Color(1, 0.2, 0.2), 1.2)
+	bark("taunt", 0.6)
 	if state == "idle" or state == "reporting":
 		_set_state("chase")
 
@@ -463,6 +469,7 @@ func take_hit(info: Dictionary) -> void:
 		_alert_allies()
 	elif not hostile:
 		provoke()
+	bark("hurt", 0.16)
 	var dmg := float(info.get("damage", 1.0))
 	var kind: String = info.get("kind", "projectile")
 	if kind == "explosion" and by_player:
@@ -545,6 +552,7 @@ func _surrender() -> void:
 	velocity = Vector3.ZERO
 	sprite.play("surrender" if sprite.has_anim("surrender") else "hurt", true)
 	_show_alert("?", Color(1.0, 0.9, 0.3), 3.0)
+	bark("yield", 1.0, true)
 	FX.slowmo(get_tree(), 0.3, 0.35)
 	for e in get_tree().get_nodes_in_group("enemy"):
 		if e != self and e.has_method("stand_down") and e.global_position.distance_to(global_position) < 14.0:
@@ -564,6 +572,7 @@ func stand_down() -> void:
 	force_hostile = false
 	set_meta("stood_down", true)
 	_set_state("idle")
+	bark("standdown", 0.6)
 
 
 ## Called by the story after you decide: "kill" finishes them, anything else lets them walk.
@@ -689,6 +698,8 @@ func _die(attacker, push: Vector3) -> void:
 	sprite.flash(Color(3.0, 3.0, 3.0), 0.12)
 	_knock = push * 1.8
 	_alert_label.visible = false
+	if _speech:
+		_speech.visible = false
 	_set_shield_visible(false)
 	if _telegraph and is_instance_valid(_telegraph):
 		_telegraph.queue_free()
@@ -842,6 +853,43 @@ func _refresh_markers() -> void:
 		var selected: bool = id == _selected_sub
 		label.modulate = Color(1.0, 0.3, 0.9) if selected else Color(0.4, 1.0, 1.0)
 		label.font_size = 36 if selected else 26
+
+
+## Combat chatter from data/barks.json ("<kind>:<enemy_type>"): cops quote policy, repo drones
+## read out your balance, brutes threaten interest. Throttled per enemy and across the whole fight.
+func bark(kind: String, chance: float = 1.0, force: bool = false) -> void:
+	if state == "dead" or randf() > chance:
+		return
+	var now := Time.get_ticks_msec()
+	if not force and (now < _bark_ready_ms or now - _last_bark_ms < 2200):
+		return
+	var lines: Array = NPC.barks().get("%s:%s" % [kind, enemy_type], [])
+	if lines.is_empty():
+		return
+	_bark_ready_ms = now + 7000
+	_last_bark_ms = now
+	if _speech == null:
+		_speech = Label3D.new()
+		_speech.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_speech.no_depth_test = true
+		_speech.pixel_size = 0.0042
+		_speech.font_size = 34
+		_speech.outline_size = 12
+		_speech.outline_modulate = Color(0.16, 0.02, 0.04, 0.95)
+		_speech.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_speech.width = 480
+		_speech.position = Vector3(0, 2.9 + (FLY_HEIGHT if flying else 0.0), 0)
+		add_child(_speech)
+	_speech.text = Copy.expand(str(lines[randi() % lines.size()]), null, {"name": Game.player_name})
+	_speech.modulate = Color(1.0, 0.86, 0.8, 0.0)
+	_speech.visible = true
+	if _speech_tw and _speech_tw.is_valid():
+		_speech_tw.kill()
+	_speech_tw = create_tween()
+	_speech_tw.tween_property(_speech, "modulate:a", 1.0, 0.12)
+	_speech_tw.tween_interval(clampf(1.4 + _speech.text.length() * 0.03, 1.8, 3.2))
+	_speech_tw.tween_property(_speech, "modulate:a", 0.0, 0.3)
+	_speech_tw.tween_callback(_speech.set_visible.bind(false))
 
 
 func _show_alert(text: String, color: Color, duration: float) -> void:

@@ -140,6 +140,9 @@ func _build_base() -> void:
 	_label.no_depth_test = false
 	_label.font_size = 64
 	_label.pixel_size = 0.008
+	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_label.width = 560  # ~4.5 m: long generated slogans wrap instead of running off the plaza
+	_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	_label.position = Vector3(0, 0.75, 1.45)  # ticker on the projector rim, always in frame
 	add_child(_label)
 

@@ -566,7 +566,9 @@ func _life(delta: float) -> void:
 		pool = b.get("infamous", [])
 	elif _partner != null and _rng.randf() < 0.6:
 		pool = b.get("pair", [])
-		_partner.call_deferred("hear_partner")
+		if not pool.is_empty():
+			_converse(str(pool[_rng.randi() % pool.size()]), _partner)
+			return
 	elif not Game.current_planet.is_empty() and _rng.randf() < 0.3:
 		pool = b.get("crisis:" + str(Game.current_planet.get("crisis", "")), [])
 	elif Game.current_planet.is_empty() and _rng.randf() < 0.3:
@@ -582,7 +584,26 @@ func _life(delta: float) -> void:
 	if pool.is_empty():
 		pool = b.get(role, b.get("civilian", []))
 	if not pool.is_empty():
-		say(str(pool[_rng.randi() % pool.size()]).replace("{name}", Game.player_name))
+		say(str(pool[_rng.randi() % pool.size()]))
+		if _partner != null and is_instance_valid(_partner) and _rng.randf() < 0.4:
+			_partner.reply_later(_rng.randf_range(1.8, 2.6))
+
+
+## A scripted exchange "A -- B -- C": lines alternate between this NPC and the partner.
+## Grammar is expanded once up front so both speakers talk about the same show / dish / team.
+func _converse(line: String, partner: Node) -> void:
+	var parts := Copy.expand(line, _rng, {"name": Game.player_name}).split(" -- ")
+	var at := 0.0
+	for i in parts.size():
+		var who: Node = self if i % 2 == 0 else partner
+		var text := parts[i].strip_edges()
+		if i == 0:
+			say(text, 2.4)
+		else:
+			who.reply_later(at, text)
+		at += clampf(1.2 + text.length() * 0.035, 1.6, 3.2)
+	_talking = at + 1.0
+	_bark_timer = maxf(_bark_timer, at + 4.0)
 
 
 ## Lines about YOU and this place: fame, bounty, class, age, the planet's story outcome, the biome.
@@ -617,21 +638,18 @@ func _reactive_barks(b: Dictionary) -> Array:
 
 
 ## Answer whatever the neighbour just said (two-sided street conversations).
-func reply_later(delay: float) -> void:
+func reply_later(delay: float, text: String = "") -> void:
 	_talking = delay + 2.5
-	_bark_timer = maxf(_bark_timer, 6.0)
+	_bark_timer = maxf(_bark_timer, delay + 5.0)
 	var t := get_tree().create_timer(delay)
 	t.timeout.connect(func():
 		if is_instance_valid(self) and state == "idle":
-			say(Copy.make("reply", _rng), 3.0))
-
-
-func hear_partner() -> void:
-	_talking = 2.5
-	_bark_timer = maxf(_bark_timer, 4.0)
+			say(text if text != "" else Copy.make("reply", _rng), 2.6))
 
 
 func say(text: String, duration: float = 3.4) -> void:
+	if text.contains("#") or text.contains("{"):
+		text = Copy.expand(text, _rng, {"name": Game.player_name})
 	_bubble.text = text
 	_bubble.visible = true
 	_bubble.modulate.a = 0.0
@@ -650,7 +668,7 @@ func _on_combat_nearby() -> void:
 	if global_position.distance_to(_player.global_position) < 10.0 and _rng.randf() < 0.5:
 		var lines: Array = barks().get("combat", [])
 		if not lines.is_empty():
-			say(lines[_rng.randi() % lines.size()], 2.0)
+			say(str(lines[_rng.randi() % lines.size()]), 2.0)
 		end_activity()
 		state = "flee"
 		_timer = 2.5

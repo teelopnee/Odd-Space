@@ -229,13 +229,14 @@ func spawn_npc(role: String, pos: Vector3, recruit_id: String = "") -> NPC:
 	n.role = role
 	n.recruit_id = recruit_id
 	n.faction = owner_faction
-	n.npc_name = CIVILIAN_NAMES[rng.randi() % CIVILIAN_NAMES.size()]
 	var style: String = "worker" if role == "merchant" else ["civilian", "civilian", "civilian", "worker", "punk", "robot"][rng.randi() % 6]
+	n.npc_name = Copy.make("robot_name" if style == "robot" else "npc_name", rng) if rng.randf() < 0.85 \
+		else CIVILIAN_NAMES[rng.randi() % CIVILIAN_NAMES.size()]
 	if owner_faction != "" and rng.randf() < 0.25:
 		style = "corporate:" + owner_faction
 	n.look = CharacterLook.random_look(rng, style)
 	if role == "merchant":
-		n.npc_name = ["Sal the Fence", "VEND-O-TRON", "Auntie Credit", "Mr. Markup"][rng.randi() % 4]
+		n.npc_name = Copy.make("merchant_name", rng)
 		n.traits.assign(["corporate"] if rng.randf() < 0.5 else ["poor"])
 	else:
 		var pool := ["poor", "worker", "artsy", "corporate", "rebel", "weird"]

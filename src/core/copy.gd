@@ -64,13 +64,16 @@ static func _fill(text: String, vars: Dictionary) -> String:
 	if not text.contains("{"):
 		return text
 	var v := vars.duplicate()
+	var game: Node = null
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree and tree.root.has_node("Game"):
+		game = tree.root.get_node("Game")
 	if not v.has("planet"):
-		var loc := ""
-		if Engine.get_main_loop() and Engine.get_main_loop().root.has_node("Game"):
-			loc = str(Engine.get_main_loop().root.get_node("Game").location_name)
+		var loc := str(game.location_name) if game else ""
 		v["planet"] = loc if loc != "" else "the Sprawl"
 	if not v.has("player"):
-		v["player"] = "you"
+		var pn := str(game.player_name) if game else ""
+		v["player"] = pn if pn != "" else "you"
 	for k in v:
 		text = text.replace("{%s}" % k, str(v[k])).replace("{%s}" % str(k).to_upper(), str(v[k]).to_upper())
 	return text
