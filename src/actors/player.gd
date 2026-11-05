@@ -36,6 +36,7 @@ const COMBO := [
 var state := State.NORMAL
 var facing := Vector3(0, 0, 1)
 var input_locked := false
+var input_grace := 0.0  ## seconds of ignored action buttons after a menu/dialogue closes
 var gravity_scale := 1.0
 
 var target: Node3D = null
@@ -200,6 +201,9 @@ func _normal_state(delta: float, move_dir: Vector3, strength: float) -> void:
 			FX.dust(get_parent(), global_position, 0.6)
 		facing = move_dir.normalized()
 	if input_locked:
+		return
+	if input_grace > 0.0:
+		input_grace -= delta
 		return
 	if Input.is_action_just_pressed("dodge") and _roll_cd <= 0.0:
 		_start_roll(move_dir)

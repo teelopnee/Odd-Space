@@ -852,6 +852,7 @@ func _close_modal() -> void:
 	_touch_root.visible = touch_enabled() and not cinematic_on
 	get_tree().paused = false
 	if player:
+		player.input_grace = 0.25  # the A/Y that confirmed a choice must not also roll / interact
 		player.refresh_interaction()
 	_refresh_status()
 

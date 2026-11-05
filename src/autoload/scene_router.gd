@@ -27,6 +27,7 @@ var _rect: ColorRect
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	ensure_gamepad_ui()
 	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
 		input_device = "touch"
 	if not Input.get_connected_joypads().is_empty():
@@ -103,3 +104,24 @@ func _on_joy_changed(_device: int, connected: bool) -> void:
 	elif Input.get_connected_joypads().is_empty() and (OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()):
 		input_device = "touch"
 		EventBus.input_device_changed.emit("touch")
+
+
+## Godot 4.7's built-in ui_accept / ui_cancel carry no gamepad buttons (and a joypad
+## event added to ui_accept in project.godot is dropped on load), so menus could be
+## navigated with the D-pad but nothing could be confirmed. Bind them at runtime:
+## A = confirm, B = back, plus Start as an extra confirm on title-like screens.
+static func ensure_gamepad_ui() -> void:
+	var binds := {"ui_accept": [JOY_BUTTON_A], "ui_cancel": [JOY_BUTTON_B]}
+	for action in binds:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		for b in binds[action]:
+			var have := false
+			for e in InputMap.action_get_events(action):
+				if e is InputEventJoypadButton and (e as InputEventJoypadButton).button_index == b:
+					have = true
+			if not have:
+				var ev := InputEventJoypadButton.new()
+				ev.device = -1
+				ev.button_index = b
+				InputMap.action_add_event(action, ev)
