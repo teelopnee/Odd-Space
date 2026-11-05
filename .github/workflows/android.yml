@@ -89,7 +89,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete latest --yes --cleanup-tag || true
-          gh release create latest build/odd-space.apk --prerelease \
-            --title "Latest build ($(git rev-parse --short HEAD))" \
-            --notes "Auto-built from main @ ${GITHUB_SHA}. On the tablet: download odd-space.apk and open it to install/update."
+          # Never delete-then-create: if GitHub's API hiccups halfway, the tablet would have nothing to
+          # download. Update the existing release in place, retrying on 5xx errors.
+          retry() { for i in 1 2 3 4 5; do "$@" && return 0; echo "retry $i: $*"; sleep $((i * 10)); done; return 1; }
+          TITLE="Latest build ($(git rev-parse --short HEAD))"
+          NOTES="Auto-built from main @ ${GITHUB_SHA}. On the tablet: download odd-space.apk and open it to install/update."
+          git tag -f latest && retry git push -f origin refs/tags/latest
+          if gh release view latest >/dev/null 2>&1; then
+            retry gh release upload latest build/odd-space.apk --clobber
+            retry gh release edit latest --prerelease --title "$TITLE" --notes "$NOTES"
+          else
+            retry gh release create latest build/odd-space.apk --prerelease --title "$TITLE" --notes "$NOTES"
+          fi
