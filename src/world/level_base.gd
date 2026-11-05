@@ -338,7 +338,7 @@ func _lightning(t: Timer) -> void:
 
 ## Weather particles ride along with the camera so they always fill the view.
 func _build_weather(kind: String) -> void:
-	if kind == "" or kind == "dust":
+	if kind == "" or kind == "dust" or OS.get_environment("ODD_NO_WEATHER") == "1":
 		return
 	var p := CPUParticles3D.new()
 	p.local_coords = false
