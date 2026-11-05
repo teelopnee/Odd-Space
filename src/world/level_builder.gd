@@ -785,7 +785,8 @@ func _lamp(p: Vector3) -> void:
 		add_mesh(body, cylinder(0.08, 3.2, 6), _mats["dark"], Vector3(0, 1.6, 0))
 		add_mesh(body, box(Vector3(0.9, 0.12, 0.3)), emissive(col, 4.0), Vector3(0.3, 3.2, 0), 0.0, false)
 		add_box_collider(body, Vector3(0.3, 3.2, 0.3), Vector3(0, 1.6, 0))
-		add_light(p + Vector3(0.4, 2.9, 0.2), col, 2.4, 8.0)
+		add_light(p + Vector3(0.4, 2.9, 0.2), col, 3.2, 9.5)
+		light_shaft(p + Vector3(0.3, 1.5, 0.05), col, 2.4, 3.0, 0.14)
 	else:
 		add_mesh(root, box(Vector3(1.2, 0.08, 0.25)), emissive(col, 5.0), p + Vector3(0, 3.0, 0), 0.0, false)
 		add_mesh(root, cylinder(0.02, 0.6, 4), _mats["dark"], p + Vector3(0, 3.35, 0), 0.0, false)
