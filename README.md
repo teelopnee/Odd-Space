@@ -12,7 +12,8 @@
 | | |
 |---|---|
 | ![Intro](docs/screenshots/intro.jpg) | ![Combat](docs/screenshots/combat.jpg) |
-| ![Swamp](docs/screenshots/planet_swamp.jpg) | ![Landing](docs/screenshots/planet_landing.jpg) |
+| ![Swamp](docs/screenshots/planet_swamp.jpg) | ![Desert](docs/screenshots/planet_desert.jpg) |
+| ![Character creation](docs/screenshots/character_creation.jpg) | ![Landing](docs/screenshots/planet_landing.jpg) |
 
 ---
 
