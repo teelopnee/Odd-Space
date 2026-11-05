@@ -179,7 +179,8 @@ func _set_faded(body: Object, faded: bool) -> void:
 	for mat in body.get_meta("fade_mats", []):
 		var m: StandardMaterial3D = mat
 		var tw := create_tween()
-		tw.tween_property(m, "albedo_color:a", 0.22 if faded else 1.0, 0.2)
+		# Full cut-away: a hashed alpha of ~0.2 leaves a dotted veil over the whole frame.
+		tw.tween_property(m, "albedo_color:a", 0.0 if faded else 1.0, 0.18)
 	for n in body.get_meta("fade_hide", []):
 		if is_instance_valid(n):
 			n.visible = not faded
