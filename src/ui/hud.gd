@@ -36,6 +36,7 @@ var _touch_root: Control
 var _joystick: TouchStick
 var _touch_buttons: Array[TouchButton] = []
 var _use_btn: TouchButton
+var _objective_label: Label
 var _oc_bar: HBoxContainer
 var _oc_pips: Array[ColorRect] = []
 var _oc_label: Label
@@ -231,6 +232,10 @@ func _build_status() -> void:
 	v.add_child(_air_label)
 	_bounty_label = make_label("", 14, Color(1.0, 0.35, 0.35))
 	v.add_child(_bounty_label)
+	_objective_label = make_label("", 14, Color(1.0, 0.85, 0.4))
+	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_objective_label.custom_minimum_size = Vector2(380, 0)
+	v.add_child(_objective_label)
 
 
 func _build_comm() -> void:
@@ -530,6 +535,8 @@ func _connect_signals() -> void:
 	EventBus.mishap.connect(_on_mishap)
 	EventBus.inventory_changed.connect(func(_i, _c): _refresh_status())
 	EventBus.overclock_changed.connect(_on_overclock)
+	Saga.objective_changed.connect(_refresh_objective)
+	_refresh_objective()
 
 
 func _refresh_status() -> void:
@@ -561,6 +568,19 @@ func toast(text: String, color: Color = Color(0.85, 0.97, 1.0)) -> void:
 	tw.tween_interval(4.5)
 	tw.tween_property(l, "modulate:a", 0.0, 0.8)
 	tw.tween_callback(l.queue_free)
+
+
+func _refresh_objective() -> void:
+	if _objective_label == null:
+		return
+	var lines: Array[String] = []
+	var main := Saga.objective_text()
+	if main != "":
+		lines.append("> " + main)
+	for q in Saga.side_quests_at(Game.location_id):
+		if q.status == "active":
+			lines.append("- %s%s" % [q.title, "  (return for reward)" if q.get("ready", false) else ""])
+	_objective_label.text = "\n".join(lines)
 
 
 func _on_overclock(meter: float, active_time: float) -> void:
@@ -795,7 +815,7 @@ func show_dialogue(speaker: String, text: String, choices: Array, callback: Call
 		b.pressed.connect(_on_choice.bind(str(ch.get("id", ""))))
 		_dialogue_choices.add_child(b)
 		if first and not b.disabled:
-			b.call_deferred("grab_focus")
+			_safe_focus.call_deferred(b)
 			first = false
 
 
@@ -898,7 +918,7 @@ func _fill_shop(vendor: String, faction_id: String, stock: Array) -> void:
 		row.add_child(sell)
 	var close := Button.new()
 	close.text = "DONE"
-	close.call_deferred("grab_focus")
+	_safe_focus.call_deferred(close)
 	close.pressed.connect(func():
 		_shop_panel.visible = false
 		_after_modal_closed())
@@ -928,7 +948,7 @@ func show_death_screen() -> void:
 	_death_panel.visible = true
 	for c in _death_panel.get_child(0).get_children():
 		if c is Button:
-			c.call_deferred("grab_focus")
+			_safe_focus.call_deferred(c)
 			break
 
 
@@ -938,3 +958,9 @@ func _on_reload() -> void:
 		Router.continue_run()
 	else:
 		Router.goto(Router.TITLE)
+
+
+## Deferred focus that tolerates the control (or its scene) being freed meanwhile.
+func _safe_focus(c: Control) -> void:
+	if is_instance_valid(c) and c.is_inside_tree():
+		c.grab_focus()

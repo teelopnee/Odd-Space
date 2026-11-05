@@ -66,6 +66,7 @@ func _rebuild() -> void:
 	for c in _tabs.get_children():
 		_tabs.remove_child(c)
 		c.queue_free()
+	_tab_journal()
 	_tab_status()
 	_tab_perks()
 	_tab_factions()
@@ -102,6 +103,70 @@ func _rich(text: String) -> RichTextLabel:
 
 
 # --- Tabs ----------------------------------------------------------------------------------
+
+func _tab_journal() -> void:
+	var v := _page("Journal")
+	v.add_child(HUD.make_label("YOUR STORY  //  generated for this run only - nobody else gets this one", 16, Color(1.0, 0.82, 0.24)))
+	var obj := Saga.objective_text()
+	if obj != "":
+		v.add_child(_rich("[color=#ffd23e][b]CURRENT:[/b][/color] " + obj))
+	v.add_child(_rich("[color=#3ee6ff]CAST[/color]"))
+	var cast_row := HBoxContainer.new()
+	cast_row.add_theme_constant_override("separation", 10)
+	v.add_child(cast_row)
+	var known := {"ally": true, "antagonist": Saga.index >= 1, "lieutenant": Saga.index >= 2, "personal": Saga.index >= 2}
+	for role in ["ally", "antagonist", "lieutenant", "personal"]:
+		var p := Saga.persona_by_role(role)
+		if p.is_empty():
+			continue
+		cast_row.add_child(_cast_card(p, role, known.get(role, false)))
+	var sq := "[color=#3ee6ff]SIDE JOBS[/color]\n"
+	var any := false
+	for pid in Saga.side:
+		for q in Saga.side[pid]:
+			if q.status == "offered":
+				continue
+			any = true
+			sq += "- %s  [%s] @ %s\n" % [q.title, "DONE" if q.status == "done" else ("RETURN" if q.get("ready", false) else "ACTIVE"), Game.planet_by_id(pid).get("name", "?")]
+	if not any:
+		sq += "None yet. Locals with a [color=#80ffe6]?[/color] over their heads have work.\n"
+	v.add_child(_rich(sq))
+	var log_txt := "[color=#3ee6ff]LOG[/color]\n"
+	for i in range(Saga.journal.size() - 1, -1, -1):
+		var e: Dictionary = Saga.journal[i]
+		log_txt += "[b]%s[/b]  [color=#8fa8ff](%s)[/color]\n%s\n\n" % [e.get("title", ""), e.get("where", ""), e.get("text", "")]
+	v.add_child(_rich(log_txt))
+
+
+## Portrait card for a saga character (silhouette until the story reveals them).
+func _cast_card(p: Dictionary, role: String, revealed: bool) -> Control:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var cv := VBoxContainer.new()
+	card.add_child(cv)
+	var portrait := LookPreview.new()
+	portrait.custom_minimum_size = Vector2(0, 110)
+	portrait.turn_every = 0.0 if not revealed else 1.4
+	portrait.anim = "idle" if role != "antagonist" else "talk"
+	cv.add_child(portrait)
+	var look: Dictionary = p.get("look", {})
+	if not revealed:
+		look = {"variant": look.get("variant", "h00"), "colors": {}}
+		portrait.set_tint(Color(0.07, 0.06, 0.14))
+	portrait.set_look(look)
+	var info := RichTextLabel.new()
+	info.bbcode_enabled = true
+	info.fit_content = true
+	info.add_theme_font_size_override("normal_font_size", 13)
+	info.add_theme_font_size_override("bold_font_size", 14)
+	if revealed:
+		info.text = "[b]%s[/b]\n[color=#ffd23e]%s[/color] - %s\n[i]%s; %s[/i]" % [p.get("name", "?"), role.to_upper(), p.get("job", ""),
+			", ".join(PackedStringArray(p.get("traits", []))), p.get("quirk", "")]
+	else:
+		info.text = "[b]???[/b]\n[color=#ffd23e]%s[/color]" % role.to_upper()
+	cv.add_child(info)
+	return card
+
 
 func _tab_status() -> void:
 	var v := _page("Status")

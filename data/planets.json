@@ -13,9 +13,9 @@
 			"fog": "#3a1060",
 			"fog_density": 0.012,
 			"sun": "#9a7dff",
-			"sun_energy": 0.35,
+			"sun_energy": 0.45,
 			"ambient": "#4a3a80",
-			"ambient_energy": 0.7,
+			"ambient_energy": 0.9,
 			"neon": [
 				"#ff3ec8",
 				"#3ee6ff",
@@ -43,7 +43,15 @@
 			"plant": "#5a9a7a",
 			"plant_glow": 0.0,
 			"puddles": "water",
-			"weather": "rain"
+			"weather": "rain",
+			"path_tex": "asphalt",
+			"water": "#05060c",
+			"water_glow": "#3ee6ff",
+			"water_glow_strength": 0.06,
+			"building_h": [
+				5.0,
+				11.0
+			]
 		},
 		{
 			"id": "toxic_swamp",
@@ -90,7 +98,15 @@
 			"plant": "#8ae06a",
 			"plant_glow": 0.55,
 			"puddles": "toxic",
-			"weather": "spores"
+			"weather": "spores",
+			"path_tex": "planks",
+			"water": "#08240c",
+			"water_glow": "#5aff3a",
+			"water_glow_strength": 0.16,
+			"building_h": [
+				3.2,
+				5.0
+			]
 		},
 		{
 			"id": "ad_desert",
@@ -133,7 +149,15 @@
 			"plant": "#c0e0ff",
 			"plant_glow": 0.2,
 			"puddles": "",
-			"weather": "snow"
+			"weather": "snow",
+			"path_tex": "concrete",
+			"water": "#4a6a90",
+			"water_glow": "#9ad0ff",
+			"water_glow_strength": 0.08,
+			"building_h": [
+				3.5,
+				6.0
+			]
 		},
 		{
 			"id": "rust_canyon",
@@ -177,7 +201,15 @@
 			"plant": "#c8a060",
 			"plant_glow": 0.0,
 			"puddles": "",
-			"weather": "embers"
+			"weather": "embers",
+			"path_tex": "floor_grate",
+			"water": "#2a0c04",
+			"water_glow": "#ff5a1e",
+			"water_glow_strength": 0.12,
+			"building_h": [
+				3.2,
+				5.5
+			]
 		},
 		{
 			"id": "crystal_moon",
@@ -222,7 +254,15 @@
 			"plant": "#c8a8ff",
 			"plant_glow": 0.8,
 			"puddles": "",
-			"weather": "motes"
+			"weather": "motes",
+			"path_tex": "floor_tile",
+			"water": "#140828",
+			"water_glow": "#c07dff",
+			"water_glow_strength": 0.22,
+			"building_h": [
+				3.5,
+				6.0
+			]
 		}
 	],
 	"crises": [

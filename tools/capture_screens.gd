@@ -1,18 +1,22 @@
 extends SceneTree
 ## Renders key scenes and saves PNG screenshots (needs a real renderer, not --headless).
 ## Run (Linux, no GPU):  xvfb-run -s "-screen 0 1280x800x24" godot --path . \
-##                        --script res://tools/capture_screens.gd -- <out_dir> [--dof=off|physical|tilt_shift]
+##                        --script res://tools/capture_screens.gd -- <out_dir> [--quick] [--dof=off|physical|tilt_shift]
 ## (Don't pass --rendering-driver: it silently switches the renderer to Forward+.)
 
 var _out := "user://screens"
 var _step := 0
 var _wait := 0
+var _queue: Array = []
+var _current := ""
+var _quick := false  ## --quick: creator + one shot per biome, skip the station/star map
 
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if not args.is_empty():
 		_out = args[0]
+	_quick = args.has("--quick")
 	DirAccess.make_dir_recursive_absolute(_out)
 
 
@@ -30,6 +34,11 @@ func _process(_delta: float) -> bool:
 			_next(30)
 		2:
 			_shot("02_character_creation")
+			if _quick:
+				root.get_node("Game").new_game("Rex Vantablack", {"background": "cryo_debtor", "motivation": "burn_consortium", "secret": "kleptomaniac"}, 4242)
+				_step = 9
+				_wait = 5
+				return false
 			root.get_node("Game").new_game("Rex Vantablack", {"background": "cryo_debtor", "motivation": "burn_consortium", "secret": "kleptomaniac"}, 4242)
 			change_scene_to_file("res://scenes/world/station_prologue.tscn")
 			_next(150)
@@ -85,20 +94,32 @@ func _process(_delta: float) -> bool:
 			_shot("07_planet_landing")
 			_next(260)
 		9:
-			_shot("08_planet_a")
+			if not _quick:
+				_shot("08_planet_a")
+			# One shot per distinct biome in this universe (dense random worlds).
 			var g = root.get_node("Game")
-			root.get_node("Router").params = {"planet_id": g.galaxy[1].id}
-			change_scene_to_file("res://scenes/world/planet_surface.tscn")
-			_next(400)
+			var seen := {}
+			for pl in g.galaxy:
+				if not seen.has(pl.environment):
+					seen[pl.environment] = true
+					_queue.append(pl)
+			_next(1)
 		10:
-			_shot("09_planet_b")
-			var g = root.get_node("Game")
-			root.get_node("Router").params = {"planet_id": g.galaxy[0].id}
+			if _queue.is_empty():
+				quit(0)
+				return false
+			var pl: Dictionary = _queue.pop_front()
+			_current = "09_world_%s" % pl.environment
+			root.get_node("Router").params = {"planet_id": pl.id}
 			change_scene_to_file("res://scenes/world/planet_surface.tscn")
-			_next(400)
+			_next(380)
 		11:
-			_shot("10_planet_c")
-			quit(0)
+			var hud = get_first_node_in_group("hud")
+			if hud and hud._dialogue_open:
+				hud._on_choice("")
+			paused = false
+			_shot(_current)
+			_step = 10
 	return false
 
 

@@ -3,23 +3,10 @@ extends Level
 ## environment -> palette/props, controller -> who guards it & owns the stuff,
 ## crisis -> enemy density/prices, anomaly -> gravity, fog, ad ghosts, rain...
 
-const W := 36
-const H := 26
-const PROP_CHARS := {"rock": "r", "crystal": "c", "mushroom": "u", "pipe": "p", "tank": "t", "antenna": "n", "ruin": "z", "crate": "="}
-const CONTROLLER_ENEMIES := {
-	"paragon": {"G": 4},
-	"halcyon": {"E": 3, "H": 1},
-	"gristle": {"B": 5, "G": 1},
-	"oxy": {"G": 2, "E": 2},
-	"lumen": {"G": 2, "E": 2},
-	"": {"R": 4, "B": 2},
-}
-
 var planet: Dictionary = {}
 var env_layer: Dictionary = {}
 var crisis_layer: Dictionary = {}
 var anomaly_layer: Dictionary = {}
-var _grid: Array = []
 
 
 func _setup() -> void:
@@ -29,9 +16,10 @@ func _setup() -> void:
 	env_layer = PlanetGenerator.layer(planet, "environments")
 	crisis_layer = PlanetGenerator.layer(planet, "crises")
 	anomaly_layer = PlanetGenerator.layer(planet, "anomalies")
-	palette = env_layer.duplicate()
+	palette = env_layer.duplicate(true)
 	owner_faction = planet.get("controller", "")
 	level_seed = int(planet.get("seed", 1))
+	_vary_palette()
 	# Outdoors the camera tilts up a little to show the horizon.
 	camera_pitch = 30.0
 	camera_distance = 16.0
@@ -54,93 +42,38 @@ func _is_outdoor() -> bool:
 
 
 func _get_layout() -> Array:
+	var gen := WorldGen.generate(level_seed, str(env_layer.get("id", "")), owner_faction, crisis_layer,
+		anomaly_layer.get("effects", {}), int(planet.get("difficulty", 1)), not Crew.is_full())
+	return gen.layout
+
+
+## Every planet of the same biome still looks different: nudge hues, fog, light and
+## weather from the planet seed (same seed -> same look, so saves stay consistent).
+func _vary_palette() -> void:
 	var r := RandomNumberGenerator.new()
-	r.seed = level_seed
-	_grid = []
-	for z in H:
-		var row := []
-		for x in W:
-			row.append("#" if x == 0 or z == 0 or x == W - 1 or z == H - 1 else ".")
-		_grid.append(row)
-	var pad_x := W / 2 - 1
-	var pad_z := H - 9
-	# Landing zone (kept clear).
-	for z in range(pad_z, pad_z + 3):
-		for x in range(pad_x, pad_x + 3):
-			_grid[z][x] = "D"
-	_grid[H - 5][W / 2] = "P"
-	# Buildings.
-	var tries := int(18 * float(env_layer.get("building_density", 0.5)))
-	for i in tries:
-		var bw := r.randi_range(2, 4)
-		var bh := r.randi_range(2, 3)
-		var bx := r.randi_range(2, W - bw - 3)
-		var bz := r.randi_range(2, H - bh - 12)
-		if _area_free(bx - 1, bz - 1, bw + 2, bh + 2):
-			for z in range(bz, bz + bh):
-				for x in range(bx, bx + bw):
-					_grid[z][x] = "b"
-	# Decor props from the environment's list.
-	var props: Array = env_layer.get("props", ["rock"])
-	for i in 26:
-		_place(r, PROP_CHARS.get(props[r.randi() % props.size()], "r"), 1, H - 2)
-	for i in 8:
-		_place(r, "L", 1, H - 2)
-	var ad_count := 4 + (4 if planet.get("crisis", "") == "ad_overload" else 0)
-	for i in ad_count:
-		_place(r, "A", 2, H - 8)
-	for i in 3:
-		_place(r, "X", 2, H - 8)
-		_place(r, "S", 2, H - 8)
-	# Services near the landing pad.
-	_place_near(r, "V", pad_x - 3, pad_z)
-	_place_near(r, "m", pad_x + 5, pad_z)
-	_place_near(r, "M", pad_x - 3, pad_z + 2)
-	_place_near(r, "T", pad_x + 5, pad_z + 2)
-	# Locals.
-	for i in r.randi_range(5, 8):
-		_place(r, "N", 2, H - 4)
-	if not Crew.is_full() and r.randf() < 0.55:
-		_place(r, "W", 2, H - 8)
-	# Enemies, by who controls the place and how bad the crisis is.
-	var mult := float(crisis_layer.get("enemy_mult", 1.0)) * (0.8 + 0.2 * int(planet.get("difficulty", 1)))
-	var table: Dictionary = CONTROLLER_ENEMIES.get(owner_faction, CONTROLLER_ENEMIES[""])
-	for ch in table:
-		for i in roundi(int(table[ch]) * mult):
-			_place(r, ch, 2, H - 13)
-	var fx: Dictionary = anomaly_layer.get("effects", {})
-	for i in int(fx.get("extra_bugs", 0)):
-		_place(r, "B", 2, H - 13)
-	var out := []
-	for row in _grid:
-		out.append("".join(PackedStringArray(row)))
-	return out
-
-
-func _area_free(x0: int, z0: int, w: int, h: int) -> bool:
-	for z in range(z0, z0 + h):
-		for x in range(x0, x0 + w):
-			if z <= 0 or x <= 0 or z >= H - 1 or x >= W - 1 or _grid[z][x] != ".":
-				return false
-	return true
-
-
-func _place(r: RandomNumberGenerator, ch: String, z_min: int, z_max: int) -> void:
-	for attempt in 30:
-		var x := r.randi_range(1, W - 2)
-		var z := r.randi_range(z_min, z_max)
-		if _grid[z][x] == "." and _area_free(x - 1, z - 1, 3, 3):
-			_grid[z][x] = ch
-			return
-
-
-func _place_near(r: RandomNumberGenerator, ch: String, x: int, z: int) -> void:
-	for attempt in 20:
-		var px := clampi(x + r.randi_range(-1, 1), 1, W - 2)
-		var pz := clampi(z + r.randi_range(-1, 1), 1, H - 2)
-		if _grid[pz][px] == ".":
-			_grid[pz][px] = ch
-			return
+	r.seed = level_seed * 7 + 3
+	for key in ["ground", "ground_alt", "wall", "fog", "ambient", "plant"]:
+		if palette.has(key):
+			var c := Color.from_string(str(palette[key]), Color.GRAY)
+			c.h = fposmod(c.h + r.randf_range(-0.035, 0.035), 1.0)
+			c.v = clampf(c.v * r.randf_range(0.88, 1.14), 0.0, 1.0)
+			palette[key] = "#" + c.to_html(false)
+	var neon: Array = palette.get("neon", ["#ff3ec8", "#3ee6ff"]).duplicate()
+	for i in neon.size():
+		var c := Color.from_string(str(neon[i]), Color.MAGENTA)
+		c.h = fposmod(c.h + r.randf_range(-0.05, 0.05), 1.0)
+		neon[i] = "#" + c.to_html(false)
+	neon.append("#" + Color.from_hsv(r.randf(), 0.75, 1.0).to_html(false))
+	palette["neon"] = neon
+	palette["fog_density"] = float(palette.get("fog_density", 0.012)) * r.randf_range(0.7, 1.35)
+	palette["sun_energy"] = float(palette.get("sun_energy", 0.5)) * r.randf_range(0.8, 1.25)
+	var sun := Color.from_string(str(palette.get("sun", "#ffffff")), Color.WHITE)
+	sun = sun.lerp(Color.from_hsv(r.randf_range(0.0, 0.12) if r.randf() < 0.5 else r.randf_range(0.6, 0.8), 0.5, 1.0), r.randf_range(0.0, 0.35))
+	palette["sun"] = "#" + sun.to_html(false)
+	if palette.get("weather", "") == "rain" and r.randf() < 0.3:
+		palette["weather"] = ""
+	elif palette.get("weather", "") == "" and r.randf() < 0.3:
+		palette["weather"] = ["rain", "motes", "embers"][r.randi() % 3]
 
 
 func _post_build() -> void:
@@ -148,7 +81,7 @@ func _post_build() -> void:
 	if fx.has("ad_ghosts"):
 		for i in int(fx["ad_ghosts"]):
 			var ghost := AdGhost.new()
-			ghost.bounds = Rect2(4, 4, W * LevelBuilder.TILE - 8, (H - 8) * LevelBuilder.TILE)
+			ghost.bounds = Rect2(4, 4, builder.width * LevelBuilder.TILE - 8, (builder.height - 8) * LevelBuilder.TILE)
 			ghost.seed_value = level_seed + i
 			add_child(ghost)
 	if fx.get("reverse_rain", false):
@@ -157,22 +90,32 @@ func _post_build() -> void:
 	for member_id in Crew.pop_mutineers():
 		var d := Crew.def(member_id)
 		var pos := get_spawn_position() + Vector3(rng.randf_range(-6, 6), 0, -10)
-		spawn_enemy("pirate", pos, {"name": "%s (MUTINEER)" % d.get("name", member_id), "sprite": d.get("sprite", ""), "hostile": true})
+		spawn_enemy("pirate", pos, {"name": "%s (MUTINEER)" % d.get("name", member_id), "look": d.get("look", {}), "hostile": true})
 		EventBus.toast.emit("%s is here, and they're not here to talk." % d.get("name", member_id), Color(1, 0.3, 0.3))
 	Game.save_game()
 	_ambient_life()
+	refresh_quests()
 	_landing()
 
 
 func _ambient_life() -> void:
 	var weather := str(palette.get("weather", ""))
 	Audio.play_ambience("amb_rain" if weather == "rain" else "amb_wind")
-	for i in 3:
+	var area := Rect2(4, 4, builder.width * LevelBuilder.TILE - 8, builder.height * LevelBuilder.TILE - 10)
+	var city := str(env_layer.get("id", "")) == "neon_sprawl"
+	for i in (5 if city else 3):
 		var d := Critter.new()
 		d.kind = "drone"
-		d.bounds = Rect2(4, 4, W * LevelBuilder.TILE - 8, H * LevelBuilder.TILE - 10)
+		d.bounds = area
 		d.seed_value = level_seed + i
 		add_child(d)
+	# Sky traffic over the rooftops (sparser out in the wilds).
+	for i in (14 if city else 4):
+		var car := Critter.new()
+		car.kind = "car"
+		car.bounds = area
+		car.seed_value = level_seed * 3 + i
+		add_child(car)
 
 
 ## The Odd Duck touches down; then you step out and the chapter card rolls.
@@ -210,7 +153,7 @@ func _reverse_rain() -> void:
 	p.amount = 400
 	p.lifetime = 2.5
 	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-	p.emission_box_extents = Vector3(W, 0.5, H)
+	p.emission_box_extents = Vector3(builder.width, 0.5, builder.height)
 	p.direction = Vector3.UP
 	p.spread = 2.0
 	p.gravity = Vector3(0, 6, 0)
@@ -229,5 +172,5 @@ func _reverse_rain() -> void:
 	mat.emission_energy_multiplier = 1.5
 	streak.material = mat
 	p.mesh = streak
-	p.position = Vector3(W * LevelBuilder.TILE * 0.5, 0.1, H * LevelBuilder.TILE * 0.5)
+	p.position = Vector3(builder.width * LevelBuilder.TILE * 0.5, 0.1, builder.height * LevelBuilder.TILE * 0.5)
 	add_child(p)

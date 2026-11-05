@@ -4,8 +4,9 @@ extends Node3D
 ##   "bot"    : little maintenance robot puttering around the floor, blinking
 ##   "drone"  : ad-drone cruising overhead with a spotlight and a sales pitch
 ##   "flyby"  : a distant ship crossing the space backdrop behind station windows
+##   "car"    : sky traffic - hovercars streaming over the rooftops in lanes
 
-@export_enum("bot", "drone", "flyby") var kind := "bot"
+@export_enum("bot", "drone", "flyby", "car") var kind := "bot"
 var bounds := Rect2(0, 0, 40, 40)
 var seed_value := 0
 
@@ -30,8 +31,12 @@ func _ready() -> void:
 			_build_drone()
 		"flyby":
 			_build_flyby()
+		"car":
+			_build_car()
 	_pick_target()
-	if kind != "flyby":
+	if kind == "car":
+		position = position.lerp(_target, _rng.randf())
+	elif kind != "flyby":
 		position = _target
 		_pick_target()
 
@@ -135,6 +140,35 @@ func _build_flyby() -> void:
 	_speed = _rng.randf_range(2.5, 5.0)
 
 
+func _build_car() -> void:
+	var paint := _mat(Color.from_hsv(_rng.randf(), _rng.randf_range(0.2, 0.7), _rng.randf_range(0.2, 0.5)), 0.0, 0.7)
+	_add(_box(Vector3(2.2, 0.42, 1.0)), paint, Vector3.ZERO, true)
+	_add(_box(Vector3(1.0, 0.32, 0.86)), _mat(Color(0.3, 0.8, 1.0), 1.2, 0.2), Vector3(-0.1, 0.34, 0), false)
+	_add(_box(Vector3(0.06, 0.12, 0.8)), _mat(Color(1.0, 0.95, 0.8), 7.0), Vector3(1.12, 0.0, 0), false)
+	_add(_box(Vector3(0.06, 0.12, 0.9)), _mat(Color(1.0, 0.15, 0.2), 6.0), Vector3(-1.12, 0.05, 0), false)
+	var neon := [Color(1.0, 0.25, 0.8), Color(0.25, 0.9, 1.0), Color(1.0, 0.8, 0.2), Color(0.5, 1.0, 0.4)][_rng.randi() % 4] as Color
+	_blink = _add(_box(Vector3(1.9, 0.04, 0.9)), _mat(neon, 4.0), Vector3(0, -0.23, 0), false)
+	# Headlight beam: a long additive wedge, no real light (keeps the light budget).
+	var beam := QuadMesh.new()
+	beam.size = Vector2(5.0, 1.2)
+	var bm := StandardMaterial3D.new()
+	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	bm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	bm.cull_mode = BaseMaterial3D.CULL_DISABLED
+	bm.albedo_color = Color(1.0, 0.95, 0.7, 0.12)
+	beam.material = bm
+	var b := _add(beam, bm, Vector3(3.6, -0.1, 0), false)
+	b.rotation.x = -PI * 0.5
+	_speed = _rng.randf_range(6.0, 11.0)
+
+
+func _box(size: Vector3) -> BoxMesh:
+	var b := BoxMesh.new()
+	b.size = size
+	return b
+
+
 func _pick_target() -> void:
 	match kind:
 		"bot":
@@ -146,6 +180,13 @@ func _pick_target() -> void:
 			position = Vector3(bounds.position.x - 20.0 if left else bounds.end.x + 20.0, _rng.randf_range(1.5, 4.5), bounds.position.y)
 			_target = Vector3(bounds.end.x + 20.0 if left else bounds.position.x - 20.0, position.y + _rng.randf_range(-1, 1), bounds.position.y)
 			scale = Vector3(-1 if not left else 1, 1, 1) * _rng.randf_range(0.6, 1.2)
+		"car":
+			var left := _rng.randf() < 0.5
+			var lane_z := _rng.randf_range(bounds.position.y - 14.0, bounds.end.y - 4.0)
+			var lane_y := [7.5, 9.5, 11.5, 13.5][_rng.randi() % 4] as float
+			position = Vector3(bounds.position.x - 25.0 if left else bounds.end.x + 25.0, lane_y, lane_z)
+			_target = Vector3(bounds.end.x + 25.0 if left else bounds.position.x - 25.0, lane_y, lane_z)
+			rotation.y = 0.0 if left else PI
 
 
 func _process(delta: float) -> void:
@@ -161,6 +202,8 @@ func _process(delta: float) -> void:
 	if to.length() < 0.3:
 		if kind == "flyby":
 			_wait = _rng.randf_range(4.0, 14.0)
+		elif kind == "car":
+			_wait = _rng.randf_range(0.5, 5.0)
 		else:
 			_wait = _rng.randf_range(0.5, 3.0)
 			if _label:

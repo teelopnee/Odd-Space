@@ -2,6 +2,7 @@
  "frame_w": 64,
  "frame_h": 64,
  "foot_row": 60,
+ "indexed": true,
  "dirs": [
   "S",
   "SE",
@@ -9,9 +10,13 @@
   "NE",
   "N"
  ],
+ "tags": [
+  "bug"
+ ],
+ "cfg": {},
  "anims": {
   "idle": {
-   "fps": 8,
+   "fps": 7,
    "loop": true,
    "frames": 8,
    "rows": {
@@ -23,7 +28,7 @@
    }
   },
   "walk": {
-   "fps": 12,
+   "fps": 11,
    "loop": true,
    "frames": 8,
    "rows": {
@@ -46,8 +51,8 @@
     "N": 14
    }
   },
-  "shoot": {
-   "fps": 14,
+  "roll": {
+   "fps": 16,
    "loop": false,
    "frames": 6,
    "rows": {
@@ -58,8 +63,8 @@
     "N": 19
    }
   },
-  "slash1": {
-   "fps": 14,
+  "shoot": {
+   "fps": 18,
    "loop": false,
    "frames": 6,
    "rows": {
@@ -70,10 +75,10 @@
     "N": 24
    }
   },
-  "guard": {
-   "fps": 10,
+  "slash1": {
+   "fps": 18,
    "loop": false,
-   "frames": 4,
+   "frames": 6,
    "rows": {
     "S": 25,
     "SE": 26,
@@ -82,10 +87,10 @@
     "N": 29
    }
   },
-  "hurt": {
-   "fps": 12,
+  "slash2": {
+   "fps": 18,
    "loop": false,
-   "frames": 3,
+   "frames": 6,
    "rows": {
     "S": 30,
     "SE": 31,
@@ -94,10 +99,10 @@
     "N": 34
    }
   },
-  "dead": {
-   "fps": 9,
+  "slash3": {
+   "fps": 16,
    "loop": false,
-   "frames": 6,
+   "frames": 7,
    "rows": {
     "S": 35,
     "SE": 36,
@@ -106,10 +111,10 @@
     "N": 39
    }
   },
-  "charge": {
-   "fps": 12,
-   "loop": true,
-   "frames": 6,
+  "guard": {
+   "fps": 14,
+   "loop": false,
+   "frames": 4,
    "rows": {
     "S": 40,
     "SE": 41,
@@ -118,10 +123,10 @@
     "N": 44
    }
   },
-  "roll": {
-   "fps": 14,
+  "hurt": {
+   "fps": 12,
    "loop": false,
-   "frames": 6,
+   "frames": 3,
    "rows": {
     "S": 45,
     "SE": 46,
@@ -130,8 +135,8 @@
     "N": 49
    }
   },
-  "slash2": {
-   "fps": 14,
+  "dead": {
+   "fps": 9,
    "loop": false,
    "frames": 6,
    "rows": {
@@ -142,10 +147,10 @@
     "N": 54
    }
   },
-  "slash3": {
-   "fps": 14,
-   "loop": false,
-   "frames": 7,
+  "talk": {
+   "fps": 7,
+   "loop": true,
+   "frames": 8,
    "rows": {
     "S": 55,
     "SE": 56,
@@ -154,10 +159,10 @@
     "N": 59
    }
   },
-  "talk": {
-   "fps": 7,
+  "charge": {
+   "fps": 12,
    "loop": true,
-   "frames": 8,
+   "frames": 6,
    "rows": {
     "S": 60,
     "SE": 61,

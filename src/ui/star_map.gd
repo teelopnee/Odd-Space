@@ -93,6 +93,11 @@ func _build_planet_buttons() -> void:
 	for p in Game.galaxy:
 		var b := Button.new()
 		b.text = str(p.name)
+		if p.get("id", "") == Saga.objective_planet():
+			b.text = "* " + b.text + " *"
+			b.add_theme_color_override("font_color", Color(1.0, 0.82, 0.24))
+		elif p.get("id", "") == Game.flags.get("native_of", ""):
+			b.text = str(p.name) + " (home)"
 		b.add_theme_font_size_override("font_size", 14)
 		b.set_meta("planet", p)
 		b.pressed.connect(_select.bind(p))
@@ -101,7 +106,7 @@ func _build_planet_buttons() -> void:
 	_layout_planets.call_deferred()
 	for b in _map.get_children():
 		if b is Button:
-			b.call_deferred("grab_focus")
+			_safe_focus.call_deferred(b)
 			break
 
 
@@ -167,12 +172,20 @@ func _select(p: Dictionary) -> void:
 	if not known.is_empty():
 		text += "\n[color=#ff3ec8]They've heard about you:[/color] %d crime(s) on the Lumen feed." % known.size()
 	text += "\n[color=#3ee6ff]AIR COST:[/color] x%.1f" % float(p.get("air_mult", 1.0))
+	if p.get("id", "") == Saga.objective_planet():
+		text += "\n\n[color=#ffd23e][b]STORY:[/b][/color] " + Saga.objective_text()
+	var jobs := 0
+	for q in Saga.side_quests_at(p.get("id", "")):
+		if q.status != "done":
+			jobs += 1
+	if jobs > 0:
+		text += "\n[color=#80ffe6]%d side job(s) known here[/color]" % jobs
 	text += "\n\n[i]Hyperlane toll: %d cr (Halcyon). Can't pay? It goes on your debt.[/i]" % WARP_TOLL
 	_info.text = text
 	_warp_btn.disabled = false
 	_warp_btn.text = "WARP TO %s" % str(p.name).to_upper()
 	if Router.input_device == "gamepad":
-		_warp_btn.call_deferred("grab_focus")
+		_safe_focus.call_deferred(_warp_btn)
 
 
 func _refresh_side() -> void:
@@ -286,7 +299,7 @@ func _ask(title: String, text: String, choices: Array) -> Dictionary:
 	_modal_panel.visible = true
 	for b in v.get_children():
 		if b is Button and not b.disabled:
-			b.call_deferred("grab_focus")
+			_safe_focus.call_deferred(b)
 			break
 	var picked: Dictionary = await _answered
 	_modal.visible = false
@@ -314,3 +327,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_menu.switch_tab(-1)
 	elif _menu.visible and event.is_action_pressed("parry"):
 		_menu.switch_tab(1)
+
+
+## Deferred focus that tolerates the control (or its scene) being freed meanwhile.
+func _safe_focus(c: Control) -> void:
+	if is_instance_valid(c) and c.is_inside_tree():
+		c.grab_focus()

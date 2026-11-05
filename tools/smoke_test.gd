@@ -7,6 +7,7 @@ var _step := 0
 var _wait := 0
 var _planet_index := 0
 var _log: Array[String] = []
+var _saga_steps := 0
 
 
 func _process(_delta: float) -> bool:
@@ -52,6 +53,11 @@ func _process(_delta: float) -> bool:
 			_next(150)
 		7:
 			_combat_and_crime()
+			# Build every pause-menu tab (journal portraits, crew, causality...) once per planet.
+			var hud = get_first_node_in_group("hud")
+			if hud:
+				hud._menu.open("journal")
+				hud._menu.visible = false
 			_planet_index += 1
 			_step = 6
 			_wait = 120
@@ -66,11 +72,59 @@ func _process(_delta: float) -> bool:
 			print("save ok: ", game.save_game(2))
 			print("load ok: ", game.load_game(2))
 			_report_state()
-			_next(5)
+			_say("native start (random look, universe 4321)")
+			var rng := RandomNumberGenerator.new()
+			rng.seed = 99
+			var look: Dictionary = load("res://src/core/character_look.gd").call("random_look", rng, "hero")
+			game.new_game("Native Tester", {"background": "street_medic", "motivation": "find_sibling", "secret": "sleeper_agent"}, 4321, look, "")
+			var home: Dictionary = game.galaxy[2]
+			game.new_game("Native Tester", {"background": "street_medic", "motivation": "find_sibling", "secret": "sleeper_agent"}, 4321, look, home.id)
+			print("  home: %s  native_of=%s  credits=%d  look=%s" % [home.name, game.flags.get("native_of", ""), game.credits, look.variant])
+			root.get_node("Router").params = {"planet_id": home.id}
+			change_scene_to_file("res://scenes/world/planet_surface.tscn")
+			_next(150)
 		9:
+			_say("saga: play every beat")
+			change_scene_to_file("res://scenes/ui/star_map.tscn")
+			var bus = root.get_node("EventBus")
+			bus.dialogue_requested.connect(_auto_answer)
+			_next(20)
+		10:
+			var saga = root.get_node("Saga")
+			if saga.is_complete() or _saga_steps > 12:
+				print("  saga ending: %s  twist: %s  journal: %d entries" % [saga.ending, saga.twist_choice, saga.journal.size()])
+				_step = 11
+				return false
+			var b: Dictionary = saga.current()
+			_saga_steps += 1
+			print("  beat %d/%d %s (%s) on %s: %s" % [saga.index + 1, saga.beats.size(), b.get("id", "?"), b.get("type", "?"), saga.objective_planet(), saga.objective_text().left(90)])
+			print("    spawns there: ", saga.spawns_for(saga.objective_planet()).map(func(sp): return sp.kind))
+			match str(b.get("type", "")):
+				"talk":
+					saga.on_persona_talk(saga.cast.get(b.get("who", ""), ""))
+				"retrieve":
+					saga.on_item_taken(b.id)
+				"defeat":
+					var dummy := Node.new()
+					dummy.set_meta("saga_tag", b.id)
+					root.get_node("EventBus").enemy_killed.emit(dummy, {})
+					dummy.free()
+			_wait = 6
+		11:
 			print("SMOKE TEST DONE")
 			quit(0)
 	return false
+
+
+## Answers every dialogue with its first enabled choice, like an impatient player.
+func _auto_answer(_speaker: String, _text: String, choices: Array, callback: Callable) -> void:
+	var pick := ""
+	for c in choices:
+		if not c.get("disabled", false):
+			pick = str(c.get("id", ""))
+			break
+	if callback.is_valid():
+		callback.call_deferred(pick)
 
 
 func _next(frames: int) -> void:

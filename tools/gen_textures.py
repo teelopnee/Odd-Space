@@ -220,6 +220,42 @@ def concrete():
     save("concrete", alb, h, 2.0)
 
 
+def asphalt():
+    """City street: dark grainy tarmac with cracks and worn paint flecks."""
+    n = tile_noise(S, 8, 21, 4)
+    grain = tile_noise(S, 32, 22, 1)
+    crack = tile_noise(S, 4, 23, 2)
+    cracks = np.abs(crack - 0.5) < 0.012
+    h = n * 0.4 + grain * 0.3 - cracks * 0.5
+    v = 0.28 + n * 0.25 + (grain - 0.5) * 0.2
+    v = np.where(cracks, v - 0.15, v)
+    alb = colorize(np.clip(v, 0, 1), rgb("#101016"), rgb("#6a6878"))
+    y, x = np.mgrid[0:S, 0:S]
+    paint = (tile_noise(S, 16, 24, 1) > 0.86) & ((x // 8 + y // 8) % 5 == 0)
+    alb = np.where(paint[..., None], rgb("#c8b060")[None, None, :] * 0.8, alb)
+    save("asphalt", alb, h, 1.6)
+
+
+def planks():
+    """Boardwalk: horizontal weathered planks with dark gaps and nails."""
+    y, x = np.mgrid[0:S, 0:S]
+    board = y // 8
+    gap = (y % 8) == 0
+    r = rng(31)
+    offs = r.integers(0, S, size=S // 8)
+    seam = ((x + offs[board]) % 32) == 0
+    grain = tile_noise(S, 4, 32, 3)
+    streak = np.sin((x * 0.35 + grain * 6.0 + board * 1.7)) * 0.5 + 0.5
+    tone = r.random(S // 8)[board] * 0.25
+    v = 0.45 + streak * 0.2 + tone - 0.12
+    nail = (((x + offs[board]) % 32 == 3) | ((x + offs[board]) % 32 == 29)) & ((y % 8) == 4)
+    v = np.where(gap | seam, 0.05, v)
+    v = np.where(nail, 0.85, v)
+    h = np.where(gap | seam, 0.0, 0.8 + streak * 0.15)
+    alb = colorize(np.clip(v, 0, 1), rgb("#1e140c"), rgb("#b08a5c"))
+    save("planks", alb, h, 2.5)
+
+
 # ---------------------------------------------------------------- backdrops
 
 def space_backdrop():
@@ -391,6 +427,8 @@ def main():
     rock_cliff()
     building_panel()
     concrete()
+    asphalt()
+    planks()
     space_backdrop()
     silhouettes()
     foliage()

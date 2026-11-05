@@ -1,0 +1,92 @@
+{
+	"_doc": "Procedural saga templates. Every run Saga (src/autoload/saga.gd) rolls a unique antagonist, ally, MacGuffin, scheme, personal thread (from your Motivation tag) and twist (from your Secret tag), then lays 7 story beats across random planets. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {faction} {macguffin} {scheme} {personal} {lieutenant} {planet} {clue}.",
+	"names": {
+		"first": ["Juno", "Rex", "Marla", "Kaz", "Priya", "Otto", "Wen", "Lula", "Dex", "Ivo", "Sol", "Tam", "Bex", "Nova", "Ash", "Zara", "Mika", "Ezra", "Lena", "Taro", "Ines", "Kofi", "Anya", "Bram", "Cleo", "Dmitri", "Fen", "Gaia", "Hiro", "Odette", "Pasha", "Quinn", "Rosa", "Teo", "Uma", "Vik", "Yara", "Zeb"],
+		"last": ["Okafor", "Vance", "Duarte", "Ng", "Kowalski", "Mbeki", "Lindqvist", "Castellanos", "Haddad", "Tanaka", "Reyes", "O'Hara", "Petrov", "Achebe", "Moreau", "Sato", "Quill", "Nakamura", "Oyelaran", "Brightwater", "Kessler", "Abara", "Fontaine", "Szabo"],
+		"nick": ["Static", "Two-Bit", "Ledger", "Halo", "Rust", "Gutter", "Chrome", "Saint", "Ghost", "Vapor", "Quarterly", "Glitch", "Tin", "Neon", "Dividend", "Overdraft", "Patch", "Lucky"]
+	},
+	"traits": ["paranoid", "flamboyant", "gentle", "greedy", "poetic", "blunt", "nervous", "cheerfully nihilistic", "devoutly brand-loyal", "conspiracy-minded", "romantic", "exhausted"],
+	"quirks": [
+		"ends every sentence with 'per my last transmission'",
+		"hums ad jingles when nervous",
+		"refers to themself in the third person",
+		"counts everything out loud",
+		"calls everyone 'valued customer'",
+		"speaks only in questions when lying",
+		"keeps a pet cactus named Collateral",
+		"quotes their own Lumen reviews",
+		"apologises to vending machines"
+	],
+	"jobs": ["air sommelier", "debt counsellor", "paste taster", "ad-dream editor", "repo pilot", "union organiser", "clone tailor", "smuggler", "street medic", "holo-preacher", "junk oracle", "retired jingle writer", "rogue auditor", "cryo-thief", "billboard hacker", "noodle-stand philosopher"],
+	"antagonist_titles": ["VP of Breathing Experience", "Chief Collateral Officer", "Director of Narrative Compliance", "Head of Synergy Enforcement", "SVP of Emotional Monetisation", "Regional Overlord of Customer Delight"],
+	"schemes": [
+		"patent breathing in the outer colonies",
+		"repossess an entire planet's population as collateral",
+		"replace every news feed with one sponsored feeling",
+		"turn the Sprawl's dreams into ad inventory",
+		"privatise gravity and bill everyone for falling",
+		"sell the last natural sunrise to the highest bidder"
+	],
+	"macguffins": [
+		{"name": "the Ledger of Everyone", "desc": "a data-core listing every debt ever owed, including the Consortium's own"},
+		{"name": "a Founder's Cryo-Key", "desc": "the master key to every cryo-vault in the Sprawl"},
+		{"name": "the Gravity Patent", "desc": "the original filing that made falling a billable event"},
+		{"name": "the Last Free Breath", "desc": "a sealed canister of 21st-century air, unowned by anyone"},
+		{"name": "Clause 9", "desc": "the missing page of the Consortium Charter that limits their power"},
+		{"name": "the Source Jingle", "desc": "the master recording behind every ad - and every sleeper trigger"}
+	],
+	"clues": ["a corrupted data shard", "a blood-stained expense report", "a cryo-pod manifest", "a Lumen raw feed nobody aired", "a key-card shaped like a smile"],
+	"personal": {
+		"find_sibling": {"label": "your sibling", "role": "sibling", "intro": "A cryo-manifest lists a pod sold the same day as yours. The name is {personal}. Last seen on {planet}.", "met": "{personal} stares at you for a long time. \"They told me you were collateral. They told me you were dead.\" They hand you a tracking code: \"{antagonist} bought both our pods.\""},
+		"pay_debt": {"label": "your debt", "role": "banker", "intro": "Your Halcyon debt file was transferred to a private collector: {personal}, operating out of {planet}.", "met": "{personal} slides your debt file across the table. \"I'll erase it. All of it. If you bring me {macguffin}. {antagonist} owes me more than you do.\""},
+		"burn_consortium": {"label": "the resistance", "role": "rebel", "intro": "A pirate broadcast keeps repeating one name: {personal}, a resistance cell leader on {planet}.", "met": "{personal} doesn't trust you. Then they see your record on the Causality feed and laugh. \"Fine. You're chaotic enough. {antagonist} is moving {macguffin} - help us take it.\""},
+		"get_famous": {"label": "your rival", "role": "rival", "intro": "Lumen's hottest new star, {personal}, is filming on {planet} - and they're telling YOUR story, badly.", "met": "{personal} rolls their eyes. \"You're the real one? Ugh. Fine. The story's bigger than both of us: {antagonist} wants {macguffin}. Whoever exposes it gets prime time.\""},
+		"buy_a_planet": {"label": "the land deed", "role": "broker", "intro": "A planet deed auction is rigged by {antagonist}. The only honest broker left is {personal}, on {planet}.", "met": "{personal} taps a deed tablet. \"Bring down {antagonist} and the auction goes public. Then any idiot can buy a planet. Even you.\""}
+	},
+	"twists": {
+		"wanted_alias": "The bounty on your old name was posted by {ally}. They needed you desperate enough to work for them.",
+		"synth_air_allergy": "Your 'allergy' was designed: {antagonist}'s air formula rejects unregistered lungs. You were the prototype.",
+		"compulsive_liar": "The wild story you tell about your past? It's true. You and {antagonist} built this scheme together, before the cryo.",
+		"sleeper_agent": "Your sleeper trigger is {antagonist}'s company jingle. {ally} has been humming it to steer you all along.",
+		"kleptomaniac": "You already stole {macguffin} once, before the freeze. {ally} knew - that's why they 'found' you."
+	},
+	"beats": [
+		{"id": "contact", "act": 1, "type": "talk", "who": "ally", "title": "A Signal in the Static",
+			"intro": "QUACK intercepts a coded ping. \"Someone named {ally} - a {ally_job} - knows about {macguffin}. They're on {planet}. Sounds like a trap. I love traps.\"",
+			"talk": "{ally} pulls you behind a noodle stand. \"{antagonist}, {antagonist_title} at {faction}, plans to {scheme}. They need {macguffin}. We need to get there first. Start with {clue} - it was dumped on {next_planet}.\""},
+		{"id": "clue", "act": 1, "type": "retrieve", "item": "clue", "title": "Follow the Paper Trail",
+			"intro": "{clue} is somewhere on {planet}, guarded by people who get paid not to ask questions.",
+			"done": "You crack {clue} open. A name falls out: {lieutenant}, {antagonist}'s fixer."},
+		{"id": "personal", "act": 2, "type": "talk", "who": "personal", "title": "Unfinished Business",
+			"intro": "{personal_intro}",
+			"talk": "{personal_met}"},
+		{"id": "lieutenant", "act": 2, "type": "defeat", "who": "lieutenant", "title": "The Fixer",
+			"intro": "{lieutenant} runs {antagonist}'s dirty work out of {planet}. They won't come quietly.",
+			"done": "{lieutenant} drops a vault key with the {faction} logo. It's warm. Ugh."},
+		{"id": "macguffin", "act": 2, "type": "retrieve", "item": "macguffin", "title": "Hostile Acquisition",
+			"intro": "{macguffin} is stored on {planet}. Security is 'premium tier'.",
+			"done": "You hold {macguffin} - {macguffin_desc}. Every Consortium scanner in the sector just blinked."},
+		{"id": "twist", "act": 3, "type": "talk", "who": "ally", "title": "The Fine Print",
+			"intro": "{ally} wants to meet on {planet}. \"Bring {macguffin}. Come alone. Well, bring the duck.\"",
+			"talk": "{twist}"},
+		{"id": "finale", "act": 3, "type": "defeat", "who": "antagonist", "title": "Hostile Takeover",
+			"intro": "{antagonist} is on {planet}, preparing to {scheme}. This ends now. Probably expensively.",
+			"done": "{antagonist} is down. {macguffin} hums in your hands. The whole Sprawl is watching the Lumen feed."}
+	],
+	"twist_choices": [
+		{"id": "forgive", "text": "Keep working with {ally}", "moral": {"mercy": 1.5, "order": 0, "greed": 0}},
+		{"id": "cut_ties", "text": "Cut {ally} loose", "moral": {"mercy": -0.5, "order": 0.5, "greed": 0}},
+		{"id": "sell_out", "text": "Sell {ally} out to {faction}", "moral": {"mercy": -1.5, "order": 0, "greed": 1.5}}
+	],
+	"endings": [
+		{"id": "expose", "text": "Broadcast {macguffin} on every Lumen screen", "epilogue": "The truth airs between two ads for Protein Paste. For one glorious quarter, nobody pays for air. {faction} stock crashes. You become a meme, then a legend, then a merchandise line."},
+		{"id": "seize", "text": "Keep {macguffin} and take {antagonist}'s seat", "epilogue": "You are now the {antagonist_title}. The view from the top floor is excellent. The air up here is free. For you."},
+		{"id": "destroy", "text": "Destroy {macguffin} so nobody owns it", "epilogue": "It burns with a strange, honest light. Nothing changes overnight. But nobody can ever {scheme}. The Odd Duck flies on, slightly lighter."}
+	],
+	"side": {
+		"bounty": {"title": "Bounty: {target}", "offer": "\"{target} has been squeezing this block dry. Paragon won't touch them - they pay their fees on time. You could, though.\"", "done": "\"Gone? Really? Here - take this before I feel like an accomplice.\""},
+		"fetch": {"title": "Lost & Found: {item}", "offer": "\"I left {item} in a crate when the drones came. It's worth nothing to anyone but me. Please.\"", "done": "\"You actually found it.\" They hold {item} like it might evaporate. \"I owe you. Literally - here.\""},
+		"sabotage": {"title": "Ad Blocker", "offer": "\"These billboards scream at my kids all night. Break {count} of them. I'll pay. Lumen won't know it was me.\"", "done": "\"Quiet. Actual quiet. I forgot what it sounds like.\""}
+	},
+	"side_items": ["my grandmother's air canister", "a holo-photo of my dog", "a jar of pre-recall paste", "my union card", "a cassette of real birdsong", "my wedding ring (rented)"]
+}

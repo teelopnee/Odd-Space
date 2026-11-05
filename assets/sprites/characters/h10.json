@@ -1,0 +1,182 @@
+{
+ "frame_w": 64,
+ "frame_h": 64,
+ "foot_row": 60,
+ "indexed": true,
+ "dirs": [
+  "S",
+  "SE",
+  "E",
+  "NE",
+  "N"
+ ],
+ "tags": [
+  "corporate"
+ ],
+ "cfg": {
+  "body": "normal",
+  "outfit": "suit",
+  "hair": "short",
+  "acc": [
+   "visor"
+  ]
+ },
+ "anims": {
+  "idle": {
+   "fps": 7,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 0,
+    "SE": 1,
+    "E": 2,
+    "NE": 3,
+    "N": 4
+   }
+  },
+  "walk": {
+   "fps": 11,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 5,
+    "SE": 6,
+    "E": 7,
+    "NE": 8,
+    "N": 9
+   }
+  },
+  "run": {
+   "fps": 14,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 10,
+    "SE": 11,
+    "E": 12,
+    "NE": 13,
+    "N": 14
+   }
+  },
+  "roll": {
+   "fps": 16,
+   "loop": false,
+   "frames": 6,
+   "rows": {
+    "S": 15,
+    "SE": 16,
+    "E": 17,
+    "NE": 18,
+    "N": 19
+   }
+  },
+  "shoot": {
+   "fps": 18,
+   "loop": false,
+   "frames": 6,
+   "rows": {
+    "S": 20,
+    "SE": 21,
+    "E": 22,
+    "NE": 23,
+    "N": 24
+   }
+  },
+  "slash1": {
+   "fps": 18,
+   "loop": false,
+   "frames": 6,
+   "rows": {
+    "S": 25,
+    "SE": 26,
+    "E": 27,
+    "NE": 28,
+    "N": 29
+   }
+  },
+  "slash2": {
+   "fps": 18,
+   "loop": false,
+   "frames": 6,
+   "rows": {
+    "S": 30,
+    "SE": 31,
+    "E": 32,
+    "NE": 33,
+    "N": 34
+   }
+  },
+  "slash3": {
+   "fps": 16,
+   "loop": false,
+   "frames": 7,
+   "rows": {
+    "S": 35,
+    "SE": 36,
+    "E": 37,
+    "NE": 38,
+    "N": 39
+   }
+  },
+  "guard": {
+   "fps": 14,
+   "loop": false,
+   "frames": 4,
+   "rows": {
+    "S": 40,
+    "SE": 41,
+    "E": 42,
+    "NE": 43,
+    "N": 44
+   }
+  },
+  "hurt": {
+   "fps": 12,
+   "loop": false,
+   "frames": 3,
+   "rows": {
+    "S": 45,
+    "SE": 46,
+    "E": 47,
+    "NE": 48,
+    "N": 49
+   }
+  },
+  "dead": {
+   "fps": 9,
+   "loop": false,
+   "frames": 6,
+   "rows": {
+    "S": 50,
+    "SE": 51,
+    "E": 52,
+    "NE": 53,
+    "N": 54
+   }
+  },
+  "talk": {
+   "fps": 7,
+   "loop": true,
+   "frames": 8,
+   "rows": {
+    "S": 55,
+    "SE": 56,
+    "E": 57,
+    "NE": 58,
+    "N": 59
+   }
+  },
+  "charge": {
+   "fps": 12,
+   "loop": true,
+   "frames": 6,
+   "rows": {
+    "S": 60,
+    "SE": 61,
+    "E": 62,
+    "NE": 63,
+    "N": 64
+   }
+  }
+ }
+}

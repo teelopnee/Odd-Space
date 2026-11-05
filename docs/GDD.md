@@ -54,14 +54,29 @@
 - Enemies: flinch/knockback (armoured ones don't), strafing ranged AI, telegraph rings for melee lunges,
   last-kill slow-mo, credit chips that magnetise to you.
 
+## 3c. Every run is different (v0.3)
+- **Start choice**: thaw out of cryo in Lot 47 (classic prologue) *or* be a native of any generated
+  world in this universe (hometown rep +12 with its owners, +40 cr, start on the pad, no prologue).
+- **Universe seed**: one number = 7 worlds + the whole saga. Shown/typed in the creator, shareable.
+- **Look**: 36 chibi body/outfit/hair variants x free palette (skin, hair, eyes, outfit, neon), live
+  8-way turntable. NPCs/enemies/crew/saga cast all roll their own looks (faction uniforms for corp staff).
+- **Saga** (procedural main story): antagonist (absurd corporate title + scheme), ally (job, traits,
+  quirk), lieutenant, MacGuffin, personal thread from *Motivation*, twist from *Secret*.
+  7 beats / 3 acts across random planets: contact → clue → personal → lieutenant → MacGuffin →
+  twist (forgive / cut ties / sell out) → finale (expose / seize / destroy). Side jobs per planet
+  (bounty, lost item, ad sabotage). Journal tab with cast portraits revealed as the story unfolds.
+- **Dense random worlds**: per-biome generators (city grid with markets and plazas, swamp canals
+  with boardwalks, plastic-glacier desert with ad towers, mesa canyon, crystal pools), random map
+  size, frontier towns around the pad, foreground dressing, sky traffic, per-seed palette/weather.
+
 ## 4. Next milestones (proposal)
 - [x] HD-2D art pass v1 (sprite forge, normal-mapped kits, lens post, weather, foliage, cutscenes).
-- [ ] Hand-painted hero portraits for dialogue; more building/prop kits per biome.
+- [ ] Hand-painted hero portraits for dialogue; [x] more building/prop kits per biome (v0.3).
 - [ ] Ship interior hub (walkable Odd Duck) instead of the nav-console screen.
 - [ ] Boss fights (Paragon mech, Halcyon repo-walker) with multi-part BREAK shields.
 - [ ] Quests generated from the Causality Graph (e.g. a reported murder spawns a vengeful sibling).
 - [ ] Bounty hunters as on-planet enemies; Paragon raids when heat is high.
 - [ ] Crew in the field (follow + assist + react live), crew personal quests.
-- [ ] Sleeper-agent trigger event, sibling search storyline, motivation endings.
+- [x] Sibling search / motivation threads and twists via the Saga; [ ] voiced sleeper-trigger set piece.
 - [ ] Localization (Thai/English) with a Thai-capable font.
 - [x] Android export preset + signed APK release; [ ] performance profiling on the Tab S12 Ultra.

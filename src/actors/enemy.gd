@@ -21,6 +21,7 @@ const WEAK_TAGS := {"melee": "MEL", "blaster": "BLS", "charged": "CHG", "explosi
 @export var enemy_type := "paragon_officer"
 @export var display_name_override := ""
 @export var sprite_override := ""
+var look_override: Dictionary = {}
 @export var force_hostile := false
 
 @onready var sprite: BillboardSprite = $Sprite
@@ -91,7 +92,12 @@ func _ready() -> void:
 	shield_max = int(def.get("shield", 3))
 	shield = shield_max
 	weak = def.get("weak", [])
-	sprite.sheet_name = sprite_override if sprite_override != "" else def.get("sprite", "officer")
+	if not look_override.is_empty():
+		sprite.set_look(look_override)
+	else:
+		var lrng := RandomNumberGenerator.new()
+		lrng.randomize()
+		sprite.set_look(CharacterLook.random_look(lrng, str(def.get("look", "punk"))))
 	if flying:
 		sprite.position.y += FLY_HEIGHT
 	var subs: Dictionary = def.get("subsystems", {})
@@ -651,7 +657,8 @@ func _die(attacker, push: Vector3) -> void:
 	FX.rumble(0.3, 0.3, 0.12)
 	var tw := create_tween()
 	tw.tween_interval(1.6)
-	tw.tween_property(sprite, "modulate:a", 0.0, 0.6)
+	tw.tween_callback(sprite.fade_to.bind(0.0, 0.6))
+	tw.tween_interval(0.6)
 	tw.tween_callback(queue_free)
 
 

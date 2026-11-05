@@ -1,9 +1,8 @@
 {
-	"_doc": "Enemy archetypes. hostility: 'always' | 'rep' (hostile only if player's rep with faction <= hostile_below, or bounty/assault). subsystems: hp, acc (hit-chance multiplier), dmg (damage multiplier), y (marker height), effect: crit | crippled | explode | disarmed | blinded | crash. BREAK: 'shield' points drop by 1 (2 for charged shots/finishers/parries) whenever a hit matches a 'weak' key (melee, blaster, charged, explosion, parry, or a subsystem id). At 0 the enemy is BROKEN: stunned, takes double damage. 'armored' enemies don't flinch unless broken.",
+	"_doc": "Enemy archetypes. hostility: 'always' | 'rep' (hostile only if player's rep with faction <= hostile_below, or bounty/assault). subsystems: hp, acc (hit-chance multiplier), dmg (damage multiplier), y (marker height), effect: crit | crippled | explode | disarmed | blinded | crash. BREAK: 'shield' points drop by 1 (2 for charged shots/finishers/parries) whenever a hit matches a 'weak' key (melee, blaster, charged, explosion, parry, or a subsystem id). At 0 the enemy is BROKEN: stunned, takes double damage. 'armored' enemies don't flinch unless broken. look: CharacterLook style used to randomise each spawn's appearance (variant + colours).",
 	"paragon_officer": {
 		"name": "Compliance Officer",
 		"faction": "paragon",
-		"sprite": "officer",
 		"hostility": "rep",
 		"hostile_below": -30,
 		"hp": 45,
@@ -67,12 +66,12 @@
 			"melee",
 			"legs",
 			"jetpack"
-		]
+		],
+		"look": "cop:paragon"
 	},
 	"repo_drone": {
 		"name": "Repo Drone",
 		"faction": "halcyon",
-		"sprite": "drone",
 		"hostility": "always",
 		"flying": true,
 		"hp": 26,
@@ -120,12 +119,12 @@
 			"blaster",
 			"charged",
 			"eye"
-		]
+		],
+		"look": "drone:halcyon"
 	},
 	"gristle_grub": {
 		"name": "Gristle Grub",
 		"faction": "gristle",
-		"sprite": "grub",
 		"hostility": "always",
 		"bug": true,
 		"hp": 18,
@@ -170,12 +169,12 @@
 		"weak": [
 			"melee",
 			"explosion"
-		]
+		],
+		"look": "bug"
 	},
 	"debt_brute": {
 		"name": "Debt Collector",
 		"faction": "halcyon",
-		"sprite": "brute",
 		"hostility": "rep",
 		"hostile_below": -40,
 		"hp": 90,
@@ -230,12 +229,12 @@
 			"legs",
 			"parry"
 		],
-		"armored": true
+		"armored": true,
+		"look": "heavy:halcyon"
 	},
 	"pirate": {
 		"name": "Rim Pirate",
 		"faction": "",
-		"sprite": "pirate",
 		"hostility": "always",
 		"hp": 38,
 		"speed": 3.6,
@@ -290,6 +289,7 @@
 			"blaster",
 			"jetpack",
 			"melee"
-		]
+		],
+		"look": "punk"
 	}
 }

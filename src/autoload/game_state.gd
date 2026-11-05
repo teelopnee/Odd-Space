@@ -12,6 +12,8 @@ const SETTINGS_PATH := "user://settings.json"
 
 var player_name := "Drifter"
 var tags := {"background": "", "motivation": "", "secret": ""}
+## Player appearance: {"variant": "h00", "colors": {...}} (see CharacterLook).
+var player_look: Dictionary = {}
 var credits := 0
 var air_debt := 0
 var hp := 100.0
@@ -67,16 +69,30 @@ func _process(delta: float) -> void:
 
 # --- New game / reset -------------------------------------------------------------
 
-func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1) -> void:
+## start_planet_id: "" = thaw in Cold Storage Lot 47; otherwise you're a native of that planet.
+func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Dictionary = {}, start_planet_id: String = "") -> void:
 	reset_all()
 	player_name = p_name if p_name.strip_edges() != "" else "Drifter"
 	tags = p_tags.duplicate()
+	player_look = look.duplicate(true)
 	world_seed = seed_value if seed_value >= 0 else randi()
 	Origin.apply_new_game(tags)
 	hp = max_hp()
 	galaxy = PlanetGenerator.generate_galaxy(world_seed, 7)
 	location_id = "station_lot47"
 	location_name = "Cold Storage Lot 47"
+	if start_planet_id != "":
+		# Native start: no cryo prologue, locals know your face, a little pocket money.
+		flags["native_of"] = start_planet_id
+		flags["prologue_woke"] = true
+		var home := planet_by_id(start_planet_id)
+		if not home.is_empty():
+			home["visited"] = true
+			var ctrl := str(home.get("controller", ""))
+			if ctrl != "":
+				Factions.change_rep(ctrl, 12, "hometown", false)
+		credits += 40
+	Saga.generate(world_seed, start_planet_id)
 	has_active_run = true
 	EventBus.stats_changed.emit()
 
@@ -84,6 +100,7 @@ func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1) -> void:
 func reset_all() -> void:
 	player_name = "Drifter"
 	tags = {"background": "", "motivation": "", "secret": ""}
+	player_look = {}
 	credits = 0
 	air_debt = 0
 	inventory = {}
@@ -102,7 +119,7 @@ func reset_all() -> void:
 
 
 func _systems() -> Array:
-	return [Factions, Causality, Crew, FlawPerk, Encounters]
+	return [Factions, Causality, Crew, FlawPerk, Encounters, Saga]
 
 
 # --- Stats helpers -------------------------------------------------------------------
@@ -262,7 +279,7 @@ func save_game(slot: int = AUTOSAVE_SLOT) -> bool:
 		"version": SAVE_VERSION,
 		"saved_at": Time.get_datetime_string_from_system(),
 		"game": {
-			"player_name": player_name, "tags": tags, "credits": credits, "air_debt": air_debt,
+			"player_name": player_name, "tags": tags, "look": player_look, "credits": credits, "air_debt": air_debt,
 			"hp": hp, "inventory": inventory, "skill_points": skill_points, "perks": perks,
 			"flaws": flaws, "flags": flags, "world_seed": world_seed, "galaxy": galaxy,
 			"location_id": location_id, "location_name": location_name,
@@ -273,6 +290,7 @@ func save_game(slot: int = AUTOSAVE_SLOT) -> bool:
 		"crew": Crew.to_save(),
 		"flawperk": FlawPerk.to_save(),
 		"encounters": Encounters.to_save(),
+		"saga": Saga.to_save(),
 	}
 	var f := FileAccess.open(save_path(slot), FileAccess.WRITE)
 	if f == null:
@@ -295,6 +313,7 @@ func load_game(slot: int = AUTOSAVE_SLOT) -> bool:
 	var g: Dictionary = data.get("game", {})
 	player_name = g.get("player_name", "Drifter")
 	tags = g.get("tags", tags)
+	player_look = g.get("look", {})
 	credits = int(g.get("credits", 0))
 	air_debt = int(g.get("air_debt", 0))
 	hp = float(g.get("hp", 100.0))
@@ -317,6 +336,7 @@ func load_game(slot: int = AUTOSAVE_SLOT) -> bool:
 	Crew.from_save(data.get("crew", {}))
 	FlawPerk.from_save(data.get("flawperk", {}))
 	Encounters.from_save(data.get("encounters", {}))
+	Saga.from_save(data.get("saga", {}))
 	has_active_run = true
 	EventBus.game_loaded.emit()
 	EventBus.stats_changed.emit()

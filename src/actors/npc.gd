@@ -13,6 +13,8 @@ const GRAVITY := 24.0
 @export var recruit_id := ""
 @export var traits: Array[String] = ["poor"]
 @export var sprite_name := "civilian_a"
+var look: Dictionary = {}
+var persona_id := ""
 
 @onready var sprite: BillboardSprite = $Sprite
 @onready var witness: WitnessComponent = $Witness
@@ -43,8 +45,13 @@ func _ready() -> void:
 	if role == "recruit" and recruit_id != "":
 		var d := Crew.def(recruit_id)
 		npc_name = d.get("name", npc_name)
-		sprite_name = d.get("sprite", sprite_name)
-	sprite.sheet_name = sprite_name
+		if d.has("look"):
+			look = d["look"]
+	if look.is_empty():
+		var lrng := RandomNumberGenerator.new()
+		lrng.randomize()
+		look = CharacterLook.random_look(lrng, "civilian")
+	sprite.set_look(look)
 	_home = global_position
 	_wander_target = _home
 	witness.calls_faction = faction if faction != "" else "paragon"
@@ -191,13 +198,18 @@ func _die(by_player: bool) -> void:
 	Audio.play_sfx("enemy_die")
 	var tw := create_tween()
 	tw.tween_interval(2.5)
-	tw.tween_property(sprite, "modulate:a", 0.0, 0.8)
+	tw.tween_callback(sprite.fade_to.bind(0.0, 0.8))
+	tw.tween_interval(0.8)
 	tw.tween_callback(queue_free)
 
 
 # --- Dialogue -------------------------------------------------------------------------------
 
 func _on_talk(_player: Node) -> void:
+	if persona_id != "" and state != "reporting":
+		_talking = 3.0
+		Saga.on_persona_talk(persona_id)
+		return
 	if state == "reporting":
 		_talk_witness()
 	elif role == "merchant":
@@ -290,7 +302,8 @@ func _on_recruit_choice(choice: String) -> void:
 		witness.active = false
 		talk.enabled = false
 		var tw := create_tween()
-		tw.tween_property(sprite, "modulate:a", 0.0, 0.8)
+		tw.tween_callback(sprite.fade_to.bind(0.0, 0.8))
+		tw.tween_interval(0.8)
 		tw.tween_callback(queue_free)
 
 

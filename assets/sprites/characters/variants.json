@@ -1,0 +1,594 @@
+{
+ "h00": {
+  "kind": "human",
+  "tags": [
+   "hero",
+   "civilian"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "jacket",
+   "hair": "spiky",
+   "acc": [
+    "scarf",
+    "goggles"
+   ]
+  }
+ },
+ "h01": {
+  "kind": "human",
+  "tags": [
+   "cop"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "armor",
+   "hair": "short",
+   "acc": [
+    "helmet",
+    "jetpack",
+    "gloves"
+   ]
+  }
+ },
+ "h02": {
+  "kind": "human",
+  "tags": [
+   "cop",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "armor",
+   "hair": "short",
+   "acc": [
+    "helmet",
+    "pads",
+    "gloves"
+   ]
+  }
+ },
+ "h03": {
+  "kind": "human",
+  "tags": [
+   "punk"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "coat",
+   "hair": "mohawk",
+   "acc": [
+    "jetpack",
+    "gloves"
+   ]
+  }
+ },
+ "h04": {
+  "kind": "human",
+  "tags": [
+   "heavy",
+   "punk"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "tank",
+   "hair": "bald",
+   "acc": [
+    "beard",
+    "pads",
+    "gloves"
+   ]
+  }
+ },
+ "h05": {
+  "kind": "human",
+  "tags": [
+   "punk",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "coat",
+   "hair": "short",
+   "acc": [
+    "mask",
+    "cybereye",
+    "scarf"
+   ]
+  }
+ },
+ "h06": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "punk"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "tank",
+   "hair": "sidecut",
+   "acc": [
+    "gloves"
+   ]
+  }
+ },
+ "h07": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "vest",
+   "hair": "short",
+   "acc": [
+    "visor",
+    "mustache"
+   ]
+  }
+ },
+ "h08": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "punk",
+   "hero"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "hoodie",
+   "hair": "hood",
+   "acc": []
+  }
+ },
+ "h09": {
+  "kind": "human",
+  "tags": [
+   "worker",
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "short",
+   "outfit": "overalls",
+   "hair": "bun",
+   "acc": [
+    "goggles",
+    "gloves"
+   ]
+  }
+ },
+ "h10": {
+  "kind": "human",
+  "tags": [
+   "corporate"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "suit",
+   "hair": "short",
+   "acc": [
+    "visor"
+   ]
+  }
+ },
+ "h11": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "suit",
+   "hair": "ponytail",
+   "acc": []
+  }
+ },
+ "h12": {
+  "kind": "human",
+  "tags": [
+   "worker",
+   "civilian"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "overalls",
+   "hair": "curly",
+   "acc": [
+    "cap",
+    "beard"
+   ]
+  }
+ },
+ "h13": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "coat",
+   "hair": "long",
+   "acc": [
+    "scarf"
+   ]
+  }
+ },
+ "r00": {
+  "kind": "human",
+  "tags": [
+   "robot",
+   "civilian"
+  ],
+  "cfg": {
+   "robot": true,
+   "body": "normal",
+   "outfit": "tank",
+   "acc": []
+  }
+ },
+ "r01": {
+  "kind": "human",
+  "tags": [
+   "robot",
+   "heavy",
+   "cop"
+  ],
+  "cfg": {
+   "robot": true,
+   "body": "broad",
+   "outfit": "armor",
+   "acc": [
+    "pads"
+   ]
+  }
+ },
+ "h14": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "coat",
+   "hair": "ponytail",
+   "acc": []
+  }
+ },
+ "h15": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "suit",
+   "hair": "short",
+   "acc": [
+    "cap"
+   ]
+  }
+ },
+ "h16": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "suit",
+   "hair": "mohawk",
+   "acc": [
+    "beard"
+   ]
+  }
+ },
+ "h17": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "vest",
+   "hair": "bun",
+   "acc": [
+    "goggles",
+    "gloves"
+   ]
+  }
+ },
+ "h18": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "tank",
+   "hair": "ponytail",
+   "acc": []
+  }
+ },
+ "h19": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "punk",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "tank",
+   "hair": "spiky",
+   "acc": [
+    "mustache",
+    "mask"
+   ]
+  }
+ },
+ "h20": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "suit",
+   "hair": "hood",
+   "acc": [
+    "beard",
+    "mustache"
+   ]
+  }
+ },
+ "h21": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "short",
+   "outfit": "hoodie",
+   "hair": "long",
+   "acc": [
+    "cybereye"
+   ]
+  }
+ },
+ "h22": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero"
+  ],
+  "cfg": {
+   "body": "short",
+   "outfit": "suit",
+   "hair": "mohawk",
+   "acc": [
+    "gloves",
+    "visor"
+   ]
+  }
+ },
+ "h23": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "punk"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "tank",
+   "hair": "spiky",
+   "acc": [
+    "cybereye",
+    "goggles",
+    "beard"
+   ]
+  }
+ },
+ "h24": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "suit",
+   "hair": "long",
+   "acc": [
+    "goggles",
+    "pads",
+    "cybereye"
+   ]
+  }
+ },
+ "h25": {
+  "kind": "human",
+  "tags": [
+   "corporate",
+   "hero",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "suit",
+   "hair": "bun",
+   "acc": [
+    "mask"
+   ]
+  }
+ },
+ "h26": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "jacket",
+   "hair": "short",
+   "acc": [
+    "cap",
+    "goggles"
+   ]
+  }
+ },
+ "h27": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "jacket",
+   "hair": "bald",
+   "acc": [
+    "beard"
+   ]
+  }
+ },
+ "h28": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "worker",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "overalls",
+   "hair": "bun",
+   "acc": [
+    "beard",
+    "pads"
+   ]
+  }
+ },
+ "h29": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "normal",
+   "outfit": "tank",
+   "hair": "bun",
+   "acc": [
+    "gloves",
+    "beard"
+   ]
+  }
+ },
+ "h30": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "punk"
+  ],
+  "cfg": {
+   "body": "slim",
+   "outfit": "vest",
+   "hair": "spiky",
+   "acc": [
+    "beard",
+    "gloves",
+    "cap"
+   ]
+  }
+ },
+ "h31": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero",
+   "heavy"
+  ],
+  "cfg": {
+   "body": "broad",
+   "outfit": "coat",
+   "hair": "long",
+   "acc": [
+    "backpack",
+    "beard"
+   ]
+  }
+ },
+ "h32": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "short",
+   "outfit": "jacket",
+   "hair": "bun",
+   "acc": [
+    "goggles",
+    "beard"
+   ]
+  }
+ },
+ "h33": {
+  "kind": "human",
+  "tags": [
+   "civilian",
+   "hero"
+  ],
+  "cfg": {
+   "body": "short",
+   "outfit": "tank",
+   "hair": "ponytail",
+   "acc": [
+    "gloves",
+    "mustache"
+   ]
+  }
+ },
+ "drone": {
+  "kind": "drone",
+  "tags": [
+   "drone"
+  ],
+  "cfg": {}
+ },
+ "drone_quad": {
+  "kind": "drone",
+  "tags": [
+   "drone"
+  ],
+  "cfg": {
+   "quad": true
+  }
+ },
+ "grub": {
+  "kind": "grub",
+  "tags": [
+   "bug"
+  ],
+  "cfg": {}
+ }
+}

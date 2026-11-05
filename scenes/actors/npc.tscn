@@ -21,7 +21,7 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="Sprite" type="Sprite3D" parent="."]
 pixel_size = 0.034
 script = ExtResource("2_sprite")
-sheet_name = "civilian_a"
+sheet_name = "h00"
 
 [node name="Witness" type="Node3D" parent="."]
 script = ExtResource("3_witness")

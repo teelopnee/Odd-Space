@@ -75,6 +75,7 @@ var _base_glow := 0.7
 func _ready() -> void:
 	add_to_group("player")
 	add_to_group("damageable")
+	sprite.set_look(Game.player_look if not Game.player_look.is_empty() else CharacterLook.default_look())
 	Game.hp = clampf(Game.hp, 1.0, Game.max_hp())
 	EventBus.player_hp_changed.emit(Game.hp, Game.max_hp())
 	interact_area.area_entered.connect(_on_interactable_entered)

@@ -5,84 +5,281 @@
 			"name": "Vex Okonkwo-Lin",
 			"title": "Ex-Paragon Officer",
 			"bio": "Quit Paragon after they billed a fire victim for the water used to save them. Still irons her uniform.",
-			"values": {"mercy": 0.4, "order": 1.0, "greed": -0.5},
+			"values": {
+				"mercy": 0.4,
+				"order": 1.0,
+				"greed": -0.5
+			},
 			"betrayal": "leak_coords",
-			"sprite": "crew_vex",
 			"recruit_line": "I still believe in rules. Just not theirs. Got room for someone who reads the manual?",
 			"barks": {
-				"approve": ["Clean work. Almost legal.", "That's how it's done. By the book. A better book."],
-				"disapprove": ["That's a felony in eleven systems.", "I didn't quit Paragon to become what they hunt.", "Do that again and we're going to talk."],
-				"disloyal": ["I still have my old Paragon comm codes. Just so you know."]
+				"approve": [
+					"Clean work. Almost legal.",
+					"That's how it's done. By the book. A better book."
+				],
+				"disapprove": [
+					"That's a felony in eleven systems.",
+					"I didn't quit Paragon to become what they hunt.",
+					"Do that again and we're going to talk."
+				],
+				"disloyal": [
+					"I still have my old Paragon comm codes. Just so you know."
+				]
+			},
+			"look": {
+				"variant": "h11",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#5a5a6a",
+					"skin": "#7a4630",
+					"hair": "#1a1418",
+					"coat": "#1c2450",
+					"top": "#e8ecff",
+					"pants": "#1a2040",
+					"accent": "#ffd23e",
+					"iris": "#7a4a2a",
+					"glow": "#3ee6ff",
+					"scarf": "#ffd23e"
+				}
 			}
 		},
 		"nuggets": {
 			"name": "Sister Nuggets",
 			"title": "Former Mascot, Current Anarchist",
 			"bio": "Spent nine years inside a giant chicken-nugget costume promoting Gristle. Took the head off one day and never put it back on.",
-			"values": {"mercy": 0.5, "order": -1.0, "greed": -0.6},
+			"values": {
+				"mercy": 0.5,
+				"order": -1.0,
+				"greed": -0.6
+			},
 			"betrayal": "mutiny",
-			"sprite": "crew_nuggets",
 			"recruit_line": "Nine years in a foam nugget teaches you who the real predators are. Let's go make them nervous.",
 			"barks": {
-				"approve": ["Smash the system! Gently, if there are kids around.", "That one's going in my zine."],
-				"disapprove": ["You sound like a Gristle shareholder.", "Bootlicker energy. Disgusting.", "I've worn costumes with more spine."],
-				"disloyal": ["Revolutions start on small ships too, captain."]
+				"approve": [
+					"Smash the system! Gently, if there are kids around.",
+					"That one's going in my zine."
+				],
+				"disapprove": [
+					"You sound like a Gristle shareholder.",
+					"Bootlicker energy. Disgusting.",
+					"I've worn costumes with more spine."
+				],
+				"disloyal": [
+					"Revolutions start on small ships too, captain."
+				]
+			},
+			"look": {
+				"variant": "h09",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#5a5a6a",
+					"skin": "#f6c9a4",
+					"hair": "#ff5a3a",
+					"pants": "#d9a24a",
+					"top": "#ffd23e",
+					"accent": "#ff5a2a",
+					"iris": "#2a8a4a",
+					"glow": "#ff3ec8",
+					"coat": "#d9a24a",
+					"scarf": "#ff5a2a"
+				}
 			}
 		},
 		"pip": {
 			"name": "Pip 'Two-Wallets' Marrow",
 			"title": "Smuggler",
 			"bio": "Has two wallets: one for the Consortium, one for reality. Neither is theirs.",
-			"values": {"mercy": -0.2, "order": -0.6, "greed": 1.0},
+			"values": {
+				"mercy": -0.2,
+				"order": -0.6,
+				"greed": 1.0
+			},
 			"betrayal": "steal_ship",
-			"sprite": "crew_pip",
 			"recruit_line": "I know every customs blind spot from here to the Rim. Price is a cut of everything. Everything.",
 			"barks": {
-				"approve": ["Now THAT's a margin.", "Profit! Beautiful, sticky profit."],
-				"disapprove": ["You left money on the table. I could hear it crying.", "Charity? Gross.", "That was a terrible business decision."],
-				"disloyal": ["Nice ship. Would be a shame if somebody... sold it."]
+				"approve": [
+					"Now THAT's a margin.",
+					"Profit! Beautiful, sticky profit."
+				],
+				"disapprove": [
+					"You left money on the table. I could hear it crying.",
+					"Charity? Gross.",
+					"That was a terrible business decision."
+				],
+				"disloyal": [
+					"Nice ship. Would be a shame if somebody... sold it."
+				]
+			},
+			"look": {
+				"variant": "h05",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#4a4a52",
+					"skin": "#d49a6e",
+					"hair": "#3a2418",
+					"coat": "#2a4a3a",
+					"top": "#24242e",
+					"pants": "#2a2a22",
+					"accent": "#ffd23e",
+					"iris": "#7a4a2a",
+					"glow": "#ff4a4a",
+					"scarf": "#ffd23e"
+				}
 			}
 		},
 		"varga": {
 			"name": "Dr. Ilse Varga",
 			"title": "Unlicensed Surgeon",
 			"bio": "Lost her licence for performing surgery 'without verifying insurance'. Has saved 4,000 lives illegally.",
-			"values": {"mercy": 1.0, "order": 0.0, "greed": -0.7},
+			"values": {
+				"mercy": 1.0,
+				"order": 0.0,
+				"greed": -0.7
+			},
 			"betrayal": "leave",
-			"sprite": "crew_varga",
 			"recruit_line": "You look like someone who gets shot a lot. I can work with that.",
 			"barks": {
-				"approve": ["Good. People are not inventory.", "Thank you. That mattered."],
-				"disapprove": ["I'll stitch them up later. Again.", "I didn't take an oath to watch that.", "Violence is a billing event for me, you know."],
-				"disloyal": ["There are other ships that need a doctor."]
+				"approve": [
+					"Good. People are not inventory.",
+					"Thank you. That mattered."
+				],
+				"disapprove": [
+					"I'll stitch them up later. Again.",
+					"I didn't take an oath to watch that.",
+					"Violence is a billing event for me, you know."
+				],
+				"disloyal": [
+					"There are other ships that need a doctor."
+				]
+			},
+			"look": {
+				"variant": "h13",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#5a5a6a",
+					"skin": "#ffe0c8",
+					"hair": "#b8b8c0",
+					"coat": "#f0f0f4",
+					"top": "#5a6a8a",
+					"pants": "#40404a",
+					"accent": "#ff5a5a",
+					"iris": "#3a6aff",
+					"glow": "#ff5a5a",
+					"scarf": "#ff5a5a"
+				}
 			}
 		},
 		"kevin": {
 			"name": "UNIT-7 'Kevin'",
 			"title": "Decommissioned Ad-Bot",
 			"bio": "A Lumen advertising robot that developed self-esteem issues. Still occasionally recommends products mid-sentence.",
-			"values": {"mercy": 0.3, "order": 0.6, "greed": 0.3},
+			"values": {
+				"mercy": 0.3,
+				"order": 0.6,
+				"greed": 0.3
+			},
 			"betrayal": "leak_coords",
-			"sprite": "crew_kevin",
 			"recruit_line": "HELLO FRIEND. I am Kevin. I would like to belong somewhere. Also, have you tried Protein Paste Lite?",
 			"barks": {
-				"approve": ["APPROVAL REGISTERED. I am experiencing... brand loyalty?", "Five stars. Would follow again."],
-				"disapprove": ["This behaviour will be reported to- no. No. I am not that anymore.", "My sentiment analysis says: yikes."],
-				"disloyal": ["Lumen keeps calling me. They say I can come home."]
+				"approve": [
+					"APPROVAL REGISTERED. I am experiencing... brand loyalty?",
+					"Five stars. Would follow again."
+				],
+				"disapprove": [
+					"This behaviour will be reported to- no. No. I am not that anymore.",
+					"My sentiment analysis says: yikes."
+				],
+				"disloyal": [
+					"Lumen keeps calling me. They say I can come home."
+				]
+			},
+			"look": {
+				"variant": "r00",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#9aa4b8",
+					"skin": "#9aa4b8",
+					"hair": "#9aa4b8",
+					"top": "#8a94a8",
+					"pants": "#6a7488",
+					"accent": "#ff3ec8",
+					"iris": "#3ee6ff",
+					"glow": "#3ee6ff",
+					"coat": "#8a94a8",
+					"scarf": "#ff3ec8"
+				}
 			}
 		},
 		"rook": {
 			"name": "Grandma Rook",
 			"title": "Retired Debt Collector",
 			"bio": "Collected debts for Halcyon for forty years. Knows exactly how much everyone is worth, down to the kidney.",
-			"values": {"mercy": -1.0, "order": 0.3, "greed": 0.5},
+			"values": {
+				"mercy": -1.0,
+				"order": 0.3,
+				"greed": 0.5
+			},
 			"betrayal": "mutiny",
-			"sprite": "crew_rook",
 			"recruit_line": "Forty years breaking kneecaps for a pension that got repossessed. Let's go break some upward.",
 			"barks": {
-				"approve": ["That's my grandchild.", "Ha! They had it coming. They always have it coming."],
-				"disapprove": ["Soft. You're going soft.", "Mercy is just debt with no collateral, dear.", "In my day we finished the job."],
-				"disloyal": ["I've collected on bigger captains than you, sweetie."]
+				"approve": [
+					"That's my grandchild.",
+					"Ha! They had it coming. They always have it coming."
+				],
+				"disapprove": [
+					"Soft. You're going soft.",
+					"Mercy is just debt with no collateral, dear.",
+					"In my day we finished the job."
+				],
+				"disloyal": [
+					"I've collected on bigger captains than you, sweetie."
+				]
+			},
+			"look": {
+				"variant": "h17",
+				"colors": {
+					"eyewhite": "#f4f4f0",
+					"dark": "#1a1030",
+					"flash": "#bff8ff",
+					"boots": "#3a2a22",
+					"gloves": "#24242e",
+					"cap": "#a03030",
+					"gear": "#5a5a6a",
+					"skin": "#e8b088",
+					"hair": "#f0f0f0",
+					"coat": "#4a2058",
+					"top": "#c0a0ff",
+					"pants": "#3a1a4a",
+					"accent": "#c0a0ff",
+					"iris": "#8a2aa0",
+					"glow": "#c0a0ff",
+					"scarf": "#c0a0ff"
+				}
 			}
 		}
 	}

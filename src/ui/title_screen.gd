@@ -57,7 +57,7 @@ func _ready() -> void:
 	Audio.play_music("odd_duck_theme")
 	for c in v.get_children():
 		if c is Button:
-			c.call_deferred("grab_focus")
+			_safe_focus.call_deferred(c)
 			break
 	var timer := Timer.new()
 	timer.wait_time = 4.0
@@ -86,3 +86,9 @@ func _next_slogan() -> void:
 func _on_continue() -> void:
 	if Game.load_game():
 		Router.continue_run()
+
+
+## Deferred focus that tolerates the control (or its scene) being freed meanwhile.
+func _safe_focus(c: Control) -> void:
+	if is_instance_valid(c) and c.is_inside_tree():
+		c.grab_focus()

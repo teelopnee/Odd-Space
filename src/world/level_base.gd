@@ -38,7 +38,10 @@ var environment: Environment
 var sun: DirectionalLight3D
 var build: Dictionary = {}
 var rng := RandomNumberGenerator.new()
+var builder: LevelBuilder
 var _dying := false
+var _quest_spawned: Dictionary = {}
+const GUARD_TYPES := {"paragon": "paragon_officer", "halcyon": "repo_drone", "gristle": "gristle_grub", "oxy": "paragon_officer", "lumen": "paragon_officer", "": "pirate"}
 
 
 func _ready() -> void:
@@ -49,7 +52,7 @@ func _ready() -> void:
 	nav_region = NavigationRegion3D.new()
 	nav_region.name = "World"
 	add_child(nav_region)
-	var builder := LevelBuilder.new(nav_region, palette, level_seed, _is_outdoor(), owner_faction)
+	builder = LevelBuilder.new(nav_region, palette, level_seed, _is_outdoor(), owner_faction)
 	build = builder.build(_get_layout())
 	actors = Node3D.new()
 	actors.name = "Actors"
@@ -202,11 +205,22 @@ func spawn_enemy(type_id: String, pos: Vector3, extra: Dictionary = {}) -> Enemy
 	e.enemy_type = type_id
 	e.display_name_override = extra.get("name", "")
 	e.sprite_override = extra.get("sprite", "")
+	e.look_override = extra.get("look", {})
 	e.force_hostile = extra.get("hostile", false)
 	e.gravity_scale = gravity_scale
 	e.world_speed_mult = enemy_speed_mult
 	actors.add_child(e)
 	e.global_position = pos + Vector3(rng.randf_range(-0.3, 0.3), 0.1, rng.randf_range(-0.3, 0.3))
+	if extra.has("tag"):
+		e.set_meta("saga_tag", extra["tag"])
+	if extra.get("elite", false):
+		var boss: bool = extra.get("boss", false)
+		e.max_hp *= 5.0 if boss else 2.6
+		e.hp = e.max_hp
+		e.shield_max += 6 if boss else 3
+		e.shield = e.shield_max
+		e.sprite.scale_base = 1.4 if boss else 1.2
+		e.call_deferred("_refresh_shield")
 	return e
 
 
@@ -216,7 +230,10 @@ func spawn_npc(role: String, pos: Vector3, recruit_id: String = "") -> NPC:
 	n.recruit_id = recruit_id
 	n.faction = owner_faction
 	n.npc_name = CIVILIAN_NAMES[rng.randi() % CIVILIAN_NAMES.size()]
-	n.sprite_name = "merchant" if role == "merchant" else CIVILIAN_SPRITES[rng.randi() % CIVILIAN_SPRITES.size()]
+	var style: String = "worker" if role == "merchant" else ["civilian", "civilian", "civilian", "worker", "punk", "robot"][rng.randi() % 6]
+	if owner_faction != "" and rng.randf() < 0.25:
+		style = "corporate:" + owner_faction
+	n.look = CharacterLook.random_look(rng, style)
 	if role == "merchant":
 		n.npc_name = ["Sal the Fence", "VEND-O-TRON", "Auntie Credit", "Mr. Markup"][rng.randi() % 4]
 		n.traits.assign(["corporate"] if rng.randf() < 0.5 else ["poor"])
@@ -324,3 +341,112 @@ func _build_weather(kind: String) -> void:
 			var c := {"spores": Color(0.6, 1.6, 0.5, 0.9), "embers": Color(2.2, 0.9, 0.3, 0.9), "motes": Color(1.4, 1.0, 2.2, 0.9)}[kind] as Color
 			m.albedo_color = c
 	camera_rig.add_child(p)
+
+
+# --- Story & side quests (Saga) -----------------------------------------------------------------
+
+## Random walkable floor tile at least min_dist from the player spawn.
+func random_floor_position(min_dist: float = 8.0) -> Vector3:
+	var spawn := get_spawn_position()
+	for attempt in 200:
+		var x := rng.randi_range(1, builder.width - 2)
+		var z := rng.randi_range(1, builder.height - 2)
+		if builder.cell(x, z) != "." and builder.cell(x, z) != "," and builder.cell(x, z) != "_":
+			continue
+		var p := builder.center(x, z)
+		if p.distance_to(spawn) >= min_dist:
+			return p
+	return spawn + Vector3(4, 0, -4)
+
+
+## Spawn whatever the Saga needs here (call again after quest state changes).
+func refresh_quests() -> void:
+	if builder == null or not is_inside_tree():
+		return
+	var planet_id := Game.location_id
+	for spec in Saga.spawns_for(planet_id):
+		var key := "%s:%s" % [spec.kind, spec.get("persona_id", spec.get("tag", ""))]
+		if spec.kind == "guards":
+			key = "guards:%d" % Saga.index
+		if _quest_spawned.has(key):
+			continue
+		_quest_spawned[key] = true
+		match spec.kind:
+			"persona":
+				var p: Dictionary = Saga.personas.get(spec.persona_id, {})
+				var near_pad: bool = spec.get("quest", "") == "side"
+				var pos := random_floor_position(4.0 if near_pad else 10.0)
+				if near_pad:
+					pos = get_spawn_position() + Vector3(rng.randf_range(-6, 6), 0, rng.randf_range(-6, -2))
+				var n := spawn_npc("civilian", pos)
+				n.persona_id = p.get("id", "")
+				n.npc_name = p.get("name", "?")
+				n.look = p.get("look", {})
+				n.sprite.set_look(n.look)
+				n.name_label.text = n.npc_name + "\n<%s>" % str(p.get("job", "")).to_upper()
+				n.faction = p.get("faction", "")
+				attach_marker(n, "!" if spec.get("quest", "") == "main" else "?", Color(1.0, 0.82, 0.24) if spec.get("quest", "") == "main" else Color(0.5, 1.0, 0.9))
+			"quest_item":
+				var pos := random_floor_position(12.0)
+				var body := builder.static_body(pos)
+				builder.add_mesh(body, builder.box(Vector3(1.0, 0.8, 0.8)), builder.emissive(Color(1.0, 0.75, 0.2), 1.5), Vector3(0, 0.4, 0))
+				builder.add_box_collider(body, Vector3(1.0, 0.8, 0.8), Vector3(0, 0.4, 0))
+				var it := PropInteractable.new()
+				it.kind = "quest_item"
+				it.quest_tag = spec.tag
+				it.prompt = "Take %s" % spec.get("label", "it")
+				it.position = Vector3(0, 0.6, 0.6)
+				body.add_child(it)
+				attach_marker(body, "!", Color(1.0, 0.82, 0.24))
+				if spec.tag == Saga.current().get("id", ""):
+					_spawn_guards(pos, 2, Saga.world.get("faction", ""))
+			"elite":
+				var p: Dictionary = Saga.personas.get(spec.persona_id, {})
+				var pos := random_floor_position(14.0)
+				var e := spawn_enemy(spec.get("enemy_type", "pirate"), pos, {"name": p.get("name", "Elite"), "look": p.get("look", {}),
+					"hostile": true, "elite": true, "boss": spec.get("boss", false), "tag": spec.tag})
+				attach_marker(e, "X", Color(1.0, 0.3, 0.3))
+			"guards":
+				_spawn_guards(random_floor_position(12.0), int(spec.get("count", 2)), str(spec.get("faction", "")))
+
+
+func _spawn_guards(center: Vector3, count: int, faction: String) -> void:
+	for i in count:
+		spawn_enemy(GUARD_TYPES.get(faction, "pirate"), center + Vector3(rng.randf_range(-3, 3), 0, rng.randf_range(-3, 3)), {"hostile": true})
+
+
+## Floating quest marker + golden light beam over a node.
+func attach_marker(node: Node3D, text: String, color: Color) -> void:
+	var holder := Node3D.new()
+	holder.name = "QuestMarker"
+	node.add_child(holder)
+	holder.position = Vector3(0, 2.9, 0)
+	var l := Label3D.new()
+	l.text = text
+	l.font_size = 96
+	l.pixel_size = 0.008
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.modulate = Color(color.r * 2.0, color.g * 2.0, color.b * 2.0)
+	l.outline_size = 16
+	l.outline_modulate = Color(0.1, 0.05, 0.0)
+	holder.add_child(l)
+	var tw := holder.create_tween().set_loops()
+	tw.tween_property(holder, "position:y", 3.2, 0.6).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(holder, "position:y", 2.9, 0.6).set_trans(Tween.TRANS_SINE)
+	var q := QuadMesh.new()
+	q.size = Vector2(1.2, 6.0)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.albedo_texture = load("res://assets/textures/light_shaft.png")
+	m.albedo_color = Color(color.r, color.g, color.b, 0.35)
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	q.material = m
+	var beam := MeshInstance3D.new()
+	beam.mesh = q
+	beam.rotation_degrees.z = 180.0
+	beam.position = Vector3(0, 3.0, 0)
+	beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	node.add_child(beam)
