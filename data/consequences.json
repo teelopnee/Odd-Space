@@ -9,7 +9,10 @@
 		"bounty": 40,
 		"news": [
 			"LUMEN FLASH: Petty thief strikes {location}. Shareholders 'mildly inconvenienced'.",
-			"BREAKING: {target_name} property relocated without a receipt at {location}. Experts call it 'theft'."
+			"BREAKING: {target_name} property relocated without a receipt at {location}. Experts call it 'theft'.",
+			"LUMEN CRIME: Item 'liberated' at {location}. {target_name} launches a sad little press release.",
+			"BREAKING: Shoplifter at {location} 'just really wanted it', say witnesses.",
+			"LOCAL: {target_name} reports theft at {location}. Insurance adjusters weep with joy."
 		],
 		"moral": {
 			"mercy": 0,
@@ -26,7 +29,10 @@
 		"bounty": 20,
 		"news": [
 			"LUMEN FLASH: Advertising surface assaulted at {location}. The ad is reportedly 'still believing in you'.",
-			"BREAKING: Hooligan disrespects a billboard at {location}. Billboard declines to comment, as it is broken."
+			"BREAKING: Hooligan disrespects a billboard at {location}. Billboard declines to comment, as it is broken.",
+			"LUMEN ARTS: Unsanctioned redecoration at {location}. Critics: 'bold'.",
+			"LOCAL: Public property at {location} expresses itself, violently.",
+			"BREAKING: Vandal strikes {location}. Ad revenue down 0.0001%. Markets panic."
 		],
 		"moral": {
 			"mercy": 0,
@@ -42,7 +48,10 @@
 		},
 		"bounty": 60,
 		"news": [
-			"LUMEN FLASH: Unprovoked violence at {location}! Victim's productivity down 40%."
+			"LUMEN FLASH: Unprovoked violence at {location}! Victim's productivity down 40%.",
+			"LUMEN FLASH: Brawl at {location}. Both parties billed.",
+			"BREAKING: Assault at {location}. Paragon: 'we were on our break'.",
+			"LOCAL: Fists thrown at {location}. Witnesses rate it 3 stars."
 		],
 		"moral": {
 			"mercy": -1,
@@ -60,7 +69,10 @@
 		"bounty": 250,
 		"news": [
 			"BREAKING: Homicide at {location}. {target_name} mourns the loss of a fully-depreciated asset.",
-			"LUMEN EXCLUSIVE: Killer at large near {location}! Paragon Compliance offers a bounty and a discount on grief counselling."
+			"LUMEN EXCLUSIVE: Killer at large near {location}! Paragon Compliance offers a bounty and a discount on grief counselling.",
+			"LUMEN SPECIAL REPORT: Tragedy at {location}. Sponsored by MediCredit(tm).",
+			"BREAKING: Body found at {location}. Halcyon confirms the debt will be passed to next of kin.",
+			"MOURNING AT {location}: Family asks for privacy, Lumen declines."
 		],
 		"moral": {
 			"mercy": -2,
@@ -76,7 +88,9 @@
 		},
 		"bounty": 0,
 		"news": [
-			"LUMEN SPORTS: Armed altercation at {location}. Final score: one drifter, {target_name} nil."
+			"LUMEN SPORTS: Armed altercation at {location}. Final score: one drifter, {target_name} nil.",
+			"LUMEN SPORTS: {target_name} employee 'retired early' at {location}.",
+			"LOCAL: Shootout at {location}. Both sides claim victory. One side is wrong."
 		],
 		"moral": {
 			"mercy": -0.5,
@@ -92,7 +106,9 @@
 		},
 		"bounty": 0,
 		"news": [
-			"LUMEN BUSINESS: Informal transaction at {location}. Economists praise 'market efficiency'."
+			"LUMEN BUSINESS: Informal transaction at {location}. Economists praise 'market efficiency'.",
+			"LUMEN BUSINESS: Money changes hands at {location}. As is tradition.",
+			"ECONOMY: Informal economy booming at {location}, say informal economists."
 		],
 		"moral": {
 			"mercy": 0,
@@ -106,7 +122,9 @@
 		"rep": {},
 		"bounty": 0,
 		"news": [
-			"LUMEN HUMAN INTEREST: Someone at {location} did something nice. Analysts are baffled."
+			"LUMEN HUMAN INTEREST: Someone at {location} did something nice. Analysts are baffled.",
+			"LUMEN FEELINGS: Someone at {location} chose mercy. Ratings unclear.",
+			"LOCAL HERO? Mystery helper strikes again at {location}."
 		],
 		"moral": {
 			"mercy": 2,
@@ -122,7 +140,9 @@
 		},
 		"bounty": 0,
 		"news": [
-			"LUMEN BUSINESS: Unlicensed generosity reported at {location}. Halcyon warns it could 'destabilise poverty'."
+			"LUMEN BUSINESS: Unlicensed generosity reported at {location}. Halcyon warns it could 'destabilise poverty'.",
+			"LUMEN HUMAN INTEREST: Stranger gives credits away at {location}. Experts baffled.",
+			"LOCAL: Act of kindness at {location} goes viral. Halcyon investigating."
 		],
 		"moral": {
 			"mercy": 1.5,
@@ -138,7 +158,8 @@
 		},
 		"bounty": 10,
 		"news": [
-			"LUMEN FLASH: Unauthorised footsteps detected at {location}."
+			"LUMEN FLASH: Unauthorised footsteps detected at {location}.",
+			"LOCAL: Footsteps detected where footsteps were not purchased at {location}."
 		],
 		"moral": {
 			"mercy": 0,
@@ -153,7 +174,9 @@
 			"$target": -2
 		},
 		"bounty": 0,
-		"news": [],
+		"news": [
+			"LOCAL: Citizen at {location} 'spoken to firmly'. Citizen now very quiet."
+		],
 		"moral": {
 			"mercy": -1,
 			"order": -1,
@@ -195,7 +218,9 @@
 		},
 		"bounty": 50,
 		"news": [
-			"LUMEN FLASH: Contraband detected near {location}. Paragon reminds citizens that freedom is a premium feature."
+			"LUMEN FLASH: Contraband detected near {location}. Paragon reminds citizens that freedom is a premium feature.",
+			"LUMEN CRIME: Contraband air seized near {location}. Seized air 'very refreshing', say officers.",
+			"BREAKING: Smugglers active at {location}. Paragon raises prices on vigilance."
 		],
 		"moral": {
 			"mercy": 0,

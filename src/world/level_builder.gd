@@ -33,6 +33,8 @@ const LAYER_OCCLUDER := 128
 const WALKABLE_EXCLUDE := ["#", " ", "b", "O", "~", "^"]
 const WATER_SHADER := "res://assets/shaders/water.gdshader"
 const STREETS := ["NEON AVE", "DEBT ST", "PASTE BLVD", "OBEY LN", "4TH QTR", "AIR WAY", "COLLATERAL RD", "SYNERGY SQ", "MARKUP ALLEY", "REFUND? NO", "LOYALTY PKWY", "CLAUSE 9 ST"]
+const SHOP_TYPES := ["food", "food", "bar", "bar", "clinic", "pawn", "motel", "arcade", "karaoke", "tattoo", "loans", "tapes", "implants", "fortune"]
+const STALL_TYPES := ["food", "food", "food", "air", "implants", "fortune", "tapes", "pawn"]
 const STALL_SIGNS := ["NOODLES", "PASTE", "AIR 2GO", "CHIPS", "REPAIR", "DUMPLINGS", "SYNTH-RAMEN", "PAWN", "FORTUNES", "CRYO-POPS", "IMPLANTS", "TAPES"]
 const SHAFT_TEX := "res://assets/textures/light_shaft.png"
 const SPAWN_CHARS := {"1": "cryo_bay", "2": "cargo_hold", "3": "medbay", "4": "server_room", "P": "default"}
@@ -515,15 +517,17 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 	deco.append(add_mesh(body, box(Vector3(shop_w + 0.4, 0.06, 0.06)), emissive(sign_color, 4.0), Vector3(shop_x, 1.95, front + 0.86), 0.0, false))
 	var label := Label3D.new()
 	var corp_label: bool = fid != "" and DataDB.factions.has(fid) and sign_color == DataDB.faction_color(fid)
-	label.text = DataDB.factions.get(fid, {}).get("short", "OPEN 25/8") if corp_label else ["NOODLES", "BAR", "CLINIC?", "PAWN", "CRYO-MOTEL", "ARCADE", "KARAOKE", "TATTOO", "PASTE HUT", "LOANS!", "TAPES", "HOTEL"][rng.randi() % 12]
-	label.font_size = 96
+	var venue_id: String = "corp_store" if corp_label else SHOP_TYPES[rng.randi() % SHOP_TYPES.size()]
+	label.text = str(DataDB.factions.get(fid, {}).get("short", "STORE")) if corp_label else Copy.make(venue_id + "_name", rng).to_upper()
+	label.font_size = 96 if label.text.length() <= 10 else (72 if label.text.length() <= 16 else 54)
 	label.pixel_size = 0.009
 	label.modulate = sign_color * 2.2
 	label.outline_size = 0
 	label.position = Vector3(shop_x, 2.55, front + 0.08)
 	body.add_child(label)
 	deco.append(label)
-	_add_venue(body, label.text, fid if corp_label else "", Vector3(shop_x, 0.8, front + 0.95))
+	_add_venue(body, label.text, fid if corp_label else "", Vector3(shop_x, 0.8, front + 0.95), venue_id)
+	_facade_paper(body, w, front, shop_x, shop_w, deco)
 	if rng.randf() < 0.18:
 		var fl := Flicker.new()
 		fl.seed_value = rng.randi()
@@ -919,9 +923,49 @@ func _life_spot(pos: Vector3, kind: String, face: Vector3) -> void:
 	root.add_child(m)
 
 
+## Flyers, posters and graffiti on the street-level facade (texts from data/copy.json).
+func _facade_paper(body: Node3D, w: float, front: float, shop_x: float, shop_w: float, deco: Array[Node]) -> void:
+	var paper_cols := [Color(0.95, 0.92, 0.82), Color(1.0, 0.85, 0.4), Color(0.6, 0.95, 1.0), Color(1.0, 0.6, 0.8), Color(0.85, 1.0, 0.6)]
+	for i in rng.randi_range(1, 4):
+		var x := rng.randf_range(-w * 0.5 + 0.4, w * 0.5 - 0.4)
+		if absf(x - shop_x) < shop_w * 0.5 + 0.3:
+			continue  # not over the shop window
+		var pc: Color = paper_cols[rng.randi() % paper_cols.size()]
+		var y := rng.randf_range(1.0, 1.9)
+		var paper := add_mesh(body, box(Vector3(0.5, 0.62, 0.015)), emissive(pc.darkened(0.15), 0.25), Vector3(x, y, front + 0.035), 0.0, false)
+		paper.rotation.z = rng.randf_range(-0.12, 0.12)
+		deco.append(paper)
+		var l := Label3D.new()
+		l.text = Copy.make("flyer", rng)
+		l.font_size = 22
+		l.pixel_size = 0.004
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.width = 110.0
+		l.modulate = Color(0.08, 0.06, 0.1)
+		l.outline_size = 0
+		l.position = Vector3(x, y, front + 0.05)
+		l.rotation.z = paper.rotation.z
+		body.add_child(l)
+		deco.append(l)
+	if rng.randf() < 0.55:
+		var g := Label3D.new()
+		g.text = Copy.make("graffiti", rng)
+		g.font_size = 72
+		g.pixel_size = 0.007
+		var spray := [Color(1.0, 0.25, 0.6), Color(0.3, 1.0, 0.9), Color(1.0, 0.9, 0.2), Color(0.6, 0.4, 1.0), Color(1, 1, 1)]
+		var sc: Color = spray[rng.randi() % spray.size()]
+		g.modulate = Color(sc.r * 1.3, sc.g * 1.3, sc.b * 1.3, 0.85)
+		g.outline_size = 10
+		g.outline_modulate = Color(0.05, 0.02, 0.08, 0.7)
+		g.position = Vector3(rng.randf_range(-w * 0.3, w * 0.3), rng.randf_range(0.35, 0.75), front + 0.04)
+		g.rotation.z = rng.randf_range(-0.1, 0.1)
+		body.add_child(g)
+		deco.append(g)
+
+
 ## A usable door/counter for whatever the sign says (data/venues.json).
-func _add_venue(parent: Node3D, sign_text: String, faction: String, local_pos: Vector3) -> void:
-	var venue := Interactions.venue_for_sign(sign_text)
+func _add_venue(parent: Node3D, sign_text: String, faction: String, local_pos: Vector3, venue_id: String = "") -> void:
+	var venue := venue_id if venue_id != "" else Interactions.venue_for_sign(sign_text)
 	if venue == "":
 		return
 	var it := PropInteractable.new()
@@ -1128,6 +1172,9 @@ func _reactive_ad() -> Dictionary:
 func _ad_sign(p: Vector3) -> void:
 	var ads: Array = DataDB.ads.get("list", [])
 	var ad: Dictionary = ads[rng.randi() % ads.size()] if not ads.is_empty() else {"faction": "lumen", "headline": "LUMEN", "text": "Watch more."}
+	if rng.randf() < 0.55:
+		var fids := ["oxy", "halcyon", "gristle", "paragon", "lumen"]
+		ad = {"faction": fids[rng.randi() % fids.size()], "headline": Copy.make("headline", rng), "text": Copy.make("ad_body", rng)}
 	var reactive := _reactive_ad()
 	if not reactive.is_empty():
 		ad = reactive
@@ -1147,6 +1194,10 @@ func _ad_sign(p: Vector3) -> void:
 	head.pixel_size = 0.0075
 	head.modulate = col * 2.5
 	head.position = Vector3(0, 2.95, 0.06)
+	head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	head.width = 320.0
+	if head.text.length() > 18:
+		head.font_size = 48
 	board.add_child(head)
 	var body_text := Label3D.new()
 	body_text.text = ad.get("text", "")
@@ -1391,15 +1442,29 @@ func _stall(p: Vector3) -> void:
 	lantern.rings = 3
 	add_mesh(body, lantern, emissive(Color(1.0, 0.75, 0.35), 4.0), Vector3(0.6, 1.8, 0.5), 0.0, false)
 	var label := Label3D.new()
-	label.text = STALL_SIGNS[rng.randi() % STALL_SIGNS.size()]
-	label.font_size = 64
+	var stall_venue: String = STALL_TYPES[rng.randi() % STALL_TYPES.size()]
+	label.text = Copy.make(stall_venue + "_name", rng).to_upper()
+	label.font_size = 64 if label.text.length() <= 12 else 46
 	label.pixel_size = 0.0075
 	label.modulate = col * 2.4
 	label.outline_size = 0
 	label.position = Vector3(0, 2.45, 0.6)
 	body.add_child(label)
-	_add_venue(body, label.text, "", Vector3(0, 0.8, 0.95))
+	_add_venue(body, label.text, "", Vector3(0, 0.8, 0.95), stall_venue)
 	_glow_spots.append([p, col, 0.7])
+	if stall_venue == "food":
+		# Hand-written menu board on the side of the stall.
+		var board := add_mesh(body, box(Vector3(0.05, 0.55, 0.7)), _mats["dark"], Vector3(0.9, 1.35, 0.1), 0.0, false)
+		board.rotation.y = 0.0
+		var menu := Label3D.new()
+		menu.text = Copy.make("menu", rng)
+		menu.font_size = 28
+		menu.pixel_size = 0.0045
+		menu.modulate = Color(1.6, 1.5, 1.2)
+		menu.outline_size = 0
+		menu.position = Vector3(0.93, 1.35, 0.1)
+		menu.rotation.y = PI * 0.5
+		body.add_child(menu)
 	if rng.randf() < 0.45:
 		add_light(p + Vector3(0, 1.7, 0.8), Color(1.0, 0.8, 0.5), 1.2, 4.5)
 	add_box_collider(body, Vector3(1.7, 1.0, 0.8), Vector3(0, 0.5, 0))
@@ -1491,7 +1556,7 @@ func _street_sign(p: Vector3) -> void:
 	add_mesh(body, cylinder(0.05, 2.8, 5), _mats["metal"], Vector3(0, 1.4, 0))
 	var names := STREETS.duplicate()
 	for i in 2:
-		var name: String = names[rng.randi() % names.size()]
+		var name: String = Copy.make("street", rng).to_upper() if rng.randf() < 0.75 else str(names[rng.randi() % names.size()])
 		names.erase(name)
 		var blade := add_mesh(body, box(Vector3(1.3, 0.28, 0.05)), emissive(Color(0.1, 0.45, 0.35), 1.2), Vector3(0.45, 2.55 - i * 0.34, 0), 0.0, false)
 		blade.rotation.y = i * PI * 0.5
@@ -1656,7 +1721,7 @@ func _landing_markings(p: Vector3) -> void:
 	var msgs := ["LANDING BAY 7  //  PARKING 40 CR/MIN", "NO LOITERING  //  BREATHING SURCHARGE APPLIES", "WELCOME, VALUED VISITOR  //  YOU ARE BEING BILLED",
 		"STAND HERE TO BE SCANNED", "SMILE: CONSORTIUM CAMERAS ACTIVE"]
 	var lbl := Label3D.new()
-	lbl.text = msgs[rng.randi() % msgs.size()]
+	lbl.text = Copy.make("floor_notice", rng) if rng.randf() < 0.8 else msgs[rng.randi() % msgs.size()]
 	lbl.font_size = 64
 	lbl.pixel_size = 0.0065
 	lbl.modulate = Color(1.0, 0.82, 0.25, 0.8)

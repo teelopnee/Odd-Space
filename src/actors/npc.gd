@@ -573,6 +573,10 @@ func _life(delta: float) -> void:
 		pool = b.get("station", [])
 	else:
 		pool = _reactive_barks(b)
+	if pool.is_empty() and role == "civilian" and _rng.randf() < 0.55:
+		# Fresh small talk every time: the copywriter knows the shows, the teams, the prices.
+		say(Copy.make("chatter", _rng))
+		return
 	if pool.is_empty():
 		pool = b.get(role, b.get("civilian", []))
 	if not pool.is_empty():

@@ -290,6 +290,7 @@ func _build_ticker() -> void:
 	_ticker_label = make_label("", 16, Color(1.0, 0.9, 0.95))
 	_ticker_clip.add_child(_ticker_label)
 	_ticker_items.assign(DataDB.ads.get("ticker", []))
+	_ticker_items.shuffle()
 	for h in Causality.latest_headlines(3):
 		_ticker_items.push_front(h)
 	_next_ticker()
@@ -737,7 +738,12 @@ func _next_ticker() -> void:
 	if _ticker_items.is_empty():
 		return
 	_ticker_index = (_ticker_index + 1) % _ticker_items.size()
-	_ticker_label.text = "LUMEN NEWS //  " + _ticker_items[_ticker_index] + "  //  "
+	var item: String = _ticker_items[_ticker_index]
+	# Two out of three items are freshly written news from the copywriter (data/copy.json).
+	if randf() < 0.66:
+		item = Copy.make("news", null, {"planet": Game.location_name.to_upper() if Game.location_name != "" else "THE SPRAWL"})
+	var desk: String = ["LUMEN NEWS", "LUMEN NEWS", "BREAKING", "MARKETS", "LUMEN SPORT", "WEATHER", "LOCAL"][randi() % 7]
+	_ticker_label.text = desk + " //  " + item + "  //  "
 	_ticker_label.reset_size()
 	_ticker_label.position = Vector2(_ticker_clip.size.x + 20.0, 2)
 

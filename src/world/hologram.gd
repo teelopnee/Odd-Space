@@ -131,7 +131,7 @@ func _build_base() -> void:
 	light.position = Vector3(0, 2.0, 1.0)
 	add_child(light)
 	_label = Label3D.new()
-	_label.text = TAGLINES[_rng.randi() % TAGLINES.size()]
+	_label.text = Copy.make("slogan", _rng) if _rng.randf() < 0.7 else TAGLINES[_rng.randi() % TAGLINES.size()]
 	_label.font_size = 96
 	_label.pixel_size = 0.012
 	_label.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
@@ -170,7 +170,7 @@ func _process(delta: float) -> void:
 		_sprite.set_look(CharacterLook.random_look(_rng, ["hero", "corporate", "punk", "civilian", "robot"][_rng.randi() % 5]))
 		_apply_colors()
 		if _label:
-			_label.text = TAGLINES[_rng.randi() % TAGLINES.size()]
+			_label.text = Copy.make("slogan", _rng) if _rng.randf() < 0.7 else TAGLINES[_rng.randi() % TAGLINES.size()]
 	if _glitch > 0.0:
 		_glitch = maxf(0.0, _glitch - delta)
 		_sprite.visible = fmod(_t, 0.1) > 0.03

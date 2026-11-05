@@ -36,6 +36,9 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
 - NPC life: `life_spot` markers (bench seats, stall queues, hologram dance floors) -> `NPC._pick_activity`
   (sit / phone / queue / dance), waving at friends, cheering on `story_event`; reactive barks (`data/barks.json`).
 - `src/core/character_look.gd` random looks (variant + palette colours); sprites are palette-indexed.
+- `src/core/copy.gd` procedural copywriter over `data/copy.json` (Tracery-style `#symbol#` grammar): billboards,
+  hologram slogans, shop/stall/street names, HUD news ticker, wall flyers + graffiti, menus, PA announcements,
+  NPC small talk. Preview: `tools/print_copy.gd -- [symbol] [count]`. Add variety by adding alternatives there.
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

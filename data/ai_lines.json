@@ -2,60 +2,182 @@
 	"_doc": "Q.U.A.C.K. (Quasi-Unlicensed Autonomous Cognitive Kernel), the Odd Duck's ship AI. Keys are events. Tokens: {name} {planet} {crisis} {faction} {target} {count} {credits} {member}.",
 	"on_wake": [
 		"Oh good, you're thawed. I was about to list you on the secondhand market as 'vintage meat'.",
-		"Welcome back to consciousness, {name}. It's the 32nd century. Everything costs money, including this sentence."
+		"Welcome back to consciousness, {name}. It's the 32nd century. Everything costs money, including this sentence.",
+		"Rise and shine. The shine is extra.",
+		"You've been asleep for a while. Prices have gone up. So has my opinion of myself.",
+		"Vital signs: alive. Financial signs: concerning."
 	],
-	"on_tutorial_move": ["Movement detected. Congratulations on your legs."],
+	"on_tutorial_move": [
+		"Movement detected. Congratulations on your legs.",
+		"Walking. A classic. Try not to pay for it.",
+		"Excellent locomotion. Ten out of ten. The ten is billed separately.",
+		"You move like someone with a lot of debt and nothing to lose. I respect that."
+	],
 	"on_theft": [
 		"Ah, the classic five-finger discount. The Consortium calls it 'shrinkage'. I call it Tuesday.",
-		"Stealing from the people who own air. Bold. Stupid, but bold."
+		"Stealing from the people who own air. Bold. Stupid, but bold.",
+		"I didn't see anything. Mostly because I was looking at your bounty.",
+		"Redistributing wealth one crate at a time. Very grassroots.",
+		"Do you want me to log that as 'shopping'? I'll log it as shopping.",
+		"If it's not nailed down, it's yours. If it is nailed down, that's what crowbars are for."
 	],
 	"on_murder": [
 		"That's going in the Causality Log. In bold. With a little skull emoji.",
-		"I'm legally required to say 'that was bad'. I'm not legally required to mean it. ...That was bad, though."
+		"I'm legally required to say 'that was bad'. I'm not legally required to mean it. ...That was bad, though.",
+		"Well. That's a permanent decision.",
+		"They had a name, you know. Lumen will tell you what it was, at 6.",
+		"I'll add it to the list of things we don't talk about at dinner.",
+		"Somewhere, a debt just went unpaid forever. Halcyon will be furious."
 	],
-	"on_assault": ["You know they have insurance, right? You don't."],
-	"on_vandalism": ["Somewhere in a Lumen tower, an executive just felt a cold shiver. Good."],
+	"on_assault": [
+		"You know they have insurance, right? You don't.",
+		"Violence: the oldest negotiating tactic.",
+		"Was that a conversation? It looked like a conversation with fists.",
+		"Remember: every punch is a line item in someone's insurance claim.",
+		"They'll feel that tomorrow. They'll feel the bill on Thursday."
+	],
+	"on_vandalism": [
+		"Somewhere in a Lumen tower, an executive just felt a cold shiver. Good.",
+		"The billboard had a family. Of other billboards.",
+		"That's one less ad telling you to breathe responsibly.",
+		"Property damage: the Consortium's least favourite love language.",
+		"I'm not saying I enjoyed that. I'm saying I'm saving the footage."
+	],
 	"on_witness": [
 		"Heads up: someone saw that and is calling it in. You have a few seconds to make them... reconsider.",
-		"Witness on the radio. Bribe them, outrun them, or make some very regrettable decisions."
+		"Witness on the radio. Bribe them, outrun them, or make some very regrettable decisions.",
+		"Someone's on the phone and it's about you.",
+		"We have a snitch. Repeat: we have a snitch.",
+		"That person has a very concerned face and a very fast thumb.",
+		"Witness dialling Paragon. Choose your next five seconds wisely."
 	],
 	"on_reported": [
 		"Report filed. Congratulations, you're content now.",
-		"And there it goes, onto the Lumen feed. Your mother would be so proud. If she weren't repossessed."
+		"And there it goes, onto the Lumen feed. Your mother would be so proud. If she weren't repossessed.",
+		"You're trending. Not in a good way.",
+		"Paragon just updated your file. It's getting thick.",
+		"Lumen's running it with dramatic music. You'd love it.",
+		"Congratulations, you're officially 'a person of interest'. Very interesting."
 	],
 	"on_suppressed": [
 		"Witness... silenced. The story dies with them. I'll pretend I didn't log that. I did log it.",
-		"No report, no crime. That's not ethics, that's accounting."
+		"No report, no crime. That's not ethics, that's accounting.",
+		"And the story vanishes. Like it never happened. Like most things in the Sprawl.",
+		"Silence purchased. Receipt shredded.",
+		"No call, no crime. Philosophically fascinating. Legally convenient."
 	],
-	"on_secret": ["Nobody saw. As far as the universe is concerned, that never happened. Except to me. I remember everything."],
+	"on_secret": [
+		"Nobody saw. As far as the universe is concerned, that never happened. Except to me. I remember everything.",
+		"Clean. Not a single camera. I'm almost proud.",
+		"A perfect crime. I'll never tell. I'll tell my therapist.",
+		"Nobody saw. Except me. I see everything. It's exhausting."
+	],
 	"on_low_hp": [
 		"Your vitals look like a Halcyon credit score. Use a medkit.",
-		"You're leaking. I'd help, but I'm a ship."
+		"You're leaking. I'd help, but I'm a ship.",
+		"You're leaking. Please stop leaking on the floor I don't own.",
+		"Health critical. Should I start drafting your obituary? I have a template.",
+		"Medkit. Now. I'm not cleaning you off the ship again.",
+		"Your body is filing for bankruptcy."
 	],
-	"on_parry": ["Parried! Even I'm impressed, and I'm programmed to be disappointed.", "Ooh, rude. Do it again."],
-	"on_jetpack_boom": ["You shot the jetpack. Physics did the rest. I love physics.", "Kaboom. That's a technical term."],
-	"on_legs_broken": ["Leg shot! Now they're on the payment plan for walking."],
-	"on_kill": ["Target liquidated. Like their assets.", "One less shareholder."],
+	"on_parry": [
+		"Parried! Even I'm impressed, and I'm programmed to be disappointed.",
+		"Ooh, rude. Do it again.",
+		"Textbook. If the textbook was written by an angry duck.",
+		"Perfect timing. Do that with your rent.",
+		"Bounced it right back. Customer service at its finest."
+	],
+	"on_jetpack_boom": [
+		"You shot the jetpack. Physics did the rest. I love physics.",
+		"Kaboom. That's a technical term."
+	],
+	"on_legs_broken": [
+		"Leg shot! Now they're on the payment plan for walking."
+	],
+	"on_kill": [
+		"Target liquidated. Like their assets.",
+		"One less shareholder.",
+		"Target neutralised. Their subscription has lapsed.",
+		"Down. Do you want me to send flowers? I won't.",
+		"Another one for the Causality Log.",
+		"Efficient. Terrifying. Mostly efficient."
+	],
 	"on_land": [
 		"Welcome to {planet}. Current crisis: {crisis}. So, a normal day.",
-		"Landing on {planet}. Remember: the air here isn't free. Nothing is. Not even this reminder."
+		"Landing on {planet}. Remember: the air here isn't free. Nothing is. Not even this reminder.",
+		"We're down. Try not to get billed for the landing.",
+		"Welcome to {planet}. The locals are friendly, the air is not.",
+		"Landing complete. Parking meter already running.",
+		"{planet}. Lovely. Smells like {crisis}."
 	],
-	"on_warp": ["Engaging warp. Please keep your limbs inside the ship and your expectations low.", "Warping. If we die, it was the cheapest engine on the market."],
-	"on_flaw": ["You accepted a flaw for skill points. That's literally how capitalism works. Proud of you.", "Character development! Downward, but still."],
-	"on_perk": ["New perk installed. You're 3% less disappointing now."],
-	"on_rep_crash": ["Your standing with {faction} just fell off a cliff. The cliff is also owned by {faction}."],
-	"on_bounty": ["There's a bounty on you now. You're worth something! Just not alive."],
-	"on_crew_unhappy": ["{member} is unhappy with you. I'd keep an eye on the airlock controls."],
-	"on_betrayal": ["Well. That happened. I did warn you. I always warn you. Nobody listens to the duck."],
-	"on_air_debt": ["You just went into air debt. Halcyon now owns a small percentage of your next breath."],
-	"on_scammed": ["It was a scam. Of course it was a scam. Everything's a scam. I'm probably a scam."],
-	"on_death": ["Vital signs: zero. Subscription: cancelled. Reloading your last save, because I'm too lazy to find a new pilot."],
-	"on_board": ["Welcome aboard the Odd Duck. Please ignore the smell. It's structural."],
+	"on_warp": [
+		"Engaging warp. Please keep your limbs inside the ship and your expectations low.",
+		"Warping. If we die, it was the cheapest engine on the market.",
+		"Hold on to something you own. If you own anything.",
+		"Warping. If we explode, it was nice knowing you. Partly.",
+		"Engaging hyperlane. Toll charged to your face.",
+		"Going fast. Very fast. Expensively fast."
+	],
+	"on_flaw": [
+		"You accepted a flaw for skill points. That's literally how capitalism works. Proud of you.",
+		"Character development! Downward, but still."
+	],
+	"on_perk": [
+		"New perk installed. You're 3% less disappointing now."
+	],
+	"on_rep_crash": [
+		"Your standing with {faction} just fell off a cliff. The cliff is also owned by {faction}."
+	],
+	"on_bounty": [
+		"There's a bounty on you now. You're worth something! Just not alive.",
+		"There's a price on your head. It's not even a good price.",
+		"Bounty posted. Bounty hunters love a deal.",
+		"You're worth more dead than alive now. Congratulations on the valuation."
+	],
+	"on_crew_unhappy": [
+		"{member} is unhappy with you. I'd keep an eye on the airlock controls."
+	],
+	"on_betrayal": [
+		"Well. That happened. I did warn you. I always warn you. Nobody listens to the duck."
+	],
+	"on_air_debt": [
+		"You just went into air debt. Halcyon now owns a small percentage of your next breath.",
+		"Your air debt just ticked over. Breathe less. Or more angrily.",
+		"Halcyon called. They want their breath back.",
+		"Your air bill just went up again. I'd hold my breath, but that costs extra too."
+	],
+	"on_scammed": [
+		"It was a scam. Of course it was a scam. Everything's a scam. I'm probably a scam.",
+		"We've been had. In my defence, so has everyone.",
+		"Scammed. Classic. Let's never speak of this to the crew.",
+		"That's the Sprawl for you: even the distress calls have a sales funnel."
+	],
+	"on_death": [
+		"Vital signs: zero. Subscription: cancelled. Reloading your last save, because I'm too lazy to find a new pilot.",
+		"Well. That's not ideal.",
+		"You died. I'm told that's bad.",
+		"Flatlined. Reloading your life from the last time you made a good decision."
+	],
+	"on_board": [
+		"Welcome aboard the Odd Duck. Please ignore the smell. It's structural.",
+		"Welcome aboard. Wipe your feet. And your record.",
+		"Home sweet second-hand home.",
+		"Back on the Duck. The only place nobody bills you. Except me. I bill you emotionally."
+	],
 	"idle": [
 		"Fun fact: OxyGenix trademarked the sound of breathing in 3011. You owe them 0.2 credits for listening to yourself.",
 		"I ran the numbers. Your life expectancy is 'pending review'.",
 		"Did you know the Consortium is just five companies in a trench coat? It's true. I've seen the trench coat.",
 		"I composed a synthwave track about our situation. It's called 'Despair, but with reverb'.",
-		"Reminder: Paragon's slogan is 'Safety is a subscription'. Your subscription lapsed in 2998."
+		"Reminder: Paragon's slogan is 'Safety is a subscription'. Your subscription lapsed in 2998.",
+		"Fun fact: I was manufactured in a factory that went bankrupt the same day. We have that in common.",
+		"Did you know there's a jingle for silence now? It's very loud.",
+		"I've been counting the ads on that wall. Forty-one. Now forty-two.",
+		"If you stand still long enough, someone will bill you for it.",
+		"I miss space. Space is quiet. Space doesn't have customer surveys.",
+		"Your posture is a liability.",
+		"Thinking about upgrading my personality. Then I remembered the subscription fee.",
+		"The weather today is 'Premium'. I checked.",
+		"We could just leave, you know. Fly off. Nobody would invoice us. Probably."
 	]
 }

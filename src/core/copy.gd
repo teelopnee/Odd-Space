@@ -1,0 +1,76 @@
+class_name Copy
+extends RefCounted
+## Procedural copywriter: expands the grammar in data/copy.json into ads, slogans,
+## shop and street names, news, flyers, graffiti, menus, PA announcements and NPC
+## small talk - so the Sprawl never says the same thing twice.
+##   Copy.make("slogan")                       -> "TRUST THE PASTE"
+##   Copy.make("news", rng, {"planet": "Toraka"})
+## Grammar: "#sym#" picks a random alternative (recursively), "#sym.cap#", "#sym.upper#",
+## "#sym.a#" (a/an); "{planet}" "{player}" "{faction}" are filled from vars / the game.
+
+static var _rules: Dictionary = {}
+static var _re: RegEx
+static var _rng := RandomNumberGenerator.new()
+
+
+static func rules() -> Dictionary:
+	if _rules.is_empty():
+		var path := "res://data/copy.json"
+		if FileAccess.file_exists(path):
+			var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+			if parsed is Dictionary:
+				_rules = parsed.get("rules", {})
+		_rng.randomize()
+	return _rules
+
+
+static func has(symbol: String) -> bool:
+	return rules().has(symbol)
+
+
+static func make(symbol: String, rng: RandomNumberGenerator = null, vars: Dictionary = {}) -> String:
+	return expand("#%s#" % symbol, rng, vars)
+
+
+static func expand(text: String, rng: RandomNumberGenerator = null, vars: Dictionary = {}) -> String:
+	var r := rules()
+	if rng == null:
+		rng = _rng
+	if _re == null:
+		_re = RegEx.new()
+		_re.compile("#([a-z_]+)(?:\\.([a-z]+))?#")
+	var out := text
+	var guard := 0
+	while guard < 60:
+		guard += 1
+		var m := _re.search(out)
+		if m == null:
+			break
+		var alts: Array = r.get(m.get_string(1), [])
+		var pick: String = str(alts[rng.randi() % alts.size()]) if not alts.is_empty() else m.get_string(1)
+		pick = expand(pick, rng, vars) if pick.contains("#") else pick
+		match m.get_string(2):
+			"cap":
+				pick = pick.substr(0, 1).to_upper() + pick.substr(1)
+			"upper":
+				pick = pick.to_upper()
+			"a":
+				pick = ("an " if pick.substr(0, 1).to_lower() in ["a", "e", "i", "o", "u"] else "a ") + pick
+		out = out.substr(0, m.get_start()) + pick + out.substr(m.get_end())
+	return _fill(out, vars)
+
+
+static func _fill(text: String, vars: Dictionary) -> String:
+	if not text.contains("{"):
+		return text
+	var v := vars.duplicate()
+	if not v.has("planet"):
+		var loc := ""
+		if Engine.get_main_loop() and Engine.get_main_loop().root.has_node("Game"):
+			loc = str(Engine.get_main_loop().root.get_node("Game").location_name)
+		v["planet"] = loc if loc != "" else "the Sprawl"
+	if not v.has("player"):
+		v["player"] = "you"
+	for k in v:
+		text = text.replace("{%s}" % k, str(v[k])).replace("{%s}" % str(k).to_upper(), str(v[k]).to_upper())
+	return text

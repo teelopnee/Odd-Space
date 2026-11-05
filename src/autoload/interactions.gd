@@ -301,6 +301,9 @@ func rumor(npc: Node = null) -> String:
 	var heads := Causality.latest_headlines(1)
 	if not heads.is_empty() and _rng.randf() < 0.25:
 		return "\"Lumen keeps running this: '%s'\"" % heads[0]
+	if _rng.randf() < 0.2:
+		var n := Copy.make("news", _rng).to_lower()
+		return "\"Did you hear? %s. %s\"" % [n.substr(0, 1).to_upper() + n.substr(1), ["Unbelievable.", "Classic.", "Of course they did.", "Lumen says it's fine.", "I'm not even surprised."][_rng.randi() % 5]]
 	var pool: Array = r.get(pools[_rng.randi() % pools.size()], r.get("tips", ["\"Nothing ever happens here.\""]))
 	var line: String = pool[_rng.randi() % pool.size()]
 	return line.format(_rumor_vars())
