@@ -393,6 +393,12 @@ func _services() -> void:
 	_place_near("j", pad.x - 3, spawn.y)
 	_place_near("N", pad.x - 2, spawn.y - 1)
 	_place_near("N", pad.x + 4, pad.y + 4)
+	if biome == "neon_sprawl":
+		# Landing plaza: a giant hologram and benches right beside the pad - the first thing you see.
+		_place_near("h", pad.x + 5, pad.y + 1)
+		_place_near("w", pad.x - 3, pad.y + 4)
+		_place_near("k", pad.x - 4, pad.y - 2)
+		_place_near("L", pad.x + 2, pad.y - 3)
 	_foreground()
 	scatter("A", 3 + r.randi() % 3 + (6 if crisis_id == "ad_overload" else 0), 2, h - 6, 1)
 	scatter("X", 2 + r.randi() % 3, 2, h - 10, 1)

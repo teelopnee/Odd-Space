@@ -9,7 +9,7 @@ const TAGLINES := ["BREATHE PREMIUM", "OBEY & ENJOY", "YOU ARE VALUED*", "DEBT I
 	"SMILE: YOU'RE BILLED", "PASTE+ NOW 4% PASTIER", "STAY LOYAL. STAY ALIVE.", "LUMEN: WATCH. MORE.", "AIR IS A LIFESTYLE"]
 const ANIMS := ["dance", "wave", "cheer", "dance", "talk", "idle", "phone"]
 
-@export var figure_scale := 5.0
+@export var figure_scale := 2.7
 @export var color_a := Color(0.25, 0.95, 1.0)
 @export var color_b := Color(1.0, 0.25, 0.85)
 @export var seed_value := 0
@@ -138,7 +138,9 @@ func _build_base() -> void:
 	_label.modulate = Color(color_b.r * 2.2, color_b.g * 2.2, color_b.b * 2.2, 0.9)
 	_label.outline_size = 0
 	_label.no_depth_test = false
-	_label.position = Vector3(0, figure_scale * 2.1 + 0.8, 0)
+	_label.font_size = 64
+	_label.pixel_size = 0.008
+	_label.position = Vector3(0, 0.75, 1.45)  # ticker on the projector rim, always in frame
 	add_child(_label)
 
 

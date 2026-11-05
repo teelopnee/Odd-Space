@@ -165,7 +165,7 @@ func _make_materials() -> void:
 	_city = outdoor and float(hr[1]) >= 9.0
 	var floor_tex: String = palette.get("ground_tex", "ground_rock") if outdoor else "floor_metal"
 	var wet: bool = outdoor and str(palette.get("weather", "")) == "rain"
-	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, (0.3 if wet else 0.85) if outdoor else 0.38, (0.25 if wet else 0.1) if outdoor else 0.45, 1.4)
+	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, (0.5 if wet else 0.85) if outdoor else 0.38, (0.15 if wet else 0.1) if outdoor else 0.45, 0.8 if wet else 1.4)
 	floor_mat.vertex_color_use_as_albedo = true
 	_mats["floor"] = floor_mat
 	for kind in [["grate", "floor_grate", 0.5, 0.6], ["tile", "floor_tile", 0.5, 0.2], ["hazard", "hazard", 0.5, 0.5]]:
@@ -173,7 +173,7 @@ func _make_materials() -> void:
 		m.vertex_color_use_as_albedo = true
 		_mats["floor_" + kind[0]] = m
 	var path_tex: String = palette.get("path_tex", "floor_grate")
-	var path := _textured(path_tex, Color.WHITE, 0.5, (0.12 if wet else 0.35) if path_tex == "asphalt" else 0.7, 0.35 if wet else 0.25, 1.3)
+	var path := _textured(path_tex, Color.WHITE, 0.5, (0.38 if wet else 0.5) if path_tex == "asphalt" else 0.7, 0.2, 0.7 if wet else 1.3)
 	path.vertex_color_use_as_albedo = true
 	_mats["floor_path"] = path
 	var water := ShaderMaterial.new()
@@ -571,13 +571,6 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 		for sx in [-1.0, 1.0]:
 			deco.append(add_mesh(body, box(Vector3(0.07, h - 2.8, 0.07)), emissive(tube, 4.5), Vector3(sx * (w * 0.5 + 0.02), 1.4 + h * 0.5, front + 0.04), 0.0, false))
 		deco.append(add_mesh(body, box(Vector3(w + 0.1, 0.07, 0.07)), emissive(tube, 4.5), Vector3(0, h - 0.1, front + 0.05), 0.0, false))
-	if _city and h > 8.0 and rng.randf() < 0.14:
-		var rh := Hologram.new()
-		rh.figure_scale = rng.randf_range(3.0, 4.2)
-		rh.seed_value = rng.randi()
-		rh.with_base = false
-		rh.position = pos + Vector3(0, h + 0.3, 0)
-		root.add_child(rh)
 	if floors > 1 and rng.randf() < 0.5:
 		var bal_y := 3.0 + rng.randi_range(1, floors - 1) * 1.4 - 0.45
 		deco.append(add_mesh(body, box(Vector3(minf(w * 0.6, 3.0), 0.08, 0.6)), _mats["dark"], Vector3(rng.randf_range(-w * 0.2, w * 0.2), bal_y, front + 0.3), 0.0, true))
@@ -1781,7 +1774,7 @@ func _window(x: int, z: int) -> void:
 func _holo_projector(p: Vector3) -> void:
 	if outdoor:
 		var holo := Hologram.new()
-		holo.figure_scale = rng.randf_range(4.5, 6.5)
+		holo.figure_scale = rng.randf_range(2.4, 3.0)  # ~5-6.5 m: the whole figure fits the HD-2D frame
 		holo.seed_value = rng.randi()
 		var pair: Array = [[Color(0.25, 0.95, 1.0), Color(1.0, 0.25, 0.85)], [Color(1.0, 0.8, 0.3), Color(1.0, 0.3, 0.4)], [Color(0.5, 1.0, 0.5), Color(0.3, 0.6, 1.0)]][rng.randi() % 3]
 		holo.color_a = pair[0]
