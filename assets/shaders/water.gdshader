@@ -23,9 +23,9 @@ void fragment() {
 			cos(p.y * 2.3 - t * 1.1) * 0.2, 1.0));
 	NORMAL_MAP = n * 0.5 + 0.5;
 	float shore = 1.0 - COLOR.a;  // 1 at the bank, 0 in open water
-	vec3 shallow = mix(deep.rgb, glow.rgb, 0.35);
+	vec3 shallow = mix(deep.rgb, glow.rgb, 0.18);
 	vec3 col = mix(deep.rgb, shallow, band * 0.55 + shore * 0.4);
-	ALBEDO = col * (0.9 + 0.2 * w);
+	ALBEDO = col * (0.7 + 0.2 * w);
 	METALLIC = 0.2;
 	ROUGHNESS = 0.12;
 	SPECULAR = 0.6;
