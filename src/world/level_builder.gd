@@ -92,6 +92,7 @@ func build(layout: Array) -> Dictionary:
 		_build_street_details()
 		_build_reflections()
 		_build_biome_extras()
+		_build_margin()
 	return result
 
 
@@ -327,7 +328,12 @@ func _build_floor() -> void:
 						base = Color(0.78, 0.78, 0.84)
 					elif kind != "floor":
 						base = Color(0.8, 0.8, 0.85) if kind != "floor_hazard" else Color(1, 1, 1)
-					groups[kind][1].append(base.lightened(rng.randf_range(-0.06, 0.08)))
+					if kind == "water":
+						# Alpha = open water (1) vs shoreline (0.25): the shader puts foam on the banks.
+						var shore := cell(x + 1, z) != "~" or cell(x - 1, z) != "~" or cell(x, z + 1) != "~" or cell(x, z - 1) != "~"
+						groups[kind][1].append(Color(1, 1, 1, 0.25 if shore else 1.0))
+					else:
+						groups[kind][1].append(base.lightened(rng.randf_range(-0.06, 0.08)))
 			for kind in groups:
 				var positions: Array = groups[kind][0]
 				var colors: Array = groups[kind][1]
@@ -613,6 +619,56 @@ func _wanted_poster(body: Node3D, w: float, front: float, deco: Array[Node]) -> 
 	l.rotation.z = paper.rotation.z
 	body.add_child(l)
 	deco.append(l)
+
+
+## The world doesn't end at the boundary wall: tiled ground, plants, rocks and (in the
+## city) a row of low lit buildings continue past the edges - especially the south edge,
+## which sits right in front of the camera.
+func _build_margin() -> void:
+	var south := 8
+	var side := 7
+	var north := 3
+	var a := pcolor("ground", "#2a2440")
+	var b := pcolor("ground_alt", "#352c52")
+	var tile_mesh := box(Vector3(TILE, FLOOR_T, TILE))
+	var xforms: Array[Transform3D] = []
+	var cols: Array = []
+	var plants: Array[Vector3] = []
+	var density := float(palette.get("foliage", 0.3))
+	for z in range(-north, height + south):
+		for x in range(-side, width + side):
+			if x >= 0 and x < width and z >= 0 and z < height:
+				continue
+			var p := center(x, z)
+			p.y = -FLOOR_T * 0.5 - 0.02
+			xforms.append(Transform3D(Basis(Vector3.UP, rng.randi_range(0, 3) * PI * 0.5), p))
+			var base := a.lerp(b, clampf(_ground_noise.get_noise_2d(x, z) * 0.9 + 0.5, 0.0, 1.0))
+			cols.append(base.darkened(0.08 + rng.randf_range(0.0, 0.08)))
+			if not _city and rng.randf() < maxf(density, 0.15) * 1.3:
+				for k in rng.randi_range(1, 3):
+					plants.append(p + Vector3(rng.randf_range(-0.9, 0.9), FLOOR_T * 0.5, rng.randf_range(-0.9, 0.9)))
+			if not _city and rng.randf() < 0.05:
+				var s2 := rng.randf_range(0.5, 1.3)
+				var rock := SphereMesh.new()
+				rock.radius = s2
+				rock.height = s2 * 1.2
+				rock.radial_segments = 6
+				rock.rings = 3
+				add_mesh(root, rock, _mats["rock"], p + Vector3(0, s2 * 0.3, 0), rng.randf() * TAU)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
+	mm.mesh = tile_mesh
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+		mm.set_instance_color(i, cols[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.material_override = _mats["floor"]
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(mmi)
+	_foliage_multimesh(plants)
 
 
 ## Little things that make each biome feel inhabited by weather and nature.
@@ -1882,6 +1938,10 @@ func _build_foliage() -> void:
 				continue
 			for k in rng.randi_range(1, 3):
 				spots.append(center(x, z) + Vector3(rng.randf_range(-0.9, 0.9), 0, rng.randf_range(-0.9, 0.9)))
+	_foliage_multimesh(spots)
+
+
+func _foliage_multimesh(spots: Array[Vector3]) -> void:
 	if spots.is_empty():
 		return
 	var cells: Array = palette.get("foliage_cells", [0, 1, 4, 5])

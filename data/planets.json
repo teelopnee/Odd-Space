@@ -45,9 +45,9 @@
 			"puddles": "water",
 			"weather": "rain",
 			"path_tex": "asphalt",
-			"water": "#05060c",
+			"water": "#0a0e1c",
 			"water_glow": "#3ee6ff",
-			"water_glow_strength": 0.06,
+			"water_glow_strength": 0.1,
 			"building_h": [
 				5.0,
 				11.0
@@ -100,9 +100,9 @@
 			"puddles": "toxic",
 			"weather": "spores",
 			"path_tex": "planks",
-			"water": "#08240c",
+			"water": "#0f4a18",
 			"water_glow": "#5aff3a",
-			"water_glow_strength": 0.16,
+			"water_glow_strength": 0.32,
 			"building_h": [
 				3.2,
 				5.0
@@ -153,7 +153,7 @@
 			"path_tex": "concrete",
 			"water": "#4a6a90",
 			"water_glow": "#9ad0ff",
-			"water_glow_strength": 0.08,
+			"water_glow_strength": 0.15,
 			"building_h": [
 				3.5,
 				6.0
@@ -203,9 +203,9 @@
 			"puddles": "",
 			"weather": "embers",
 			"path_tex": "floor_grate",
-			"water": "#2a0c04",
+			"water": "#3a1608",
 			"water_glow": "#ff5a1e",
-			"water_glow_strength": 0.12,
+			"water_glow_strength": 0.25,
 			"building_h": [
 				3.2,
 				5.5
@@ -256,9 +256,9 @@
 			"puddles": "",
 			"weather": "motes",
 			"path_tex": "floor_tile",
-			"water": "#140828",
+			"water": "#2a1450",
 			"water_glow": "#c07dff",
-			"water_glow_strength": 0.22,
+			"water_glow_strength": 0.38,
 			"building_h": [
 				3.5,
 				6.0

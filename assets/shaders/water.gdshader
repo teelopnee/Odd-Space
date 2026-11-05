@@ -1,7 +1,7 @@
 shader_type spatial;
-// Glossy pixel-friendly water / sludge for planet channels and pools.
-// Cheap: three crossing sine swells drive the normal and a soft emission pulse,
-// so neon and lamps smear across it like a wet street in an 80s poster.
+// Pixel-friendly water / toxic sludge. Moving ripple bands, a glowing foam line
+// along the banks (vertex colour alpha = distance to shore, set by LevelBuilder),
+// sparkles, and an emissive pulse so pools read as liquid even at night.
 
 uniform vec4 deep : source_color = vec4(0.02, 0.04, 0.08, 1.0);
 uniform vec4 glow : source_color = vec4(0.2, 0.9, 1.0, 1.0);
@@ -16,13 +16,22 @@ void fragment() {
 	float b = sin(p.y * 2.3 - t * 1.1);
 	float c = sin((p.x + p.y) * 3.1 + t * 2.0);
 	float w = a * 0.5 + b * 0.5 + c * 0.25;
-	vec3 n = normalize(vec3(cos(p.x * 1.7 + t * 1.3) * 0.18 + cos((p.x + p.y) * 3.1 + t * 2.0) * 0.08,
-			cos(p.y * 2.3 - t * 1.1) * 0.18, 1.0));
+	// Slow drifting ripple bands (quantised for the pixel look).
+	float band = sin(p.x * 0.9 + p.y * 1.4 - t * 0.8) * 0.5 + 0.5;
+	band = floor(band * 4.0) / 4.0;
+	vec3 n = normalize(vec3(cos(p.x * 1.7 + t * 1.3) * 0.2 + cos((p.x + p.y) * 3.1 + t * 2.0) * 0.1,
+			cos(p.y * 2.3 - t * 1.1) * 0.2, 1.0));
 	NORMAL_MAP = n * 0.5 + 0.5;
-	ALBEDO = deep.rgb * (0.85 + 0.15 * w);
-	METALLIC = 0.15;
-	ROUGHNESS = 0.18;
-	SPECULAR = 0.45;
-	float sparkle = step(1.05, w) * 0.6;
-	EMISSION = glow.rgb * glow_strength * (0.75 + 0.25 * w) + glow.rgb * sparkle * glow_strength;
+	float shore = 1.0 - COLOR.a;  // 1 at the bank, 0 in open water
+	vec3 shallow = mix(deep.rgb, glow.rgb, 0.35);
+	vec3 col = mix(deep.rgb, shallow, band * 0.55 + shore * 0.4);
+	ALBEDO = col * (0.9 + 0.2 * w);
+	METALLIC = 0.2;
+	ROUGHNESS = 0.12;
+	SPECULAR = 0.6;
+	float sparkle = step(1.08, w) * 0.8;
+	float foam = smoothstep(0.55, 1.0, shore) * (0.6 + 0.4 * sin(t * 2.0 + p.x * 4.0 + p.y * 3.0));
+	EMISSION = glow.rgb * glow_strength * (0.55 + 0.45 * band + 0.25 * w)
+		+ glow.rgb * sparkle * max(glow_strength, 0.15)
+		+ mix(vec3(1.0), glow.rgb, 0.5) * foam * max(glow_strength, 0.2) * 1.5;
 }
