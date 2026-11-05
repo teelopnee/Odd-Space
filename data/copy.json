@@ -969,6 +969,28 @@
 			"Bionic Bits",
 			"#adj_shop# Socket",
 			"Eye Candy Optics"
+		],
+		"reply": [
+			"Tell me about it.",
+			"Same. Every day.",
+			"Shh! The billboard can hear you.",
+			"You can't say that out loud.",
+			"My cousin said that once. Then she got repossessed.",
+			"Ugh. #review#",
+			"At least the rain's free.",
+			"That's the Sprawl for you.",
+			"No way. Really?",
+			"I'd laugh, but laughing costs extra.",
+			"Want to split some #dish#?",
+			"I heard the #team# are getting sold for parts.",
+			"Don't remind me.",
+			"Lumen said it's fine, so it's fine.",
+			"We should start a union. Kidding. Unless?",
+			"Classic #faction_short.cap#.",
+			"I'm saving up for #aspiration# too.",
+			"Have you tried #product#? #review#",
+			"Keep your voice down, Paragon's on #street#.",
+			"Sure, sure. And I'm a shareholder."
 		]
 	}
 }

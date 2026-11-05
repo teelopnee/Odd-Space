@@ -576,6 +576,8 @@ func _life(delta: float) -> void:
 	if pool.is_empty() and role == "civilian" and _rng.randf() < 0.55:
 		# Fresh small talk every time: the copywriter knows the shows, the teams, the prices.
 		say(Copy.make("chatter", _rng))
+		if _partner != null and is_instance_valid(_partner):
+			_partner.reply_later(_rng.randf_range(1.6, 2.4))
 		return
 	if pool.is_empty():
 		pool = b.get(role, b.get("civilian", []))
@@ -612,6 +614,16 @@ func _reactive_barks(b: Dictionary) -> Array:
 	if options.is_empty() or _rng.randf() < 0.35:
 		return []
 	return b.get(options[_rng.randi() % options.size()], [])
+
+
+## Answer whatever the neighbour just said (two-sided street conversations).
+func reply_later(delay: float) -> void:
+	_talking = delay + 2.5
+	_bark_timer = maxf(_bark_timer, 6.0)
+	var t := get_tree().create_timer(delay)
+	t.timeout.connect(func():
+		if is_instance_valid(self) and state == "idle":
+			say(Copy.make("reply", _rng), 3.0))
 
 
 func hear_partner() -> void:
