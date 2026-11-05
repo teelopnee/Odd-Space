@@ -1,7 +1,7 @@
 extends SceneTree
 ## Renders key scenes and saves PNG screenshots (needs a real renderer, not --headless).
 ## Run (Linux, no GPU):  xvfb-run -s "-screen 0 1280x800x24" godot --path . \
-##                        --script res://tools/capture_screens.gd -- <out_dir> [--quick] [--dof=off|physical|tilt_shift]
+##                        --script res://tools/capture_screens.gd -- <out_dir> [--quick] [--biome=<env id>] [--creator] [--dof=off|physical|tilt_shift]
 ## (Don't pass --rendering-driver: it silently switches the renderer to Forward+.)
 
 var _out := "user://screens"
@@ -105,7 +105,13 @@ func _process(_delta: float) -> bool:
 			# One shot per distinct biome in this universe (dense random worlds).
 			var g = root.get_node("Game")
 			var seen := {}
+			var only := ""
+			for a in OS.get_cmdline_user_args():
+				if str(a).begins_with("--biome="):
+					only = str(a).substr(8)
 			for pl in g.galaxy:
+				if only != "" and pl.environment != only:
+					continue
 				if not seen.has(pl.environment):
 					seen[pl.environment] = true
 					_queue.append(pl)
