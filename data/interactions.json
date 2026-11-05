@@ -10,7 +10,13 @@
 			"success": {
 				"lines": [
 					"\"Honestly? Nobody's asked me anything in weeks. I'm {job}. It's... a job.\"",
-					"\"Small talk is taxed at 3% here, but I'll risk it.\" They actually smile."
+					"\"Small talk is taxed at 3% here, but I'll risk it.\" They actually smile.",
+					"\"Did you catch #media_product# last night? #show_opinion#\"",
+					"\"#chatter#\" They seem glad somebody listened.",
+					"\"Know what I miss? #thing.cap#. Before they started billing for it.\"",
+					"\"The #team# play tonight. I've got #small_num# credits on them. That's my rent.\"",
+					"\"I'm {job}. Don't ask what it pays. It pays in #product#.\"",
+					"\"Somebody wrote '#graffiti#' on the wall by my place. I've started to agree with it.\""
 				],
 				"effects": {
 					"attitude": 8,
@@ -27,7 +33,8 @@
 			"success": {
 				"lines": [
 					"\"What do I need? {need}. Same as everyone.\"",
-					"They look at you like nobody has ever asked. \"{need}. Can you believe it?\""
+					"They look at you like nobody has ever asked. \"{need}. Can you believe it?\"",
+					"\"What do I need? {need}. And #aspiration#, one day. A person can dream. Dreams are billed, but still.\""
 				],
 				"effects": {
 					"attitude": 5,
@@ -1957,17 +1964,23 @@
 			"warm": [
 				"\"Hey, you look like one of us. Rough century, huh?\"",
 				"\"Finally, someone who doesn't smell like a shareholder.\"",
-				"\"You've got kind eyes. Rare. Probably illegal.\""
+				"\"You've got kind eyes. Rare. Probably illegal.\"",
+				"\"You look like you need #dish#. The stall on the corner does a good one.\"",
+				"\"Stay out of trouble. Or at least out of #faction#'s.\""
 			],
 			"cold": [
 				"\"I know your type. Keep walking.\"",
 				"\"Don't stand so close, you'll lower my credit score.\"",
-				"\"Whatever you're selling, I already owe on it.\""
+				"\"Whatever you're selling, I already owe on it.\"",
+				"\"Unless you're buying, I'm busy. Busy owing.\"",
+				"\"Move along. I'm on the clock. The clock belongs to #faction#.\""
 			],
 			"neutral": [
 				"\"Breathe quietly, friend. They bill by the decibel now.\"",
 				"\"Got any spare air? No? Yeah. Nobody does.\"",
-				"\"Don't look at the ads too long. They look back.\""
+				"\"Don't look at the ads too long. They look back.\"",
+				"\"#chatter#\"",
+				"\"Careful. #pa_body.cap#\" They shrug. \"That's what the speakers say, anyway.\""
 			]
 		},
 		"rumors": {

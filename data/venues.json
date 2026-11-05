@@ -30,7 +30,10 @@
 			"greet": [
 				"Steam, chilli and the smell of something that used to be a vegetable.",
 				"\"Two credits a bowl, three if you want it to stop moving.\"",
-				"A queue of night-shift workers slurps in silence under a flickering menu."
+				"A queue of night-shift workers slurps in silence under a flickering menu.",
+				"#food_scene#\n#food_keeper#",
+				"#food_scene#\n#food_keeper#",
+				"#food_scene#\n#food_keeper#"
 			],
 			"options": [
 				{
@@ -132,7 +135,10 @@
 			"greet": [
 				"Synthwave on a busted speaker. Somebody's crying into a glass of liquid air.",
 				"The bartender polishes a glass with a Lumen-branded rag. \"What'll it be? And don't say 'water', water's extra.\"",
-				"A dozen faces turn to look at you, then turn back to their drinks."
+				"A dozen faces turn to look at you, then turn back to their drinks.",
+				"#bar_scene#\n#bar_keeper#",
+				"#bar_scene#\n#bar_keeper#",
+				"#bar_scene#\n#bar_keeper#"
 			],
 			"options": [
 				{
@@ -285,7 +291,10 @@
 			"name": "Karaoke Den",
 			"greet": [
 				"Neon booths, sticky microphones, a pirated song library from three centuries.",
-				"Someone is murdering a power ballad. The crowd loves it."
+				"Someone is murdering a power ballad. The crowd loves it.",
+				"#karaoke_scene#\n#karaoke_keeper#",
+				"#karaoke_scene#\n#karaoke_keeper#",
+				"#karaoke_scene#\n#karaoke_keeper#"
 			],
 			"options": [
 				{
@@ -347,7 +356,10 @@
 			"name": "Arcade",
 			"greet": [
 				"Cabinets from four centuries blink in the dark. 'DEBT INVADERS', 'PASTE-MAN', 'ESCAPE THE SPRAWL'.",
-				"Kids, retirees and one very sweaty executive, all chasing high scores."
+				"Kids, retirees and one very sweaty executive, all chasing high scores.",
+				"#arcade_scene#\n#arcade_keeper#",
+				"#arcade_scene#\n#arcade_keeper#",
+				"#arcade_scene#\n#arcade_keeper#"
 			],
 			"options": [
 				{
@@ -417,7 +429,10 @@
 			"name": "Back-Alley Clinic",
 			"greet": [
 				"A cracked green cross. Inside: a medic with tired eyes and very clean hands.",
-				"\"Unlicensed means cheap, not bad. Usually.\""
+				"\"Unlicensed means cheap, not bad. Usually.\"",
+				"#clinic_scene#\n#clinic_keeper#",
+				"#clinic_scene#\n#clinic_keeper#",
+				"#clinic_scene#\n#clinic_keeper#"
 			],
 			"options": [
 				{
@@ -510,7 +525,10 @@
 			"name": "Pawn Shop",
 			"greet": [
 				"Every object in here has a story and a price tag. The stories are free.",
-				"\"I buy anything. I sell anything. I don't remember anything.\""
+				"\"I buy anything. I sell anything. I don't remember anything.\"",
+				"#pawn_scene#\n#pawn_keeper#",
+				"#pawn_scene#\n#pawn_keeper#",
+				"#pawn_scene#\n#pawn_keeper#"
 			],
 			"options": [
 				{
@@ -617,7 +635,10 @@
 			"name": "Cryo-Motel",
 			"greet": [
 				"Coffin-sized sleep pods stacked eight high. The sign promises 'up to four hours of unbilled dreams'.",
-				"\"Pod or suite? The suite is a pod with a window. The window is a screen.\""
+				"\"Pod or suite? The suite is a pod with a window. The window is a screen.\"",
+				"#motel_scene#\n#motel_keeper#",
+				"#motel_scene#\n#motel_keeper#",
+				"#motel_scene#\n#motel_keeper#"
 			],
 			"options": [
 				{
@@ -697,7 +718,10 @@
 			"name": "Halcyon Loans",
 			"greet": [
 				"A smiling hologram: \"Debt is just a future you haven't paid for yet!\"",
-				"Pastel walls, soft music, a single exit that locks from outside."
+				"Pastel walls, soft music, a single exit that locks from outside.",
+				"#loans_scene#\n#loans_keeper#",
+				"#loans_scene#\n#loans_keeper#",
+				"#loans_scene#\n#loans_keeper#"
 			],
 			"options": [
 				{
@@ -805,7 +829,10 @@
 			"name": "Tattoo Parlour",
 			"greet": [
 				"Ink, needles and neon. The artist has a tattoo of their own tattoo.",
-				"\"Pick a design. Or let me pick. I'm better at it.\""
+				"\"Pick a design. Or let me pick. I'm better at it.\"",
+				"#tattoo_scene#\n#tattoo_keeper#",
+				"#tattoo_scene#\n#tattoo_keeper#",
+				"#tattoo_scene#\n#tattoo_keeper#"
 			],
 			"options": [
 				{
@@ -888,7 +915,10 @@
 			"name": "Tape Shop",
 			"greet": [
 				"Walls of cassettes. Real ones. The shopkeeper hasn't looked up in a decade.",
-				"\"No streaming. No ads. No refunds.\""
+				"\"No streaming. No ads. No refunds.\"",
+				"#tapes_scene#\n#tapes_keeper#",
+				"#tapes_scene#\n#tapes_keeper#",
+				"#tapes_scene#\n#tapes_keeper#"
 			],
 			"options": [
 				{
@@ -937,7 +967,10 @@
 			"name": "Air Kiosk",
 			"greet": [
 				"\"AIR 2GO - Now 3% Less Nitrogen!\"",
-				"A bored teenager guards tanks of air like they're gold. They basically are."
+				"A bored teenager guards tanks of air like they're gold. They basically are.",
+				"#air_scene#\n#air_keeper#",
+				"#air_scene#\n#air_keeper#",
+				"#air_scene#\n#air_keeper#"
 			],
 			"options": [
 				{
@@ -992,7 +1025,10 @@
 			"name": "Implant Workshop",
 			"greet": [
 				"Robot arms twitch on hooks. A mechanic with mismatched eyes waves you in.",
-				"\"Upgrades, repairs, regrets. Pick two.\""
+				"\"Upgrades, repairs, regrets. Pick two.\"",
+				"#implants_scene#\n#implants_keeper#",
+				"#implants_scene#\n#implants_keeper#",
+				"#implants_scene#\n#implants_keeper#"
 			],
 			"options": [
 				{
@@ -1062,7 +1098,10 @@
 			"name": "Fortune Teller",
 			"greet": [
 				"Incense, a cracked crystal ball and a card reader. The fortune teller accepts all major currencies and souls.",
-				"\"I see... a debt. I always see a debt.\""
+				"\"I see... a debt. I always see a debt.\"",
+				"#fortune_scene#\n#fortune_keeper#",
+				"#fortune_scene#\n#fortune_keeper#",
+				"#fortune_scene#\n#fortune_keeper#"
 			],
 			"options": [
 				{
@@ -1099,7 +1138,10 @@
 			"name": "Consortium Store",
 			"greet": [
 				"Bright, clean, scentless. A greeter-drone sings the store's name in four-part harmony.",
-				"\"Welcome, valued customer! Your loyalty tier has been noted. Silently. Forever.\""
+				"\"Welcome, valued customer! Your loyalty tier has been noted. Silently. Forever.\"",
+				"#corp_store_scene#\n#corp_store_keeper#",
+				"#corp_store_scene#\n#corp_store_keeper#",
+				"#corp_store_scene#\n#corp_store_keeper#"
 			],
 			"options": [
 				{

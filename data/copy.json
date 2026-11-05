@@ -658,7 +658,7 @@
 		],
 		"absurd_event": [
 			"RECORD BREATHING",
-			"A SNEEZE ON {planet}",
+			"A SNEEZE ON {PLANET}",
 			"CEO SMILES",
 			"RAIN STAYS FREE FOR ONE MORE DAY",
 			"A RUMOUR",
@@ -736,18 +736,18 @@
 		"news": [
 			"#faction_short# SHARES #up_down# #num#% AFTER #absurd_event#",
 			"CONSORTIUM BOARD VOTES TO #absurd_policy#",
-			"FORECAST FOR {planet}: #weather#",
+			"FORECAST FOR {PLANET}: #weather#",
 			"SPORT: #team.upper# BEAT #team.upper# #score# IN #sport.upper#",
 			"PARAGON ARRESTS #num# FOR #petty_crime#",
 			"LUMEN'S '#media_product.upper#' RENEWED FOR SEASON #num#",
 			"OXYGENIX SCIENTISTS DISCOVER #discovery#",
-			"{planet} RESIDENTS REPORT #weird_local#",
+			"{PLANET} RESIDENTS REPORT #weird_local#",
 			"MARKETS: AIR #up_down# #pct#%, HOPE FLAT",
 			"HALCYON OFFERS #loan_product.upper# TO NEWBORNS",
 			"GRISTLE RECALLS #paste_product.upper# OVER 'TEXTURE CONCERNS'",
 			"CELEBRITY #first.upper# #last.upper# SPOTTED BREATHING FOR FREE - FANS OUTRAGED",
 			"POLL: #pct#% OF CITIZENS 'FINE', REST BUSY",
-			"TRAFFIC: #num#-HOUR QUEUE AT THE {planet} AIR GATE",
+			"TRAFFIC: #num#-HOUR QUEUE AT THE {PLANET} AIR GATE",
 			"OBITUARY: #person.upper#, LOYAL CUSTOMER, ACCOUNT STILL ACTIVE"
 		],
 		"room_desc": [
@@ -863,7 +863,7 @@
 			"WELCOME, VALUED VISITOR  //  YOU ARE BEING BILLED",
 			"STAND HERE TO BE SCANNED",
 			"SMILE: CONSORTIUM CAMERAS ACTIVE",
-			"#brand.upper# WELCOMES YOU TO {planet}",
+			"#brand.upper# WELCOMES YOU TO {PLANET}",
 			"KEEP OFF THE PAINT  //  PAINT IS COPYRIGHTED",
 			"THIS SQUARE SPONSORED BY #brand.upper#"
 		],
@@ -916,7 +916,7 @@
 			"My cousin works for #faction#. #job_complaint#",
 			"They raised the price of #thing# again.",
 			"The #team# lost again. I'm billing them for emotional damage.",
-			"Weather on {planet} today: #weather.cap#. Same as my mood.",
+			"Weather on {planet} today: #weather.lower#. Same as my mood.",
 			"I'm saving up for #aspiration#.",
 			"Have you tried #product#? #review#",
 			"Somebody painted '#graffiti#' on my wall. I kind of agree.",
@@ -1093,6 +1093,198 @@
 			"Gristle",
 			"Paragon",
 			"Lumen"
+		],
+		"food_scene": [
+			"Steam rolls off a wok the size of a satellite dish.",
+			"A plastic stool, a flickering menu and a smell you'd sell your air for.",
+			"Rain drums on the awning. Inside it's warm and loud and smells of garlic.",
+			"Three regulars hunch over their bowls without looking up. A good sign. Or a hostage situation.",
+			"The menu board flickers between #dish# and something with no name.",
+			"A cat sleeps on the counter. There's a cat on the menu board too. Different cat, hopefully."
+		],
+		"food_keeper": [
+			"The cook doesn't look up. \"#dish#? Or #dish#? Those are the choices.\"",
+			"\"Sit, sit! Today's special is #dish#. Yesterday's special was also #dish#.\"",
+			"\"Cash, credits or a good story. Mostly credits.\"",
+			"The owner taps a sign: NO PASTE-SHAMING. \"What'll it be?\"",
+			"\"You look hungry. Everyone looks hungry. Sit down.\"",
+			"\"Kitchen closes when the rain stops. The rain never stops.\""
+		],
+		"bar_scene": [
+			"Synth-pop on a busted speaker. The floor is sticky in a reassuring way.",
+			"A neon sign buzzes 'OPEN' with the P burned out.",
+			"Somebody in the corner is losing an argument with a jukebox.",
+			"Two dockers arm-wrestle under a dead hologram of a cocktail.",
+			"The air in here is thick, warm and almost certainly unbilled.",
+			"A screen over the bar plays #media_product# on mute. Nobody watches."
+		],
+		"bar_keeper": [
+			"The bartender slides you a coaster. It's an ad for #product#.",
+			"\"What'll it be? And don't say water. Water's extra.\"",
+			"\"First drink's full price. Second drink's full price. I don't do discounts.\"",
+			"\"If you're with #faction#, you pay double. If you're not, you pay regular double.\"",
+			"The bartender polishes a glass that will never be clean. \"Talk or drink. Or both.\"",
+			"\"House special tonight: liquid air on the rocks. Rocks are extra.\""
+		],
+		"karaoke_scene": [
+			"Somebody in booth 3 is murdering a love song with real commitment.",
+			"A disco ball with half its mirrors missing throws light around like loose change.",
+			"The song list scrolls past: three centuries of pirated heartbreak.",
+			"Six dock workers scream a power ballad in perfect harmony.",
+			"The mic smells of mint and regret."
+		],
+		"karaoke_keeper": [
+			"\"Booths are by the hour. Talent not included.\"",
+			"\"Tonight's hit is '#song#' by #band#. Everyone's sick of it. Everyone sings it.\"",
+			"\"Sing something sad. The sad ones get tips.\"",
+			"\"The machine scores you. It's never given anyone more than a 6. It's owned by #faction#.\""
+		],
+		"arcade_scene": [
+			"Cabinets from four centuries blink in the dark, all of them playing to nobody.",
+			"A kid with no shoes holds the top score on every machine.",
+			"The carpet has seen things. Glowing, beeping things.",
+			"A claw machine full of air canisters. Nobody has ever won one."
+		],
+		"arcade_keeper": [
+			"\"Tokens! Five for #small_num# credits! Or one for a face scan!\"",
+			"The attendant points at a cabinet called #cabinet#. \"New one. Nobody's beaten level 2.\"",
+			"\"No crying on the machines. They short out.\"",
+			"\"High score gets a free air canister. High score is 9,999,999. Good luck.\""
+		],
+		"clinic_scene": [
+			"The waiting room is full. Everyone's holding a number and a coupon.",
+			"A cracked green cross flickers. The chairs are bolted down. So are the magazines.",
+			"A poster asks: IS YOUR PAIN COVERED? Underneath, smaller: (IT IS NOT).",
+			"Something beeps steadily in the back room. Either a machine or a very calm patient."
+		],
+		"clinic_keeper": [
+			"The medic looks at you, then at your wallet. \"Where does it hurt? Be specific, it's itemised.\"",
+			"\"No insurance? Good. Insurance just makes it slower.\"",
+			"\"I can fix most things. I can't fix the price.\"",
+			"A nurse-drone chirps: \"WELCOME. YOUR WAIT TIME IS #small_num# HOURS. OR #small_num# CREDITS.\""
+		],
+		"pawn_scene": [
+			"Shelves of somebody's whole life, priced by the kilo.",
+			"A wedding ring, a prosthetic hand and a signed photo of a news anchor share one display case.",
+			"Behind the counter: WE BUY ANYTHING. WE SELL IT BACK FOR MORE.",
+			"A stuffed real bird watches you from a high shelf. The price tag just says 'ASK'."
+		],
+		"pawn_keeper": [
+			"\"Buying or selling? Either way, I win. Nothing personal.\"",
+			"\"Everything's got a price. Even you. Especially you.\"",
+			"\"No questions asked. Lots of answers given, though.\"",
+			"\"Don't touch the cursed stuff. It's on the left. Or the right. I forget.\""
+		],
+		"motel_scene": [
+			"Sleep pods stacked eight high, humming like a fridge full of dreams.",
+			"The lobby has one plant. It's plastic. It's dying anyway.",
+			"A sign: ROOMS BY THE HOUR, BY THE NIGHT, OR BY THE DEBT.",
+			"Somewhere above, a pod alarm plays the #brand# jingle."
+		],
+		"motel_keeper": [
+			"The clerk doesn't look up from #media_product#. \"Pod or premium pod? Premium has a window. It's painted on.\"",
+			"\"Checkout is at #time#. Late checkout is billed per snore.\"",
+			"\"Dreams are recorded for quality purposes. Opting out is #small_num# credits.\""
+		],
+		"loans_scene": [
+			"A smiling hologram greets you by your credit score.",
+			"Gold carpet, white leather and no windows at all.",
+			"A brochure shows a happy family. The small print says they belong to Halcyon.",
+			"Every chair faces a screen counting up somebody's interest."
+		],
+		"loans_keeper": [
+			"\"Debt is just a future you haven't paid for yet!\"",
+			"\"Rates as low as #pct#%! Per hour!\"",
+			"\"Collateral? Your lungs will do. Most people have two.\"",
+			"The broker's smile doesn't move. \"Let's talk about your potential.\""
+		],
+		"tattoo_scene": [
+			"Needles buzz like angry bees. Flash sheets cover every wall.",
+			"The artist's arms are a gallery. One tattoo is a barcode. It still scans.",
+			"A customer winces in the chair, getting a #brand# logo. Sponsored ink pays the rent.",
+			"Neon light, antiseptic and an old synth record crackling."
+		],
+		"tattoo_keeper": [
+			"\"What'll it be? No corporate logos. Unless you're paying corporate prices.\"",
+			"\"First tattoo? Don't faint. Fainting's extra.\"",
+			"\"I can cover a debt barcode. It'll cost you, though.\""
+		],
+		"tapes_scene": [
+			"Walls of cassettes. Real ones. Every label hand-written.",
+			"A tape deck plays something with real drums. It sounds illegal.",
+			"A crate marked BANNED BY LUMEN - 3 FOR 2.",
+			"Dust, magnetic tape and a cat asleep on the #genre# section."
+		],
+		"tapes_keeper": [
+			"The shopkeeper hums along to #band#. \"You into #genre#? Course you are.\"",
+			"\"No streaming in here. Streaming is how they find you.\"",
+			"\"That one's a bootleg of #media_product#, uncut. Don't tell anyone.\""
+		],
+		"air_scene": [
+			"Canisters stacked like ammunition, every one labelled MOUNTAIN FRESH.",
+			"A pressure gauge ticks. The queue breathes shallowly, saving up.",
+			"A banner: #oxy_brand.upper# - TASTE THE ALTITUDE.",
+			"The kiosk hisses. It might be a leak. It might be the ambience."
+		],
+		"air_keeper": [
+			"\"Fresh air! Bottled today! Or yesterday! Or the day before!\"",
+			"\"Regular, premium or #oxy_brand# Gold?\"",
+			"The vendor taps a canister. \"Smell that? That's freedom. #small_num# credits.\""
+		],
+		"implants_scene": [
+			"Robot arms twitch on hooks. A box of eyes sits by the register.",
+			"Sparks rain off a workbench where someone is getting a new knee.",
+			"The diagnostics screen flickers: WARRANTY VOID.",
+			"A poster of a smiling cyborg: UPGRADE OR BE UPGRADED."
+		],
+		"implants_keeper": [
+			"\"Let's see what we're working with.\" The mechanic squints at you like a used car.",
+			"\"Second-hand parts, first-hand prices.\"",
+			"\"Is your spine original? Ooh. Vintage.\""
+		],
+		"fortune_scene": [
+			"Incense, a cracked crystal ball and a card reader.",
+			"Beaded curtains and a cat with one eye. The eye is a camera.",
+			"Tarot cards on the table, every one of them sponsored.",
+			"A neon palm glows in the window: YOUR FUTURE, SUBSCRIPTION-FREE."
+		],
+		"fortune_keeper": [
+			"\"I see... debt. No, wait. That's everyone.\"",
+			"\"Cross my palm with credits and I'll cross yours with destiny.\"",
+			"\"The stars say #weather.lower#. The stars are sponsored.\""
+		],
+		"corp_store_scene": [
+			"Bright, clean, scentless. Music designed to make you forget you have a home.",
+			"Every shelf faces you. Every product smiles.",
+			"A greeter-drone sings the store's name in four-part harmony.",
+			"The aisles are arranged so the exit is always one more aisle away."
+		],
+		"corp_store_keeper": [
+			"\"WELCOME, VALUED CUSTOMER. YOU ARE BEING VALUED.\"",
+			"\"Today's featured product: #product#! #benefit#!\"",
+			"An associate smiles with every tooth. \"Have you considered upgrading your loyalty tier?\""
+		],
+		"song": [
+			"Breathe For Me (Extended Mix)",
+			"My Heart Is On Layaway",
+			"Paste & Roses",
+			"Don't Repossess My Love",
+			"Neon Tears",
+			"Interest Rate Of My Heart",
+			"Last Breath Before Payday",
+			"Collateral Romance",
+			"Lungs Of Gold",
+			"Overdraft Lullaby"
+		],
+		"cabinet": [
+			"DEBT INVADERS II",
+			"PASTE-MAN DELUXE",
+			"SUPER REPO BROS",
+			"AIR RAID 2084",
+			"STREET COLLECTOR",
+			"MORTAL MORTGAGE",
+			"COMPLIANCE KONG",
+			"SHAREHOLDER SMASH"
 		]
 	}
 }

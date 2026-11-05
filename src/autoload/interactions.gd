@@ -74,7 +74,8 @@ func fill(text: String, npc: Node = null) -> String:
 		"npc": npc.npc_name if npc else "they", "job": npc.job if npc else "", "need": npc.need if npc else "",
 		"faction": DataDB.faction_name(npc.faction) if npc else "",
 	}
-	return text.format(vars)
+	var out := text.format(vars)
+	return Copy.expand(out, _rng) if out.contains("#") else out
 
 
 # --- Availability -------------------------------------------------------------------------
@@ -367,7 +368,7 @@ func open_venue(venue_id: String, sign_text: String, faction: String) -> void:
 			text += "  [%d%%]" % roundi(chance_of(o, null) * 100.0)
 		choices.append({"id": o.id, "text": text, "disabled": cost > 0 and not Game.can_afford(cost)})
 	choices.append({"id": "leave", "text": "Leave"})
-	EventBus.dialogue_requested.emit(title, str(greet[_rng.randi() % greet.size()]), choices, _on_venue_choice)
+	EventBus.dialogue_requested.emit(title, Copy.expand(str(greet[_rng.randi() % greet.size()]), _rng), choices, _on_venue_choice)
 
 
 func _venue_used(venue_id: String, opt: String) -> bool:

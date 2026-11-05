@@ -6,7 +6,7 @@ extends RefCounted
 ##   Copy.make("slogan")                       -> "TRUST THE PASTE"
 ##   Copy.make("news", rng, {"planet": "Toraka"})
 ## Grammar: "#sym#" picks a random alternative (recursively), "#sym.cap#", "#sym.upper#",
-## "#sym.a#" (a/an); "{planet}" "{player}" "{faction}" are filled from vars / the game.
+## "#sym.lower#", "#sym.a#" (a/an); "{planet}" "{player}" "{faction}" are filled from vars / the game.
 
 static var _rules: Dictionary = {}
 static var _re: RegEx
@@ -54,6 +54,8 @@ static func expand(text: String, rng: RandomNumberGenerator = null, vars: Dictio
 				pick = pick.substr(0, 1).to_upper() + pick.substr(1)
 			"upper":
 				pick = pick.to_upper()
+			"lower":
+				pick = pick.to_lower()
 			"a":
 				pick = ("an " if pick.substr(0, 1).to_lower() in ["a", "e", "i", "o", "u"] else "a ") + pick
 		out = out.substr(0, m.get_start()) + pick + out.substr(m.get_end())
