@@ -23,7 +23,7 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   and are registered in `Game._systems()` + `Game.save_game()/load_game()`.
 - `src/actors/` Player / Enemy (data-driven subsystems) / NPC (witness, dialogue) / Projectile.
 - `src/world/` `LevelBuilder` (ASCII → 3D: normal-mapped kit, wall dressing, windows, shafts, foliage,
-  horizons, water `~`, cliffs `^`, street props k q j g w i v o Y, facades, rooftop cables),
+  horizons, water `~`, cliffs `^`, street props k q j g w i v o Y, facades, low lantern cables, landing-bay paint),
   `WorldGen` (per-biome dense map generators + connectivity fix; preview with `tools/print_world.gd`),
   `Level` base (lighting/bloom, weather, navmesh bake, spawning, HUD, `refresh_quests()` for Saga),
   `station_prologue.gd` (intro cutscene), `planet_surface.gd` (WorldGen + per-seed palette variation +
@@ -55,6 +55,11 @@ Screenshots (software Vulkan): `apt-get install mesa-vulkan-drivers xvfb`, then
 Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 
 ## Gotchas learned the hard way (Godot 4.7)
+- Outdoor camera (pitch 30, fov 32, distance 16) only sees ground ~8-32 m ahead and things below ~5 m:
+  sky, rooftop props and anything taller never appear in frame. Put "wow" at street level; keep holograms ~2.4-3x.
+- Thin particles (rain < ~0.05 m wide) turn into screen noise; prefer fewer, larger streaks.
+- Never run `--import` while `tools/sprite_forge.py` is still writing sheets: a half-written PNG gets imported as
+  `valid=false`. Fix: delete that `.png.import` and re-import.
 - `VirtualJoystick` is a **native class** in 4.7 → ours is `TouchStick`. Check `ClassDB.class_exists()` before naming classes.
 - No `match` inside a multi-line lambda passed as a call argument (parser error). Use a named method.
 - `var x := <Variant expression>` fails ("cannot infer type") → write `var x: bool = ...`.
