@@ -774,6 +774,7 @@ func after_interaction(before_rel: String, before_att: int) -> String:
 	elif d != 0:
 		FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), "%+d" % d, Color(0.5, 1, 0.6) if d > 0 else Color(1, 0.4, 0.4))
 	if rel != before_rel:
+		Tips.show("labels")
 		return "%s: %s -> %s" % [npc_name, before_rel.capitalize() if before_rel != "" else "Neutral", rel.capitalize() if rel != "" else "Neutral"]
 	return ""
 

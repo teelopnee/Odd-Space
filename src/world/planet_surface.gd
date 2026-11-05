@@ -186,6 +186,7 @@ func _landing() -> void:
 	await get_tree().create_timer(1.2).timeout
 	hud.cinematic(false)
 	player.set_cutscene(false)
+	Tips.show("first_planet")
 
 
 func _reverse_rain() -> void:

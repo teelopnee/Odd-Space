@@ -39,7 +39,7 @@ jobs:
           path: |
             ~/godot
             ~/.local/share/godot/export_templates
-          key: godot-${{ env.GODOT_VERSION }}-android
+          key: godot-${{ env.GODOT_VERSION }}-android-desktop
 
       - name: Install Godot and Android templates
         run: |
@@ -50,7 +50,8 @@ jobs:
             curl -sSL -o t.tpz "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
             T=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
             mkdir -p "$T"
-            unzip -q -j t.tpz templates/android_release.apk templates/android_debug.apk templates/version.txt -d "$T"
+            unzip -q -j t.tpz templates/android_release.apk templates/android_debug.apk templates/version.txt \
+              templates/windows_release_x86_64.exe templates/linux_release.x86_64 -d "$T"
             rm t.tpz
           fi
 
@@ -84,6 +85,16 @@ jobs:
           ~/godot/godot --headless --path . --export-release "Android" build/odd-space.apk
           ls -la build
 
+      - name: Export Windows + Linux builds (for PC stores such as Gumroad)
+        run: |
+          mkdir -p build/windows build/linux
+          ~/godot/godot --headless --path . --export-release "Windows Desktop" build/windows/ODD-SPACE.exe || echo "::warning::Windows export failed"
+          ~/godot/godot --headless --path . --export-release "Linux" build/linux/ODD-SPACE.x86_64 || echo "::warning::Linux export failed"
+          chmod +x build/linux/ODD-SPACE.x86_64 2>/dev/null || true
+          (cd build/windows && ls ODD-SPACE.exe >/dev/null 2>&1 && zip -q -r ../odd-space-windows.zip .) || true
+          (cd build/linux && ls ODD-SPACE.x86_64 >/dev/null 2>&1 && zip -q -r ../odd-space-linux.zip .) || true
+          ls -la build
+
       - name: Publish "latest" pre-release
         if: hashFiles('build/odd-space.apk') != ''
         env:
@@ -95,9 +106,11 @@ jobs:
           TITLE="Latest build ($(git rev-parse --short HEAD))"
           NOTES="Auto-built from main @ ${GITHUB_SHA}. On the tablet: download odd-space.apk and open it to install/update."
           git tag -f latest && retry git push -f origin refs/tags/latest
+          FILES="build/odd-space.apk"
+          for f in build/odd-space-windows.zip build/odd-space-linux.zip; do [ -f "$f" ] && FILES="$FILES $f"; done
           if gh release view latest >/dev/null 2>&1; then
-            retry gh release upload latest build/odd-space.apk --clobber
+            retry gh release upload latest $FILES --clobber
             retry gh release edit latest --prerelease --title "$TITLE" --notes "$NOTES"
           else
-            retry gh release create latest build/odd-space.apk --prerelease --title "$TITLE" --notes "$NOTES"
+            retry gh release create latest $FILES --prerelease --title "$TITLE" --notes "$NOTES"
           fi

@@ -51,6 +51,7 @@ static func unlock(id: String, equip: bool = true) -> bool:
 	Game.flags["weapons"] = o
 	if equip:
 		_equip(slot, id)
+	Tips.show("weapons")
 	EventBus.toast.emit("NEW WEAPON: %s - %s" % [str(data()[slot][id].get("name", id)).to_upper(), data()[slot][id].get("desc", "")],
 		Color(1.0, 0.85, 0.3))
 	return true

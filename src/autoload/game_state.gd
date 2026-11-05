@@ -4,7 +4,7 @@ extends Node
 ## from_save(data) and is wired into _systems() below.
 
 const SAVE_DIR := "user://saves/"
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2  ## 2: weapons/equip + keepers/street flags (older saves load with defaults)
 const AIR_TICK_SECONDS := 10.0
 const AIR_BASE_COST := 1.0
 const AUTOSAVE_SLOT := 0
@@ -33,7 +33,9 @@ var play_time := 0.0
 var stats := StatBlock.new()
 var has_active_run := false
 ## Per-device settings (not part of save slots).
-var settings := {"dof_mode": "tilt_shift", "touch": "auto", "music_db": -8.0, "sfx_db": -4.0}
+var settings := {"dof_mode": "tilt_shift", "touch": "auto", "music_db": -8.0, "sfx_db": -4.0,
+	"difficulty": "normal", "graphics": "medium" if OS.has_feature("mobile") else "high", "ui_scale": 1.0,
+	"followups": "sometimes", "tips": "on", "tips_seen": []}
 
 ## Levels switch this on: you only pay for air while breathing it.
 var air_billing_active := false
@@ -198,6 +200,7 @@ func add_air_debt(amount: int) -> void:
 
 
 func _bill_air() -> void:
+	Tips.show("air")
 	var mult := stat("air_cost_mult")
 	if not current_planet.is_empty():
 		mult *= float(current_planet.get("air_mult", 1.0))

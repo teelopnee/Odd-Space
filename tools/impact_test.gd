@@ -82,7 +82,7 @@ func _witness_test() -> void:
 			var inter = root.get_node("Interactions")
 			inter.resolve(w, "write_cheque")
 		else:
-			for tries in 6:
+			for tries in 14:
 				if w.state != "reporting":
 					break
 				w._on_witness_choice(method)
@@ -131,6 +131,11 @@ func _verb_test() -> void:
 	# Fast-forward the consequences: favours come due, grudges become complaints.
 	for n in npcs:
 		if is_instance_valid(n) and n.owes_favour:
+			n.end_activity()  # don't let them wander off to the food stall mid-test
+			n.witness.silence("test")  # nor be busy phoning in a later test crime
+			n.state = "idle"  # nor still running from the test's other scuffles
+			n.scared_until = 0.0
+			n.spooked_until = 0.0
 			n._favour_wait = 0.05
 			player.global_position = n.global_position + Vector3(1.5, 0, 0)
 			_favour_npc = n
@@ -162,7 +167,9 @@ func _followup_test() -> void:
 	if _favour_npc and is_instance_valid(_favour_npc):
 		var gained: bool = game.credits != _credits_before or game.inventory != _items_before or int(game.flags.get("fame", 0)) != _fame_before \
 			or int(game.flags.get("followers", 0)) > 0
-		_check(not _favour_npc.owes_favour and gained, "a grateful NPC came back with a gift")
+		_check(not _favour_npc.owes_favour and gained, "a grateful NPC came back with a gift (owes=%s state=%s act=%s d=%.1f appr=%s)" % [
+			_favour_npc.owes_favour, _favour_npc.state, _favour_npc.activity,
+			_favour_npc.global_position.distance_to(get_first_node_in_group("player").global_position), _favour_npc._approach_kind])
 	var complaints: Array = root.get_node("Causality").query("complaint")
 	_check(not complaints.is_empty(), "a wronged NPC files a complaint with Paragon (%d, status %s)" % [complaints.size(),
 		complaints[0].status if not complaints.is_empty() else "-"])

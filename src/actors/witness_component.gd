@@ -84,6 +84,8 @@ func begin_report(node_id: int) -> void:
 		if get_parent().has_method("on_report_started"):
 			get_parent().on_report_started()
 	EventBus.witness_started.emit(self, node_id)
+	if get_parent().is_in_group("npc"):
+		Tips.show("witness")
 	report_started.emit(node_id)
 	Audio.play_sfx("radio")
 

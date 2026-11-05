@@ -62,6 +62,7 @@ func _ready() -> void:
 	_spawn_entities()
 	_spawn_camera_and_hud()
 	_post_build()
+	apply_quality()
 	_bake_navigation()
 	Game.air_billing_active = true
 	Audio.play_music(music)
@@ -138,7 +139,7 @@ func _build_environment() -> void:
 	sun = DirectionalLight3D.new()
 	sun.light_color = pcolor("sun", "#9a7dff")
 	sun.light_energy = float(palette.get("sun_energy", 0.4))
-	sun.shadow_enabled = true
+	sun.shadow_enabled = str(Game.settings.get("graphics", "high")) != "low"
 	sun.shadow_blur = 1.2
 	sun.shadow_opacity = 0.85
 	sun.directional_shadow_max_distance = 45.0
@@ -183,6 +184,20 @@ func _spawn_player() -> void:
 	player.global_position = get_spawn_position() + Vector3(0, 0.1, 0.9)
 
 
+var _crowd_i := 0
+
+
+## Graphics preset (Settings): render scale and particle density for slower devices.
+static func quality_mult() -> float:
+	return {"low": 0.35, "medium": 0.7, "high": 1.0}.get(str(Game.settings.get("graphics", "high")), 1.0)
+
+
+func apply_quality() -> void:
+	get_viewport().scaling_3d_scale = {"low": 0.6, "medium": 0.8, "high": 1.0}.get(str(Game.settings.get("graphics", "high")), 1.0)
+	if sun:
+		sun.shadow_enabled = str(Game.settings.get("graphics", "high")) != "low"
+
+
 func _spawn_entities() -> void:
 	for e in build.get("entities", []):
 		var c: String = e["char"]
@@ -190,7 +205,10 @@ func _spawn_entities() -> void:
 		if ENEMY_CHARS.has(c):
 			spawn_enemy(ENEMY_CHARS[c], pos)
 		elif c == "N":
-			spawn_npc("civilian", pos)
+			# Low graphics: thinner crowds (every other civilian).
+			_crowd_i += 1
+			if str(Game.settings.get("graphics", "high")) != "low" or _crowd_i % 2 == 0:
+				spawn_npc("civilian", pos)
 		elif c == "M":
 			spawn_npc("merchant", pos)
 		elif c == "W":
@@ -354,7 +372,7 @@ func _on_player_died() -> void:
 func _rain_extras() -> void:
 	var sp := CPUParticles3D.new()
 	sp.local_coords = false
-	sp.amount = 70
+	sp.amount = roundi(70 * quality_mult())
 	sp.lifetime = 0.3
 	sp.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
 	sp.emission_box_extents = Vector3(14, 0.02, 10)
@@ -420,7 +438,7 @@ func _build_weather(kind: String) -> void:
 	p.mesh = q
 	match kind:
 		"rain":
-			p.amount = 320
+			p.amount = roundi(320 * quality_mult())
 			p.lifetime = 0.9
 			p.emission_box_extents = Vector3(18, 0.5, 14)
 			p.position = Vector3(0, 10, 0)
@@ -435,7 +453,7 @@ func _build_weather(kind: String) -> void:
 			m.albedo_color = Color(0.65, 0.78, 1.0, 0.3)
 			_rain_extras()
 		"snow":
-			p.amount = 360
+			p.amount = roundi(360 * quality_mult())
 			p.lifetime = 5.0
 			p.preprocess = 5.0
 			p.emission_box_extents = Vector3(18, 0.5, 14)
@@ -448,7 +466,7 @@ func _build_weather(kind: String) -> void:
 			q.size = Vector2(0.07, 0.07)
 			m.albedo_color = Color(0.95, 0.97, 1.0, 0.85)
 		"spores", "embers", "motes":
-			p.amount = 160
+			p.amount = roundi(160 * quality_mult())
 			p.lifetime = 6.0
 			p.preprocess = 6.0
 			p.emission_box_extents = Vector3(16, 2.5, 12)

@@ -290,17 +290,34 @@ func resolve(npc: Node, verb_id: String) -> bool:
 			impact.append_array(_other_callers(npc))
 	if not impact.is_empty():
 		text += "\n\n" + _impact_block(impact)
-	# ...and they always answer back: a counter-move you can respond to.
+		Tips.show("choices")
+	# ...and they answer back: a counter-move you can respond to. Big moments always; small talk
+	# only sometimes (Settings: "NPC follow-ups"), and less often from someone who already did.
 	if is_instance_valid(npc) and npc.state != "dead":
 		var key := "served" if npc.get("_leaving") else "%s_%s" % [kind, "ok" if success else "fail"]
-		if present_counter(npc, key, text):
+		if should_counter(npc, key) and present_counter(npc, key, text):
+			npc.set_meta("countered", int(npc.get_meta("countered", 0)) + 1)
 			return success
 	EventBus.dialogue_requested.emit(npc.npc_name, text, [], Callable())
 	return success
 
 
+## The "what changed" block: at most three lines - the call, the relationship, the biggest consequence.
 func _impact_block(impact: Array) -> String:
-	return "[color=#9adfff]" + "\n".join(PackedStringArray(impact.map(func(l): return "> " + str(l)))) + "[/color]"
+	return "[color=#9adfff]" + "\n".join(PackedStringArray(impact.slice(0, 3).map(func(l): return "> " + str(l)))) + "[/color]"
+
+
+## Always for moments that matter (caught stealing, a threat that failed, a fight, being evicted);
+## otherwise a roll set by the player's "NPC follow-ups" setting.
+const ALWAYS_COUNTER := ["served", "theft_fail", "threat_fail", "fight_ok", "fight_fail", "keeper_fight_ok", "keeper_fight_fail",
+	"keeper_theft_fail", "keeper_banned"]
+
+
+func should_counter(npc: Node, key: String) -> bool:
+	if force_outcome != null or ALWAYS_COUNTER.has(key):
+		return true
+	var base: float = {"often": 0.75, "sometimes": 0.4, "rare": 0.15}.get(str(Game.settings.get("followups", "sometimes")), 0.4)
+	return _rng.randf() < base / (1.0 + float(npc.get_meta("countered", 0)))
 
 
 ## Lasting reaction when the verb data doesn't name one (data/reactions.json "default_react").
@@ -589,6 +606,7 @@ func open_venue(venue_id: String, sign_text: String, faction: String, door: Node
 	var v: Dictionary = DataDB.venues.get("venues", {}).get(venue_id, {})
 	if v.is_empty():
 		return
+	Tips.show("shops")
 	var keeper: Node = door.get_meta("keeper") if door and door.has_meta("keeper") else null
 	if keeper != null and (not is_instance_valid(keeper) or keeper.state == "dead"):
 		keeper = null
@@ -792,10 +810,12 @@ func _keeper_reacts(keeper: Node, vid: String, choice: String, success: bool, te
 	if not impact.is_empty():
 		text += "\n\n" + _impact_block(impact)
 	var key := "keeper_%s_%s" % [kind, ok]
-	if present_counter(keeper, key, text, "venue"):
-		return
-	if present_counter(keeper, "%s_%s" % [kind, ok], text):
-		return
+	if should_counter(keeper, key):
+		keeper.set_meta("countered", int(keeper.get_meta("countered", 0)) + 1)
+		if present_counter(keeper, key, text, "venue"):
+			return
+		if present_counter(keeper, "%s_%s" % [kind, ok], text):
+			return
 	EventBus.dialogue_requested.emit(keeper.npc_name, text, [], Callable())
 
 

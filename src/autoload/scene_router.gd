@@ -28,6 +28,7 @@ var _rect: ColorRect
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	ensure_gamepad_ui()
+	get_tree().root.content_scale_factor = float(Game.settings.get("ui_scale", 1.0))
 	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
 		input_device = "touch"
 	if not Input.get_connected_joypads().is_empty():
@@ -125,3 +126,33 @@ static func ensure_gamepad_ui() -> void:
 				ev.device = -1
 				ev.button_index = b
 				InputMap.action_add_event(action, ev)
+
+
+## Phones and tablets: the system Back button closes what's open (or opens the menu) instead of
+## killing the game, and leaving the app pauses + autosaves (Android may close us in the background).
+func _notification(what: int) -> void:
+	var hud := get_tree().get_first_node_in_group("hud") if is_inside_tree() else null
+	match what:
+		NOTIFICATION_WM_GO_BACK_REQUEST:
+			if hud == null:
+				get_tree().quit()
+				return
+			var ev := InputEventAction.new()
+			ev.action = "ui_cancel" if hud.get("_modal") and hud._modal.visible else "pause"
+			ev.pressed = true
+			Input.parse_input_event(ev)
+		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
+			if hud != null and Game.has_active_run and not (hud.get("_modal") and hud._modal.visible):
+				hud.open_menu()
+			if what == NOTIFICATION_APPLICATION_PAUSED and Game.has_active_run:
+				Game.save_game()
+
+
+## PC: F11 or Alt+Enter toggles fullscreen.
+func _unhandled_key_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k == null or not k.pressed or k.echo:
+		return
+	if k.keycode == KEY_F11 or (k.keycode == KEY_ENTER and k.alt_pressed):
+		var full := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)

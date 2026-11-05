@@ -93,6 +93,14 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   (`Game.add_item`), sold by street traders / pawn / corp stores, dropped by enemies, start kit by background.
   Swap: `swap_melee` (1 / L3 / BLADE) and `swap_ranged` (2 / R3 / GUN). `Grenade` node, Projectile `pull/stun/push_force`.
   Test: `tools/combat_test.gd` (every enemy, tokens, every weapon, dash, riot guard, boom chain, unlocks).
+- Player-facing polish: `src/core/tips.gd` + `data/tips.json` (one-time just-in-time tips, banner in HUD, seen list in
+  device settings); `Interactions.should_counter` (big moments always, else Settings "followups"); `_impact_block` caps
+  at 3 lines; HUD `_update_context_buttons` (touch buttons only when useful); Settings: difficulty (`Enemy.dmg_mult`,
+  token limits), graphics (`Level.apply_quality/quality_mult`), ui_scale (root content_scale_factor), tips, followups.
+  `Router._notification`: Android Back = close/open menu, app pause/focus-out = pause menu + autosave.
+  Title "CREDITS & LICENSES" (Godot + third-party licence texts - required for distribution). PC: Windows/Linux presets,
+  mouse (LMB melee, RMB fire; touch-emulated mouse ignored), F11 fullscreen. Critique log: `docs/REVIEW.md` - update it
+  every pass (score, open issues, fix log).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

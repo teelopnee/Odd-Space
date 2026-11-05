@@ -66,4 +66,6 @@ signal speech_bubble(speaker: Node, text: String)
 signal player_act(kind: String, target: String)
 ## Equipped weapon changed (slot "melee" | "ranged") - HUD shows it.
 signal weapon_changed(slot: String, weapon_id: String)
+## A one-time tip banner (Tips.show).
+signal tip_shown(title: String, text: String)
 signal input_device_changed(device: String)  # "touch" | "keyboard" | "gamepad"

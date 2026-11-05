@@ -1,6 +1,6 @@
 # ODD-SPACE
 
-> **Sci-Fi HD-2D Action-RPG** · Retro-Futurism ยุค 80s/90s · Dark Satire เสียดสีทุนนิยมอวกาศ
+> **Sci-Fi 2.5D (2D sprites in a 3D diorama) Action-RPG** · Retro-Futurism ยุค 80s/90s · Dark Satire เสียดสีทุนนิยมอวกาศ
 > Godot **4.7** (Mobile renderer / Vulkan) · ออกแบบให้พัฒนาและเล่นบน **Samsung Galaxy Tab S12 Ultra** · รองรับ **จอย / จอสัมผัส / คีย์บอร์ด**
 
 ![Station](docs/screenshots/station.jpg)
@@ -177,10 +177,10 @@
 
 ## ✨ จาก v0.2.0
 
-**ภาพแบบ HD-2D (สไตล์เดียวกับ Octopath แต่เป็นงานออริจินัลทั้งหมด)**
+**ภาพแบบ 2.5D (สไตล์เดียวกับ classic diorama JRPGs แต่เป็นงานออริจินัลทั้งหมด)**
 - ตัวละคร pixel art **8 ทิศทาง** + แอนิเมชันลื่น (เดิน/วิ่ง/กลิ้ง/คอมโบ 3 ท่า/ยิง/ชาร์จ/ปัด/บาดเจ็บ/ล้ม/คุย) สร้างด้วย *Sprite Forge* (โมเดล 3D → ลงสีแบบ pixel art อัตโนมัติ)
 - ฉาก 3D พร้อม **normal map** แสงนีออน/โคมไฟสะท้อนพื้นผิว, หน้าต่างมองเห็นเนบิวลา, ลำแสงฝุ่น, ฝุ่นลอย, พื้นสะท้อนแสง, หญ้า/พืชต่างดาวพลิ้วตามลม, ฝน/หิมะ/สปอร์/ประกายไฟ
-- เลนส์แบบ HD-2D: **tilt-shift**, bloom ฟุ้ง, vignette, chromatic aberration, grain, color grading
+- เลนส์แบบ 2.5D: **tilt-shift**, bloom ฟุ้ง, vignette, chromatic aberration, grain, color grading
 - **คัตซีน**: แถบ letterbox, การ์ดชื่อฉาก (Chapter card), ยานลงจอดทุกครั้งที่ถึงดาวใหม่ — ฉากต่อฉาก
 
 **การต่อสู้มันส์ ๆ**

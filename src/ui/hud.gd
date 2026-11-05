@@ -36,6 +36,12 @@ var _prompt_btn: Button
 var _touch_root: Control
 var _joystick: TouchStick
 var _touch_buttons: Array[TouchButton] = []
+var _tip_panel: PanelContainer
+var _tip_title: Label
+var _tip_text: Label
+var _tip_queue: Array = []
+var _tip_time := 0.0
+var _ctx_check := 0.0
 var _use_btn: TouchButton
 var _objective_label: Label
 var _oc_bar: HBoxContainer
@@ -77,6 +83,7 @@ func _ready() -> void:
 	_build_status()
 	_build_comm()
 	_build_toasts()
+	_build_tip()
 	_build_ticker()
 	_build_target_panel()
 	_build_witness_alert()
@@ -86,6 +93,76 @@ func _ready() -> void:
 	_build_modal()
 	_connect_signals()
 	_refresh_status()
+
+
+## One-time tip banner (Tips.show): top centre, never pauses, queues if several fire at once.
+func _build_tip() -> void:
+	_tip_panel = PanelContainer.new()
+	_tip_panel.anchor_left = 0.5
+	_tip_panel.anchor_right = 0.5
+	_tip_panel.offset_left = -330
+	_tip_panel.offset_right = 330
+	_tip_panel.offset_top = 64
+	_tip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.03, 0.06, 0.12, 0.88)
+	sb.border_color = Color(0.35, 0.95, 1.0, 0.9)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(6)
+	sb.set_content_margin_all(12)
+	_tip_panel.add_theme_stylebox_override("panel", sb)
+	var v := VBoxContainer.new()
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_panel.add_child(v)
+	_tip_title = make_label("", 17, Color(0.35, 0.95, 1.0))
+	v.add_child(_tip_title)
+	_tip_text = make_label("", 16, Color(0.95, 0.97, 1.0))
+	_tip_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip_text.custom_minimum_size = Vector2(620, 0)
+	v.add_child(_tip_text)
+	_tip_panel.visible = false
+	root.add_child(_tip_panel)
+	EventBus.tip_shown.connect(func(t, x):
+		_tip_queue.append([t, x])
+		if not _tip_panel.visible:
+			_next_tip())
+
+
+func _next_tip() -> void:
+	if _tip_queue.is_empty():
+		_tip_panel.visible = false
+		return
+	var t: Array = _tip_queue.pop_front()
+	_tip_title.text = "TIP  //  " + str(t[0])
+	_tip_text.text = str(t[1])
+	_tip_panel.visible = true
+	_tip_panel.modulate.a = 1.0
+	_tip_time = clampf(3.5 + str(t[1]).length() * 0.045, 5.0, 9.0)
+
+
+## Touch: show only the buttons that matter right now (fewer, bigger targets).
+func _update_context_buttons() -> void:
+	var p := get_tree().get_first_node_in_group("player") as Node3D
+	var fighting := false
+	if p:
+		for e in get_tree().get_nodes_in_group("enemy"):
+			if e.get("hostile") and (e as Node3D).global_position.distance_to(p.global_position) < 16.0:
+				fighting = true
+				break
+	for b in _touch_buttons:
+		var vis := true
+		match b.action:
+			"target_cycle", "subsystem_next", "parry":
+				vis = fighting
+			"overclock":
+				vis = p != null and int(p.get("overclock_pips")) > 0
+			"swap_melee":
+				vis = Arsenal.owned("melee").size() > 1
+			"swap_ranged":
+				vis = Arsenal.owned("ranged").size() > 1
+		if b.text == "MED":
+			vis = Game.item_count("medkit") > 0 and Game.hp < Game.max_hp() * 0.8
+		b.visible = vis
 
 
 func _build_cinematic() -> void:
@@ -355,6 +432,7 @@ func touch_enabled() -> bool:
 
 
 func apply_settings() -> void:
+	get_tree().root.content_scale_factor = float(Game.settings.get("ui_scale", 1.0))
 	if not _modal.visible:
 		_touch_root.visible = touch_enabled()
 	if camera_rig:
@@ -415,7 +493,7 @@ func _update_hint() -> void:
 	elif dev == "gamepad":
 		_hint_label.text = "X melee (far: dash)  RT shoot  A roll  RB parry  B overclock  LB target  LT part  L3/R3 swap blade/gun  Y use"
 	else:
-		_hint_label.text = "J melee (far: dash)  K shoot  SPACE roll  L parry  R overclock  TAB target  Q part  1/2 swap blade/gun  F use"
+		_hint_label.text = "J / L-click melee (far: dash)  K / R-click shoot  SPACE roll  L parry  R boost  TAB target  1/2 swap  F use  F11 fullscreen"
 
 
 func _add_touch_button(action: String, text: String, from_br: Vector2, radius: float, color: Color, fs: int = 20) -> TouchButton:
@@ -744,6 +822,15 @@ func _process(delta: float) -> void:
 			_next_ticker()
 	_update_target_panel()
 	_update_witness_alert()
+	if _tip_panel and _tip_panel.visible:
+		_tip_time -= delta
+		_tip_panel.modulate.a = clampf(_tip_time / 0.6, 0.0, 1.0)
+		if _tip_time <= 0.0:
+			_next_tip()
+	_ctx_check -= delta
+	if _ctx_check <= 0.0 and _touch_root and _touch_root.visible:
+		_ctx_check = 0.25
+		_update_context_buttons()
 	if _hint_label and _hint_time > 0.0:
 		_hint_time -= delta
 		_hint_label.modulate.a = clampf(_hint_time / 3.0, 0.0, 1.0)

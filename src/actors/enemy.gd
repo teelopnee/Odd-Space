@@ -207,6 +207,11 @@ func _physics_process(delta: float) -> void:
 				if hostile and player_ok and dist < float(def.get("aggro_range", 10.0)) and _has_los(_player.global_position):
 					_set_state("chase")
 					_show_alert("!", Color(1, 0.4, 0.3), 0.8)
+					Tips.show("combat")
+					if def.get("guard", false):
+						Tips.show("riot")
+					elif def.get("explode", false):
+						Tips.show("boom")
 			"reporting":
 				pass
 			"chase":
@@ -288,13 +293,21 @@ func _update_riot_shield() -> void:
 			_riot_shield.look_at(_riot_shield.global_position + to.normalized(), Vector3.UP)
 
 
+## Difficulty (Settings): how hard enemies hit you.
+static func dmg_mult() -> float:
+	return {"story": 0.55, "normal": 1.0, "hard": 1.35}.get(str(Game.settings.get("difficulty", "normal")), 1.0)
+
+
 func _take_token() -> bool:
 	_attackers = _attackers.filter(func(e): return is_instance_valid(e) and e.state in ["windup", "attack"])
 	if _attackers.has(self) or has_meta("saga_tag"):
 		return true
-	if _attackers.size() >= MAX_ATTACKERS:
+	var diff := str(Game.settings.get("difficulty", "normal"))
+	var max_att: int = {"story": 1, "normal": MAX_ATTACKERS, "hard": 3}.get(diff, MAX_ATTACKERS)
+	var max_shoot: int = {"story": 1, "normal": MAX_SHOOTERS, "hard": 2}.get(diff, MAX_SHOOTERS)
+	if _attackers.size() >= max_att:
 		return false
-	if _is_ranged() and _attackers.filter(func(e): return e._is_ranged()).size() >= MAX_SHOOTERS:
+	if _is_ranged() and _attackers.filter(func(e): return e._is_ranged()).size() >= max_shoot:
 		return false
 	_attackers.append(self)
 	return true
@@ -357,6 +370,8 @@ func _set_state(new_state: String, duration: float = 0.0) -> void:
 		_telegraph = null
 	match new_state:
 		"windup":
+			if not _is_ranged():
+				Tips.show("parry")
 			sprite.play("charge", true)
 			sprite.flash(Color(3.0, 1.3, 0.4), duration)
 			_show_alert("!", Color(1.0, 0.6, 0.1), duration)
@@ -502,7 +517,7 @@ func _do_attack() -> void:
 		FX.shake(get_tree(), 0.35)
 		Audio.play_sfx("explosion", 0.1, -8.0)
 	if _flat_dist(_player.global_position) <= reach:
-		var dmg := float(def.get("damage", 8)) * (0.5 if _disarmed else 1.0)
+		var dmg := float(def.get("damage", 8)) * (0.5 if _disarmed else 1.0) * dmg_mult()
 		_player.receive_attack({"damage": dmg, "attacker": self, "kind": "melee", "bug": is_bug,
 			"position": global_position})
 
@@ -522,7 +537,7 @@ func _explode(killer) -> void:
 	FX.shake(get_tree(), 0.5)
 	Audio.play_sfx("explosion", 0.1)
 	if _player and is_instance_valid(_player) and _player.is_alive() and _flat_dist(_player.global_position) <= r:
-		_player.receive_attack({"damage": dmg, "attacker": self, "kind": "explosion", "position": global_position})
+		_player.receive_attack({"damage": dmg * dmg_mult(), "attacker": self, "kind": "explosion", "position": global_position})
 	for e in get_tree().get_nodes_in_group("enemy"):
 		if e != self and is_instance_valid(e) and e.is_alive() and e.global_position.distance_to(global_position) <= r:
 			e.take_hit({"damage": dmg * 1.2, "attacker": killer if killer else self, "kind": "explosion", "position": e.global_position,
@@ -544,7 +559,7 @@ func _fire_bolt() -> void:
 	aim += Vector3(randf_range(-spread, spread), 0, randf_range(-spread, spread))
 	var dir := (aim - from).normalized()
 	Projectile.spawn(get_parent(), from + dir * 0.5, dir, float(def.get("projectile_speed", 14.0)) * BOLT_SPEED_MULT,
-		float(def.get("damage", 8)), "enemy", self)
+		float(def.get("damage", 8)) * dmg_mult(), "enemy", self)
 	FXSprite.play_at(get_parent(), "muzzle", from + dir * 0.6, 0.8, 2.5, Color(1.0, 0.5, 0.6), dir.x < 0)
 	Audio.play_sfx("enemy_shoot", 0.1, -6.0)
 
@@ -863,6 +878,8 @@ func _die(attacker, push: Vector3) -> void:
 			FX.slowmo(get_tree(), 0.25, 0.6)
 			FX.punch(get_tree(), 0.12, 0.4)
 	EventBus.enemy_killed.emit(self, {"by_player": by_player, "type": enemy_type})
+	if by_player:
+		Tips.show("parts")
 	Audio.play_sfx("enemy_die")
 	FX.rumble(0.3, 0.3, 0.12)
 	var tw := create_tween()

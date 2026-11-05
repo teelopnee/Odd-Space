@@ -1,0 +1,87 @@
+{
+	"_doc": "Just-in-time tips (src/core/tips.gd): shown once each, the first time the situation happens, as a small non-blocking banner. Text per input device: touch / pad / key. Players can turn tips off in Settings.",
+	"first_planet": {
+		"title": "YOUR STORY, YOUR STREET",
+		"touch": "People here notice what you do and remember it. Walk up to anyone and tap the middle button to talk.",
+		"pad": "People here notice what you do and remember it. Walk up to anyone and press Y to talk.",
+		"key": "People here notice what you do and remember it. Walk up to anyone and press F to talk."
+	},
+	"combat": {
+		"title": "FIGHT SMART",
+		"touch": "MELEE when a foe is 3-9 m away = DASH STRIKE. ROLL through shots. Shooters stop to reload after each burst - that's your opening.",
+		"pad": "X with a foe 3-9 m away = DASH STRIKE. A to roll through shots. Shooters stop to reload after a burst - go in then.",
+		"key": "J with a foe 3-9 m away = DASH STRIKE. SPACE to roll through shots. Shooters stop to reload after a burst - go in then."
+	},
+	"parry": {
+		"title": "PARRY",
+		"touch": "Tap PARRY just before a hit lands: bolts fly back at double damage and brutes stagger.",
+		"pad": "RB just before a hit lands: bolts fly back at double damage and brutes stagger.",
+		"key": "L just before a hit lands: bolts fly back at double damage and brutes stagger."
+	},
+	"parts": {
+		"title": "BREAK THEIR GEAR",
+		"touch": "Tap an enemy's part (legs, weapon, jetpack) to aim at it. Broken legs slow them, broken weapons disarm them.",
+		"pad": "LT picks an enemy part to aim at. Broken legs slow them, broken weapons disarm them.",
+		"key": "Q picks an enemy part to aim at. Broken legs slow them, broken weapons disarm them."
+	},
+	"witness": {
+		"title": "SOMEONE IS CALLING PARAGON",
+		"touch": "A witness is on the phone about you. Reach them before the bar fills: pay, charm or scare them. Or just leave fast.",
+		"pad": "A witness is on the phone about you. Reach them before the bar fills (Y): pay, charm or scare them.",
+		"key": "A witness is on the phone about you. Reach them before the bar fills (F): pay, charm or scare them."
+	},
+	"labels": {
+		"title": "THEY REMEMBER",
+		"touch": "Tags over heads show how people feel about you. Friends give gifts and won't report you. Enemies complain to Paragon.",
+		"pad": "Tags over heads show how people feel about you. Friends give gifts and won't report you. Enemies complain to Paragon.",
+		"key": "Tags over heads show how people feel about you. Friends give gifts and won't report you. Enemies complain to Paragon."
+	},
+	"shops": {
+		"title": "OWNERS REMEMBER TOO",
+		"touch": "The owner by the door is the same person every visit. Treat them well and prices drop. Wreck the place and you're banned.",
+		"pad": "The owner by the door is the same person every visit. Treat them well and prices drop. Wreck the place and you're banned.",
+		"key": "The owner by the door is the same person every visit. Treat them well and prices drop. Wreck the place and you're banned."
+	},
+	"weapons": {
+		"title": "NEW WEAPON",
+		"touch": "Swap weapons with the BLADE and GUN buttons.",
+		"pad": "Swap weapons: L3 = blade, R3 = gun.",
+		"key": "Swap weapons: 1 = blade, 2 = gun."
+	},
+	"medkit": {
+		"title": "LOW HEALTH",
+		"touch": "Tap MED to use a medkit. Clinics and street traders sell more.",
+		"pad": "Use a medkit from the menu (START > ITEMS). Clinics sell more.",
+		"key": "Use a medkit from the menu (ESC > ITEMS). Clinics sell more."
+	},
+	"overclock": {
+		"title": "OVERCLOCK READY",
+		"touch": "BOOST spends a bar: you move, hit and fire faster for a few seconds.",
+		"pad": "B spends a bar: you move, hit and fire faster for a few seconds.",
+		"key": "R spends a bar: you move, hit and fire faster for a few seconds."
+	},
+	"air": {
+		"title": "AIR ISN'T FREE",
+		"touch": "You're billed for breathing. Unpaid air becomes debt - and Halcyon collects. Pay at an AIR kiosk or loan office.",
+		"pad": "You're billed for breathing. Unpaid air becomes debt - and Halcyon collects. Pay at an AIR kiosk or loan office.",
+		"key": "You're billed for breathing. Unpaid air becomes debt - and Halcyon collects. Pay at an AIR kiosk or loan office."
+	},
+	"riot": {
+		"title": "RIOT SHIELD",
+		"touch": "Shots from the front bounce off. Flank them, PARRY their swing, charge a shot, or blow them up.",
+		"pad": "Shots from the front bounce off. Flank them, parry their swing, charge a shot, or blow them up.",
+		"key": "Shots from the front bounce off. Flank them, parry their swing, charge a shot, or blow them up."
+	},
+	"boom": {
+		"title": "AD-BOMB BOT",
+		"touch": "It runs at you and explodes. Shoot it first - near its friends.",
+		"pad": "It runs at you and explodes. Shoot it first - near its friends.",
+		"key": "It runs at you and explodes. Shoot it first - near its friends."
+	},
+	"choices": {
+		"title": "PEOPLE ANSWER BACK",
+		"touch": "What you do to someone has a result - and they may push back. The blue lines show what changed.",
+		"pad": "What you do to someone has a result - and they may push back. The blue lines show what changed.",
+		"key": "What you do to someone has a result - and they may push back. The blue lines show what changed."
+	}
+}

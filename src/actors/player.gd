@@ -633,6 +633,8 @@ func add_overclock(amount: float) -> void:
 		return
 	overclock = clampf(overclock + amount, 0.0, 100.0)
 	_emit_overclock()
+	if overclock >= OVERCLOCK_PER_PIP:
+		Tips.show("overclock")
 
 
 func activate_overclock() -> void:
@@ -909,6 +911,7 @@ func _apply_damage(dmg: float, push_dir: Vector3) -> void:
 	Game.hp = maxf(0.0, Game.hp - dmg)
 	if was_ok and Game.hp > 0.0 and Game.hp < Game.max_hp() * 0.35:
 		EventBus.player_act.emit("hurt", "")  # bystanders notice you bleeding
+		Tips.show("medkit")
 	EventBus.player_hp_changed.emit(Game.hp, Game.max_hp())
 	FX.damage_number(get_parent(), global_position + Vector3(0, 1.9, 0), str(roundi(dmg)), Color(1.0, 0.3, 0.4))
 	sprite.flash(Color(3.0, 0.6, 0.6), 0.12)
@@ -966,3 +969,18 @@ func _refresh_interactable() -> void:
 
 func refresh_interaction() -> void:
 	_refresh_interactable()
+
+
+## PC: left mouse = MELEE, right mouse = FIRE (hold to charge). Mouse events emulated from touch
+## are ignored, so tablets and phones never get phantom attacks.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event is InputEventMouseButton or event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+	var mb := event as InputEventMouseButton
+	var action := "melee" if mb.button_index == MOUSE_BUTTON_LEFT else ("attack" if mb.button_index == MOUSE_BUTTON_RIGHT else "")
+	if action == "":
+		return
+	if mb.pressed:
+		Input.action_press(action)
+	else:
+		Input.action_release(action)
