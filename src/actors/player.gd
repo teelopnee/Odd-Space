@@ -445,6 +445,16 @@ func _update_glow(delta: float) -> void:
 
 # --- Animation / feel ---------------------------------------------------------------------------
 
+var _idle_time := 0.0
+
+
+func _near_dance_floor() -> bool:
+	for sp in get_tree().get_nodes_in_group("life_spot"):
+		if sp.get_meta("kind", "") == "dance" and (sp as Node3D).global_position.distance_to(global_position) < 4.5:
+			return true
+	return false
+
+
 func _update_animation() -> void:
 	var hspeed := Vector2(velocity.x, velocity.z).length()
 	match state:
@@ -471,7 +481,14 @@ func _update_animation() -> void:
 				sprite.play("walk")
 				sprite.speed_scale = clampf(hspeed / 2.6, 0.6, 1.4)
 			else:
-				sprite.play("idle")
+				# Stand around long enough and you check your wristpad (or dance near a hologram).
+				_idle_time += get_physics_process_delta_time()
+				if _idle_time > 9.0 and state == State.NORMAL and target == null:
+					sprite.play("dance" if _near_dance_floor() else "phone")
+				else:
+					sprite.play("idle")
+			if hspeed > 0.35 or _shoot_pose > 0.0 or _charge > 0.0:
+				_idle_time = 0.0
 	var face_dir := facing
 	if target != null and is_instance_valid(target) and state == State.NORMAL and (hspeed < 0.5 or _shoot_pose > 0.0):
 		face_dir = target.global_position - global_position

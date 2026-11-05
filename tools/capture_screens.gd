@@ -118,7 +118,12 @@ func _process(_delta: float) -> bool:
 			_current = "09_world_%s" % pl.environment
 			root.get_node("Router").params = {"planet_id": pl.id}
 			change_scene_to_file("res://scenes/world/planet_surface.tscn")
-			_next(380)
+			_step = 40
+			_wait = 45
+		40:
+			_shot(_current + "_wide")
+			_step = 11
+			_wait = 330
 		11:
 			var hud = get_first_node_in_group("hud")
 			if hud and hud._dialogue_open:

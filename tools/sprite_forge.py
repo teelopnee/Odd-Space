@@ -310,6 +310,9 @@ ANIMS = [
     ("shoot", 6, 18, False), ("slash1", 6, 18, False), ("slash2", 6, 18, False), ("slash3", 7, 16, False),
     ("guard", 4, 14, False), ("hurt", 3, 12, False), ("dead", 6, 9, False), ("talk", 8, 7, True),
     ("charge", 6, 12, True),
+    # Life animations (NPC activities, crowds, surrender):
+    ("sit", 8, 5, True), ("phone", 8, 6, True), ("dance", 8, 10, True), ("cheer", 6, 9, True),
+    ("wave", 6, 9, True), ("surrender", 6, 6, True),
 ]
 
 
@@ -422,6 +425,73 @@ def pose(anim, t):
         p["larm"] = (0.1, 0.2)
         p["head_tilt"] = 0.08 * g
         p["bob"] = -0.4 + 0.4 * abs(g)
+    elif anim == "sit":
+        # Perched on a bench, feet dangling and kicking a little.
+        g = s(t * tau)
+        p["crouch"] = 1.0
+        p["bob"] = -0.2 + 0.2 * g
+        p["lthigh"], p["rthigh"] = 1.42, 1.42
+        p["lknee"], p["rknee"] = 1.25 + 0.25 * g, 1.25 - 0.25 * g
+        p["larm"], p["rarm"] = (0.65, 0.3), (0.65, 0.3)
+        p["lelbow"] = p["relbow"] = 0.7
+        p["head_tilt"] = 0.05 * s(t * tau + 1.3)
+        p["blink"] = 0.55 <= t < 0.65
+    elif anim == "phone":
+        # Head down, doom-scrolling a wristpad; thumb taps.
+        g = s(t * tau * 2)
+        p["bob"] = -0.3 + 0.2 * s(t * tau)
+        p["rarm_dir"] = (-0.15, -0.55, 0.45)
+        p["rfore_dir"] = (-0.45, 0.35 + 0.05 * g, 0.75)
+        p["larm_dir"] = (0.2, -0.6, 0.35)
+        p["lfore_dir"] = (0.55, 0.3, 0.7)
+        p["head_tilt"] = 0.22
+        p["weapon"] = "phone"
+        p["blink"] = 0.3 <= t < 0.38
+    elif anim == "dance":
+        g = s(t * tau)
+        h = s(t * tau * 2)
+        p["bob"] = -0.9 + 1.2 * abs(h)
+        p["twist"] = 0.35 * g
+        p["lean"] = 0.06 * h
+        p["rarm_dir"] = (0.5 + 0.3 * g, 0.75 + 0.2 * h, 0.2)
+        p["rfore_dir"] = (0.1, 0.9, 0.2 - 0.3 * g)
+        p["larm_dir"] = (-0.5 + 0.3 * g, 0.2 - 0.6 * h, 0.4)
+        p["lfore_dir"] = (-0.2, 0.6, 0.5)
+        p["lthigh"], p["rthigh"] = 0.35 * max(0.0, g), 0.35 * max(0.0, -g)
+        p["lknee"], p["rknee"] = 0.2 + 0.6 * max(0.0, g), 0.2 + 0.6 * max(0.0, -g)
+        p["head_tilt"] = 0.12 * g
+        p["tail"] = 0.4 + 0.3 * h
+    elif anim == "cheer":
+        g = s(t * tau)
+        p["bob"] = 1.2 * max(0.0, g) - 0.4
+        p["rarm_dir"] = (0.45, 0.9, 0.15 + 0.15 * g)
+        p["rfore_dir"] = (0.25, 1.0, 0.1)
+        p["larm_dir"] = (-0.45, 0.9, 0.15 - 0.15 * g)
+        p["lfore_dir"] = (-0.25, 1.0, 0.1)
+        p["lthigh"] = p["rthigh"] = -0.15 * max(0.0, g)
+        p["lknee"] = p["rknee"] = 0.1 + 0.4 * max(0.0, g)
+        p["head_tilt"] = -0.1
+        p["tail"] = 0.6
+    elif anim == "wave":
+        g = s(t * tau)
+        p["rarm_dir"] = (0.55, 0.75, 0.3)
+        p["rfore_dir"] = (0.35 * g, 1.0, 0.15)
+        p["larm"] = (0.05, 0.18)
+        p["head_tilt"] = 0.06 * g
+        p["bob"] = -0.3 + 0.3 * abs(g)
+    elif anim == "surrender":
+        # Down on one knee, hands up, head bowed - the boss is begging.
+        g = s(t * tau)
+        p["crouch"] = 0.85
+        p["lthigh"], p["lknee"] = 1.45, 1.5
+        p["rthigh"], p["rknee"] = -0.15, 1.75
+        p["rarm_dir"] = (0.5, 0.85, 0.25)
+        p["rfore_dir"] = (0.05, 1.0, 0.0)
+        p["larm_dir"] = (-0.5, 0.85, 0.25)
+        p["lfore_dir"] = (-0.05, 1.0, 0.0)
+        p["head_tilt"] = 0.25 + 0.04 * g
+        p["bob"] = 0.15 * g
+        p["blink"] = 0.4 <= t < 0.6
     elif anim == "charge":
         g = s(t * 2 * math.pi)
         p["rarm_dir"] = (0.7, 0.2, 0.6)
@@ -575,6 +645,11 @@ def build_human(cfg, facing, anim, t):
     elif w == "baton":
         prims.append(P_cone(rhand - rd * 1.5, rhand + rd * 2.5, 1.0, 1.0, "gear"))
         prims.append(P_cone(rhand + rd * 2.5, rhand + rd * 12.0, 1.2, 0.9, "flash"))
+    elif w == "phone":
+        # A glowing wristpad screen held between the hands.
+        pc = (lhand + rhand) * 0.5 + fwd_t * 0.6 + up * 0.6
+        prims.append(P_box(pc, [2.2, 1.5, 0.35], [right_t, norm(up * 0.6 + fwd_t * 0.8), norm(fwd_t * 0.6 - up * 0.8)], 0.3, "gear"))
+        prims.append(P_box(pc + norm(up * 0.8 + fwd_t * 0.2) * 0.4, [1.8, 1.2, 0.2], [right_t, norm(up * 0.6 + fwd_t * 0.8), norm(fwd_t * 0.6 - up * 0.8)], 0.2, "glow"))
 
     # head
     hb = [right_t, up, fwd_t]

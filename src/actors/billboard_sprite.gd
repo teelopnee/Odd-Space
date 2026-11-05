@@ -13,6 +13,7 @@ signal animation_finished(anim: String)
 const SECTORS := [["S", false], ["SE", false], ["E", false], ["NE", false], ["N", false], ["NE", true], ["E", true], ["SE", true]]
 const DEFAULT_PIXEL_SIZE := 0.034
 const INDEXED_SHADER := preload("res://assets/shaders/indexed_sprite.gdshader")
+const HOLO_SHADER := preload("res://assets/shaders/holo_sprite.gdshader")
 
 static var _meta_cache: Dictionary = {}
 
@@ -33,6 +34,8 @@ var speed_scale := 1.0
 var base_modulate := Color.WHITE
 var frame_index := 0
 var scale_base := 1.0
+var y_offset := 0.0  ## extra lift (e.g. sitting on a bench seat)
+var holo := false  ## giant additive hologram (Hologram node); set before entering the tree
 
 var _time := 0.0
 var _fw := 48
@@ -100,7 +103,9 @@ func _load_sheet() -> void:
 		if _look.is_empty():
 			_look = {"variant": sheet_name, "colors": CharacterLook.random_colors(RandomNumberGenerator.new(), "civilian")}
 		_mat = ShaderMaterial.new()
-		_mat.shader = INDEXED_SHADER
+		_mat.shader = HOLO_SHADER if holo else INDEXED_SHADER
+		if holo:
+			cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_mat.set_shader_parameter("sheet", texture)
 		_mat.set_shader_parameter("palette", CharacterLook.palette_texture(_look.get("colors", {})))
 		material_override = _mat
@@ -187,7 +192,7 @@ func _process(delta: float) -> void:
 	_squash = _squash.lerp(Vector2.ONE, 1.0 - exp(-14.0 * delta))
 	scale = Vector3(_squash.x, _squash.y, 1.0) * scale_base
 	if ground_align:
-		position.y = _base_y * _squash.y * scale_base
+		position.y = _base_y * _squash.y * scale_base + y_offset
 
 
 func _apply_frame() -> void:

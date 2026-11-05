@@ -21,6 +21,14 @@ var need := ""
 var attitude := 0      ## -100..100, how much they like the player (Interactions)
 var discount := 0.0    ## merchant price discount earned through interactions
 var loyal := false     ## won't report you any more
+var activity := ""     ## sit | phone | queue | dance | wave | cheer ("" = wander)
+var _act_target := Vector3.ZERO
+var _act_time := 0.0
+var _act_face := Vector3.ZERO
+var _act_spot: Node3D = null
+var _act_check := 0.0
+var _waved := false
+var _seated := false
 
 @onready var sprite: BillboardSprite = $Sprite
 @onready var witness: WitnessComponent = $Witness
@@ -77,6 +85,9 @@ func _ready() -> void:
 	_bubble.render_priority = 4
 	_bubble.visible = false
 	add_child(_bubble)
+	_act_check = _rng.randf_range(0.5, 6.0)
+	EventBus.story_event.connect(func(_k, _i): react_cheer())
+	EventBus.interaction_done.connect(func(_v, ok, _n): if ok and _rng.randf() < 0.4: react_cheer())
 	EventBus.enemy_killed.connect(func(_e, _i): _on_combat_nearby())
 	EventBus.subsystem_broken.connect(func(_e, _s, _f): _on_combat_nearby())
 	if role != "recruit":
@@ -99,7 +110,12 @@ func _physics_process(delta: float) -> void:
 	match state:
 		"idle":
 			if role != "merchant":
-				move = _wander()
+				move = _activity(delta) if activity != "" else _wander()
+				if activity == "" and story_id == "" and persona_id == "":
+					_act_check -= delta
+					if _act_check <= 0.0:
+						_act_check = _rng.randf_range(6.0, 14.0)
+						_pick_activity()
 		"flee":
 			var away := global_position - _flee_from
 			away.y = 0.0
@@ -114,14 +130,116 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if move.length() > 0.1:
 		sprite.set_facing(move)
+	elif activity != "" and _act_time > 0.0 and _act_face != Vector3.ZERO:
+		sprite.set_facing(_act_face)
 	elif _partner != null and is_instance_valid(_partner):
 		sprite.set_facing(_partner.global_position - global_position)
 	elif _player != null and global_position.distance_to(_player.global_position) < 3.5:
 		sprite.set_facing(_player.global_position - global_position)
 	if state == "flee":
 		sprite.play("run")
+	elif move.length() > 0.1:
+		sprite.play("walk")
+	elif state == "reporting" or _talking > 0.0:
+		sprite.play("talk")
+	elif activity != "" and _act_time > 0.0:
+		sprite.play(_activity_anim())
 	else:
-		sprite.play("walk" if move.length() > 0.1 else ("talk" if state == "reporting" or _talking > 0.0 else "idle"))
+		sprite.play("idle")
+
+
+# --- Daily life: benches, phones, food queues, dancing near holograms ----------------------
+
+func _pick_activity() -> void:
+	var roll := _rng.randf()
+	var spots := get_tree().get_nodes_in_group("life_spot")
+	var best: Node3D = null
+	var best_d := 14.0
+	for sp in spots:
+		var d: float = (sp as Node3D).global_position.distance_to(global_position)
+		if d < best_d and not sp.get_meta("taken", false) and _rng.randf() < 0.7:
+			best = sp
+			best_d = d
+	if best != null and roll < 0.65:
+		_act_spot = best
+		best.set_meta("taken", true)
+		activity = str(best.get_meta("kind", "sit"))
+		_act_target = best.global_position
+		_act_face = best.get_meta("face", Vector3.BACK)
+		_act_time = -1.0  # walking there first
+		return
+	if roll < 0.85:
+		activity = "phone"
+		_act_target = global_position
+		_act_face = Vector3(_rng.randf_range(-1, 1), 0, 1).normalized()
+		_act_time = _rng.randf_range(6.0, 16.0)
+
+
+func _activity(delta: float) -> Vector3:
+	if _act_time < 0.0:
+		var to := _act_target - global_position
+		to.y = 0.0
+		if to.length() > 0.35:
+			return to.normalized()
+		global_position.x = _act_target.x
+		global_position.z = _act_target.z
+		_act_time = _rng.randf_range(12.0, 35.0)
+		if activity == "sit":
+			# Shift the sprite back onto the bench seat (the body stays clear of its collider).
+			sprite.position += -_act_face * 0.42
+			sprite.y_offset = 0.2
+			_seated = true
+		return Vector3.ZERO
+	_act_time -= delta
+	if _act_time <= 0.0:
+		end_activity()
+	return Vector3.ZERO
+
+
+func _activity_anim() -> String:
+	match activity:
+		"sit":
+			return "sit"
+		"phone":
+			return "phone"
+		"dance":
+			return "dance"
+		"cheer":
+			return "cheer"
+		"wave":
+			return "wave"
+		"queue":
+			return "talk" if fmod(_act_time, 7.0) < 2.0 else "idle"
+	return "idle"
+
+
+func end_activity() -> void:
+	if _seated:
+		sprite.position -= -_act_face * 0.42
+		sprite.y_offset = 0.0
+		_seated = false
+	if _act_spot != null and is_instance_valid(_act_spot):
+		_act_spot.set_meta("taken", false)
+	_act_spot = null
+	activity = ""
+	_act_time = 0.0
+	_home = global_position
+	_wander_target = _home
+
+
+## Something good just happened nearby: the crowd cheers.
+func react_cheer() -> void:
+	if state != "idle" or _player == null or not is_instance_valid(_player):
+		return
+	if global_position.distance_to(_player.global_position) > 12.0 or attitude < -10:
+		return
+	if activity != "" and activity != "phone":
+		return
+	activity = "cheer"
+	_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1)
+	_act_time = _rng.randf_range(2.0, 3.5)
+	if _rng.randf() < 0.4:
+		say(["WOOO!", "Legend!", "Did you see that?!", "Finally, someone did something!", "Put it on Lumen!"][_rng.randi() % 5], 2.0)
 
 
 func _wander() -> Vector3:
@@ -396,6 +514,7 @@ func story_left(sid: String) -> void:
 
 
 func flee_from_player() -> void:
+	end_activity()
 	state = "flee"
 	_timer = 4.0
 	_flee_from = _player.global_position if _player != null and is_instance_valid(_player) else global_position
@@ -418,6 +537,17 @@ func _life(delta: float) -> void:
 	if _player == null or not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
 	_bark_timer -= delta
+	if _player != null and is_instance_valid(_player) and name_label:
+		# Only nearby or important people show their name - keeps crowds readable.
+		var important: bool = story_id != "" or persona_id != "" or role != "civilian" or state == "reporting"
+		name_label.visible = important or global_position.distance_squared_to(_player.global_position) < 30.0
+	if not _waved and _player != null and state == "idle" and attitude >= 20 and activity in ["", "phone"] \
+			and global_position.distance_to(_player.global_position) < 5.0:
+		_waved = true
+		activity = "wave"
+		_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1)
+		_act_time = 2.2
+		say(["Hey! It's you!", "Looking good, friend.", "Stay safe out there!", "Thanks for before!"][_rng.randi() % 4], 2.2)
 	if _bark_timer > 0.0 or state != "idle" or _player == null:
 		return
 	_bark_timer = _rng.randf_range(9.0, 22.0)
@@ -441,10 +571,43 @@ func _life(delta: float) -> void:
 		pool = b.get("crisis:" + str(Game.current_planet.get("crisis", "")), [])
 	elif Game.current_planet.is_empty() and _rng.randf() < 0.3:
 		pool = b.get("station", [])
+	else:
+		pool = _reactive_barks(b)
 	if pool.is_empty():
 		pool = b.get(role, b.get("civilian", []))
 	if not pool.is_empty():
-		say(pool[_rng.randi() % pool.size()])
+		say(str(pool[_rng.randi() % pool.size()]).replace("{name}", Game.player_name))
+
+
+## Lines about YOU and this place: fame, bounty, class, age, the planet's story outcome, the biome.
+func _reactive_barks(b: Dictionary) -> Array:
+	var options := []
+	if int(Game.flags.get("fame", 0)) >= 15:
+		options.append("famous")
+	if Factions.total_bounty() >= 300:
+		options.append("wanted")
+	var w := Origin.wealth()
+	if w >= 4:
+		options.append("rich_player")
+	elif w <= 0:
+		options.append("poor_player")
+	if Game.tags.get("age", "") in ["elder", "ancient"]:
+		options.append("old_player")
+	elif Game.tags.get("age", "") == "teen":
+		options.append("young_player")
+	if Game.current_planet.get("liberated", false):
+		options.append("liberated")
+	match str(Game.current_planet.get("crisis_state", "")):
+		"resolved":
+			options.append("story_good")
+		"worse":
+			options.append("story_bad")
+	var env := str(Game.current_planet.get("environment", ""))
+	if env != "":
+		options.append("biome:" + env)
+	if options.is_empty() or _rng.randf() < 0.35:
+		return []
+	return b.get(options[_rng.randi() % options.size()], [])
 
 
 func hear_partner() -> void:
@@ -472,6 +635,7 @@ func _on_combat_nearby() -> void:
 		var lines: Array = barks().get("combat", [])
 		if not lines.is_empty():
 			say(lines[_rng.randi() % lines.size()], 2.0)
+		end_activity()
 		state = "flee"
 		_timer = 2.5
 		_flee_from = _player.global_position

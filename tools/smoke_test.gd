@@ -223,6 +223,17 @@ func _new_life() -> void:
 		var ch := (e.get("choices", []) as Array).filter(func(c): return root.get_node("Saga").choice_ok(c))
 		if not ch.is_empty():
 			stories._on_street_choice(str(ch[_arng.randi() % ch.size()].id), null, str(e.id))
+	# Walk into every venue and try everything this character is allowed to do.
+	var venues: Dictionary = root.get_node("DataDB").venues.get("venues", {})
+	var tried := 0
+	for vid in venues:
+		interactions._venue_ctx = {"id": vid, "sign": "TEST", "faction": ""}
+		for o in venues[vid].get("options", []):
+			if root.get_node("Saga").choice_ok(o):
+				interactions._venue_ctx = {"id": vid, "sign": "TEST", "faction": ""}
+				interactions._on_venue_choice(str(o.id))
+				tried += 1
+	print("    venue options tried: %d   fame %d  followers %d" % [tried, int(game.flags.get("fame", 0)), int(game.flags.get("followers", 0))])
 	var early: Dictionary = root.get_node("Saga").early_ending_available()
 	if not early.is_empty():
 		print("    early ending available: ", early.get("text", ""))

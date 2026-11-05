@@ -8,7 +8,19 @@
 		"Three jobs and I still can't afford silence.",
 		"Heard the Odd Duck is back in port. Smells like it.",
 		"My kid wants to be a shareholder when she grows up.",
-		"Paragon fined me for loitering in my own shadow."
+		"Paragon fined me for loitering in my own shadow.",
+		"Third shift today. The paste tastes like Tuesday.",
+		"My landlord charges for the echo. I whisper now.",
+		"Saw a real bird once. Lumen said it was a drone.",
+		"If you squint, the smog looks like a sunset. I squint a lot.",
+		"My kid wants to be a billboard when they grow up.",
+		"They raised the price of standing still.",
+		"Whoever invented the jingle, I hope their air runs out.",
+		"Ten more years and I own my own lungs.",
+		"Rain's free. For now. Drink up.",
+		"Heard the Consortium patented Mondays.",
+		"Don't make eye contact with the drones. They upsell.",
+		"I miss the old ads. They only lied a little."
 	],
 	"merchant": [
 		"Fresh medkits! Barely expired!",
@@ -39,16 +51,104 @@
 		"You hear about the debt strike?",
 		"Lumen said it's sunny. It's raining. Lumen's never wrong.",
 		"My cousin got repossessed last week.",
-		"Wanna split an air canister?"
+		"Wanna split an air canister?",
+		"Did you pay your air this week? -- Define 'pay'.",
+		"Paste or noodles? -- Noodles are paste with ambition.",
+		"I got promoted! -- To what? -- Unpaid senior intern.",
+		"You hear about the new tax? -- Which one? -- Exactly."
 	],
 	"station": [
 		"This station's been dead since the repo drones moved in.",
 		"Cryo-bay's full of collateral. Some of them still snore.",
 		"Halcyon's drones are scanning everything. Even the rats."
 	],
-	"crisis:air_bubble": ["Breathing futures are up again. I'm shorting my lungs."],
-	"crisis:debt_strike": ["We're not paying! They can't repossess ALL of us. ...Can they?"],
-	"crisis:paste_recall": ["They found a tooth in Batch 88. Not a human tooth. Not an animal tooth."],
-	"crisis:ad_overload": ["Even my dreams have unskippable ads now."],
-	"crisis:compliance_week": ["Report a neighbour, win a toaster! I already reported myself twice."]
+	"crisis:air_bubble": [
+		"Breathing futures are up again. I'm shorting my lungs."
+	],
+	"crisis:debt_strike": [
+		"We're not paying! They can't repossess ALL of us. ...Can they?"
+	],
+	"crisis:paste_recall": [
+		"They found a tooth in Batch 88. Not a human tooth. Not an animal tooth."
+	],
+	"crisis:ad_overload": [
+		"Even my dreams have unskippable ads now."
+	],
+	"crisis:compliance_week": [
+		"Report a neighbour, win a toaster! I already reported myself twice."
+	],
+	"famous": [
+		"That's {name}! From the feeds!",
+		"Can I get a selfie? I'll pay. Three credits?",
+		"My cousin's a big fan. Also a big Paragon informant.",
+		"You look shorter in real life.",
+		"Sign my air canister!",
+		"Is it true what Lumen says about you?"
+	],
+	"wanted": [
+		"That's the face from the posters...",
+		"Don't look. DON'T LOOK. Okay, look a little.",
+		"There's a reward for you, you know. A big one.",
+		"Paragon's been asking about you all week.",
+		"I didn't see you. I don't see anybody. I'm blind on Thursdays."
+	],
+	"rich_player": [
+		"Nice coat. Real fabric? Must be nice.",
+		"Rich people don't come down here unless they're buying the street.",
+		"Smells like money. Old money.",
+		"Spare a credit, your highness?"
+	],
+	"poor_player": [
+		"You look like you slept under the ad-bridge too.",
+		"Hang in there. Nobody else will.",
+		"Need a tip? The noodle stand gives leftovers after midnight."
+	],
+	"old_player": [
+		"Respect, grandparent. You survived this long.",
+		"My nan says air used to be free. She's a liar, right? Right?"
+	],
+	"young_player": [
+		"Shouldn't you be in a learning-subscription?",
+		"Kids these days. Already in debt. Respect."
+	],
+	"liberated": [
+		"No owners here anymore. Just us. It's chaos. It's wonderful.",
+		"We vote on things now. Mostly about noise. But we VOTE.",
+		"Paragon left. The air smells different. Better? Different."
+	],
+	"story_good": [
+		"Things got better around here. Someone actually helped.",
+		"Did you hear? Someone stood up for us.",
+		"I don't know who fixed it, but I'd buy them a drink."
+	],
+	"story_bad": [
+		"Things got worse. Somebody sold us out.",
+		"Ever since that 'deal', nothing's been right here.",
+		"If I find who broke the strike..."
+	],
+	"biome:neon_sprawl": [
+		"The sky is ads all the way up.",
+		"Watch out for low-flying cars. They don't stop for pedestrians. Or physics.",
+		"Rain again. It's always raining here. They bill by the drop."
+	],
+	"biome:toxic_swamp": [
+		"Don't drink the water. Don't touch the water. Don't LOOK at the water.",
+		"The mushrooms are singing again.",
+		"My boots dissolved last week. Good boots."
+	],
+	"biome:ad_desert": [
+		"That billboard's been playing the same jingle for a hundred years.",
+		"It's not snow. It's shredded plastic. Breathe through your scarf.",
+		"Cold enough to freeze your debt. Almost."
+	],
+	"biome:rust_canyon": [
+		"Seventy percent of the planet's gone. The other thirty is on layaway.",
+		"Hear that rumble? That's either the mine or the planet giving up.",
+		"Rust in your teeth, rust in your lungs. Home."
+	],
+	"biome:crystal_moon": [
+		"The crystals hum at night. Halcyon says it's 'asset noise'.",
+		"Don't touch the glowing ones. They're collateral.",
+		"Pretty, isn't it? Repossessed, but pretty."
+	]
 }

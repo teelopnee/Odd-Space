@@ -283,6 +283,59 @@ func _on_player_died() -> void:
 		hud.show_death_screen()
 
 
+## Splashes where drops hit the ground, plus distant lightning that flashes the whole scene.
+func _rain_extras() -> void:
+	var sp := CPUParticles3D.new()
+	sp.local_coords = false
+	sp.amount = 260
+	sp.lifetime = 0.28
+	sp.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	sp.emission_box_extents = Vector3(14, 0.02, 10)
+	sp.position = Vector3(0, 0.04, 0)
+	sp.direction = Vector3.UP
+	sp.spread = 35.0
+	sp.gravity = Vector3(0, -14, 0)
+	sp.initial_velocity_min = 1.2
+	sp.initial_velocity_max = 2.4
+	var q := QuadMesh.new()
+	q.size = Vector2(0.05, 0.05)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	m.billboard_keep_scale = true
+	m.albedo_color = Color(0.75, 0.85, 1.0, 0.55)
+	q.material = m
+	sp.mesh = q
+	camera_rig.add_child(sp)
+	var t := Timer.new()
+	t.wait_time = rng.randf_range(6.0, 14.0)
+	t.autostart = true
+	t.timeout.connect(_lightning.bind(t))
+	add_child(t)
+
+
+func _lightning(t: Timer) -> void:
+	t.wait_time = rng.randf_range(8.0, 22.0)
+	if not is_instance_valid(sun):
+		return
+	var base_sun := sun.light_energy
+	var base_amb := environment.ambient_light_energy
+	var tw := create_tween()
+	for i in rng.randi_range(1, 3):
+		tw.tween_callback(func():
+			sun.light_energy = base_sun + 3.5
+			environment.ambient_light_energy = base_amb + 1.4)
+		tw.tween_interval(0.06)
+		tw.tween_callback(func():
+			sun.light_energy = base_sun
+			environment.ambient_light_energy = base_amb)
+		tw.tween_interval(rng.randf_range(0.05, 0.16))
+	tw.tween_interval(rng.randf_range(0.6, 1.6))
+	tw.tween_callback(func(): Audio.play_sfx("thunder", 0.15, -6.0))
+
+
 ## Weather particles ride along with the camera so they always fill the view.
 func _build_weather(kind: String) -> void:
 	if kind == "" or kind == "dust":
@@ -312,6 +365,7 @@ func _build_weather(kind: String) -> void:
 			q.size = Vector2(0.03, 0.6)
 			m.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
 			m.albedo_color = Color(0.6, 0.75, 1.0, 0.45)
+			_rain_extras()
 		"snow":
 			p.amount = 360
 			p.lifetime = 5.0

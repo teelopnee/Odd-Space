@@ -6,7 +6,10 @@ extends Node3D
 ##   "flyby"  : a distant ship crossing the space backdrop behind station windows
 ##   "car"    : sky traffic - hovercars streaming over the rooftops in lanes
 
-@export_enum("bot", "drone", "flyby", "car") var kind := "bot"
+@export_enum("bot", "drone", "flyby", "car", "streetcar") var kind := "bot"
+var lane_from := Vector3.ZERO
+var lane_to := Vector3.ZERO
+var _stopped := 0.0
 var bounds := Rect2(0, 0, 40, 40)
 var seed_value := 0
 
@@ -31,10 +34,10 @@ func _ready() -> void:
 			_build_drone()
 		"flyby":
 			_build_flyby()
-		"car":
+		"car", "streetcar":
 			_build_car()
 	_pick_target()
-	if kind == "car":
+	if kind == "car" or kind == "streetcar":
 		position = position.lerp(_target, _rng.randf())
 	elif kind != "flyby":
 		position = _target
@@ -163,6 +166,18 @@ func _build_car() -> void:
 	_speed = _rng.randf_range(6.0, 11.0)
 
 
+func _blocked(to: Vector3) -> bool:
+	var dir := to.normalized()
+	for g in ["player", "npc"]:
+		for n in get_tree().get_nodes_in_group(g):
+			var rel: Vector3 = (n as Node3D).global_position - global_position
+			rel.y = 0.0
+			var ahead := rel.dot(dir)
+			if ahead > 0.0 and ahead < 3.6 and (rel - dir * ahead).length() < 1.1:
+				return true
+	return false
+
+
 func _box(size: Vector3) -> BoxMesh:
 	var b := BoxMesh.new()
 	b.size = size
@@ -180,10 +195,17 @@ func _pick_target() -> void:
 			position = Vector3(bounds.position.x - 20.0 if left else bounds.end.x + 20.0, _rng.randf_range(1.5, 4.5), bounds.position.y)
 			_target = Vector3(bounds.end.x + 20.0 if left else bounds.position.x - 20.0, position.y + _rng.randf_range(-1, 1), bounds.position.y)
 			scale = Vector3(-1 if not left else 1, 1, 1) * _rng.randf_range(0.6, 1.2)
+		"streetcar":
+			position = lane_from + Vector3(0, 0.45, 0)
+			_target = lane_to + Vector3(0, 0.45, 0)
+			var d := _target - position
+			rotation.y = atan2(-d.z, d.x)
+			_speed = _rng.randf_range(4.0, 7.0)
 		"car":
 			var left := _rng.randf() < 0.5
 			var lane_z := _rng.randf_range(bounds.position.y - 14.0, bounds.end.y - 4.0)
-			var lane_y := [7.5, 9.5, 11.5, 13.5][_rng.randi() % 4] as float
+			# Low enough to whoosh through the frame, high enough to clear the street.
+			var lane_y := [4.8, 5.8, 6.8, 9.0][_rng.randi() % 4] as float
 			position = Vector3(bounds.position.x - 25.0 if left else bounds.end.x + 25.0, lane_y, lane_z)
 			_target = Vector3(bounds.end.x + 25.0 if left else bounds.position.x - 25.0, lane_y, lane_z)
 			rotation.y = 0.0 if left else PI
@@ -197,6 +219,13 @@ func _process(delta: float) -> void:
 		_wait -= delta
 		return
 	var to := _target - position
+	if kind == "streetcar" and _blocked(to):
+		# Someone's in the road: brake, flash the lights, wait.
+		_stopped += delta
+		if _blink:
+			_blink.visible = fmod(_t, 0.3) < 0.15
+		return
+	_stopped = 0.0
 	if kind == "bot":
 		to.y = 0.0
 	if to.length() < 0.3:

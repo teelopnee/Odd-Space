@@ -229,6 +229,40 @@ def mix(*parts):
     return out
 
 
+
+def build_extra():
+    """v0.5: one track per biome + thunder. Separate so older files stay byte-identical."""
+    os.makedirs(MUSIC_DIR, exist_ok=True)
+    def mel(scale, pattern, reps=2):
+        out = []
+        for rep in range(reps):
+            for (b, bt, idx, ln) in pattern:
+                out.append((b + rep * 4, bt, scale[idx % len(scale)] + (12 if rep and idx < 2 else 0), ln))
+        return out
+    pat = [(0, 0, 4, 1), (0, 1, 3, 0.5), (0, 1.5, 2, 1.5), (1, 0, 0, 2), (1, 2, 1, 2), (2, 0, 2, 1),
+           (2, 1, 3, 1), (2, 2, 4, 2), (3, 0, 5, 1.5), (3, 1.5, 4, 0.5), (3, 2, 2, 2)]
+    tracks = {
+        # E minor synthwave for the Sprawl: Em C G D
+        "neon_city": (108, [[52, 55, 59], [48, 52, 55], [55, 59, 62], [50, 54, 57]], [64, 67, 69, 71, 74, 76], True, False),
+        # Swamp: slow C minor with a sad lute: Cm Ab Eb Bb
+        "bog_hymn": (72, [[48, 51, 55], [44, 48, 51], [51, 55, 58], [46, 50, 53]], [60, 63, 65, 67, 70, 72], False, True),
+        # Desert of dead billboards: F# minor, sparse: F#m D A E
+        "glacier_static": (80, [[54, 57, 61], [50, 54, 57], [57, 61, 64], [52, 56, 59]], [66, 69, 71, 73, 76, 78], False, True),
+        # Canyon: driving G minor: Gm Eb F Dm
+        "rust_run": (120, [[55, 58, 62], [51, 55, 58], [53, 57, 60], [50, 53, 57]], [67, 70, 72, 74, 77, 79], True, False),
+        # Crystal moon: dreamy B minor: Bm G D A
+        "crystal_lull": (76, [[47, 50, 54], [43, 47, 50], [50, 54, 57], [45, 49, 52]], [71, 74, 76, 78, 81, 83], False, True),
+    }
+    for name, (bpm, chords, scale, drums, dark) in tracks.items():
+        write_wav(os.path.join(MUSIC_DIR, name + ".wav"), render_song(bpm, 8, chords, mel(scale, pat), drums=drums, dark=dark))
+        print("music", name)
+    thunder = mix(noise_burst(0.12, 7000, 25) * 0.9, noise_burst(3.2, 380, 1.1) * 1.0, sweep(70, 28, 2.8, "sine", 1.2) * 0.6)
+    thunder = np.asarray(thunder, dtype=np.float64)
+    thunder /= max(1e-6, np.max(np.abs(thunder)))
+    write_wav(os.path.join(SFX_DIR, "thunder.wav"), thunder * 0.8)
+    print("sfx thunder")
+
+
 def build_sfx():
     os.makedirs(SFX_DIR, exist_ok=True)
     sfx = {
@@ -306,4 +340,5 @@ if __name__ == "__main__":
     build_sfx()
     build_ambience()
     build_music()
+    build_extra()
     print("audio written")

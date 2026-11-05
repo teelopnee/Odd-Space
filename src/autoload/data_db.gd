@@ -18,6 +18,7 @@ var enemies: Dictionary = {}
 var items: Dictionary = {}
 var interactions: Dictionary = {}
 var stories: Dictionary = {}
+var venues: Dictionary = {}
 
 
 func _ready() -> void:
@@ -38,6 +39,7 @@ func reload() -> void:
 	items = _load("items.json")
 	interactions = _load("interactions.json")
 	stories = _load("stories.json")
+	venues = _load("venues.json")
 
 
 func faction_ids() -> Array:

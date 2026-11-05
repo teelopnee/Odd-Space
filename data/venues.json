@@ -1,0 +1,1153 @@
+{
+	"_doc": "Venues: every shop sign in the world is a place you can use (Interactions.open_venue). 'signs' maps the text on a building/stall sign to a venue id. Options use the shared requirement grammar (requires / requires_any, see data/interactions.json) plus cost, chance + chance_mods. Outcome keys: text, effects (Encounters DSL incl. mods = permanent stat source, heal_full), axes, fame, followers, rumor (count), save (true = rest + autosave), shop (item list), music (random track), once (per venue per planet).",
+	"signs": {
+		"NOODLES": "food",
+		"SYNTH-RAMEN": "food",
+		"DUMPLINGS": "food",
+		"PASTE HUT": "food",
+		"PASTE": "food",
+		"CHIPS": "food",
+		"CRYO-POPS": "food",
+		"BAR": "bar",
+		"KARAOKE": "karaoke",
+		"ARCADE": "arcade",
+		"CLINIC?": "clinic",
+		"PAWN": "pawn",
+		"CRYO-MOTEL": "motel",
+		"HOTEL": "motel",
+		"LOANS!": "loans",
+		"TATTOO": "tattoo",
+		"TAPES": "tapes",
+		"AIR 2GO": "air",
+		"REPAIR": "implants",
+		"IMPLANTS": "implants",
+		"FORTUNES": "fortune",
+		"OPEN 25/8": "corp_store"
+	},
+	"venues": {
+		"food": {
+			"name": "Street Kitchen",
+			"greet": [
+				"Steam, chilli and the smell of something that used to be a vegetable.",
+				"\"Two credits a bowl, three if you want it to stop moving.\"",
+				"A queue of night-shift workers slurps in silence under a flickering menu."
+			],
+			"options": [
+				{
+					"id": "eat",
+					"text": "Eat something hot (6 cr)",
+					"cost": 6,
+					"success": {
+						"text": "It's paste, but someone loved it into noodles. You feel human for a whole minute.",
+						"effects": {
+							"hp": 30
+						}
+					}
+				},
+				{
+					"id": "treat_queue",
+					"text": "Pay for everyone in the queue (40 cr)",
+					"cost": 40,
+					"success": {
+						"text": "A cheer goes up. Strangers slap your back. The cook winks and adds a fried egg to your bowl.",
+						"effects": {
+							"hp": 30
+						},
+						"axes": {
+							"mercy": 1.5
+						},
+						"followers": 1,
+						"fame": 1
+					}
+				},
+				{
+					"id": "ask_cook",
+					"text": "Ask the cook what people are saying",
+					"success": {
+						"text": "The cook leans over the steam.",
+						"rumor": 1
+					}
+				},
+				{
+					"id": "leftovers",
+					"text": "Ask for leftovers",
+					"requires": {
+						"max_wealth": 1
+					},
+					"chance": 0.7,
+					"chance_mods": {
+						"age:teen": 0.15,
+						"age:elder": 0.15,
+						"flag:charming": 0.1
+					},
+					"success": {
+						"text": "The cook pushes a chipped bowl across the counter. \"On the house. Don't tell the house.\"",
+						"effects": {
+							"hp": 15
+						}
+					},
+					"fail": {
+						"text": "\"Leftovers are a premium feature now.\""
+					}
+				},
+				{
+					"id": "cook_together",
+					"text": "Step behind the counter and cook",
+					"requires": {
+						"flag": "chef"
+					},
+					"once": true,
+					"success": {
+						"text": "You and the cook work the woks in a blur. By midnight the queue is around the block and someone's filming.",
+						"effects": {
+							"credits": 35,
+							"hp": 20
+						},
+						"fame": 2,
+						"followers": 1
+					}
+				},
+				{
+					"id": "buy_stall",
+					"text": "Buy the whole stall, just because (150 cr)",
+					"requires": {
+						"flag": "rich"
+					},
+					"cost": 150,
+					"once": true,
+					"success": {
+						"text": "You hand the cook the deed back immediately. They stare at it, then at you, then start crying into the broth.",
+						"axes": {
+							"mercy": 2,
+							"greed": -1
+						},
+						"followers": 2,
+						"fame": 2
+					}
+				}
+			]
+		},
+		"bar": {
+			"name": "Bar",
+			"greet": [
+				"Synthwave on a busted speaker. Somebody's crying into a glass of liquid air.",
+				"The bartender polishes a glass with a Lumen-branded rag. \"What'll it be? And don't say 'water', water's extra.\"",
+				"A dozen faces turn to look at you, then turn back to their drinks."
+			],
+			"options": [
+				{
+					"id": "drink",
+					"text": "Buy a drink and listen (10 cr)",
+					"cost": 10,
+					"success": {
+						"text": "The drink burns. The bar talks.",
+						"rumor": 1,
+						"effects": {
+							"hp": 5
+						}
+					}
+				},
+				{
+					"id": "round",
+					"text": "Buy a round for the whole bar (60 cr)",
+					"cost": 60,
+					"success": {
+						"text": "\"TO THE ONE WHO PAYS!\" The bar roars. Three people tell you secrets they'll regret by morning.",
+						"rumor": 2,
+						"fame": 2,
+						"followers": 1
+					}
+				},
+				{
+					"id": "arm_wrestle",
+					"text": "Arm-wrestle the house champion (bet 20)",
+					"cost": 20,
+					"chance": 0.4,
+					"chance_mods": {
+						"flag:bouncer": 0.3,
+						"flag:hothead": 0.15,
+						"tag:asteroid_miner": 0.2,
+						"age:elder": -0.15,
+						"age:teen": -0.1
+					},
+					"success": {
+						"text": "The champion's wrist hits the table with a crack. The bar goes wild. You collect.",
+						"effects": {
+							"credits": 50
+						},
+						"fame": 2
+					},
+					"fail": {
+						"text": "Your knuckles kiss the table. The champion buys you a consolation drink. It's water. It's extra.",
+						"effects": {
+							"hp": -5
+						}
+					}
+				},
+				{
+					"id": "brawl",
+					"text": "Start a bar fight",
+					"requires": {
+						"any_flag": [
+							"hothead",
+							"bouncer",
+							"ruthless"
+						]
+					},
+					"success": {
+						"text": "Chairs, glasses, a synth-keytar. When the dust settles you're standing and somebody's paying for the damages. Not you.",
+						"effects": {
+							"hp": -15,
+							"credits": 25
+						},
+						"fame": 1,
+						"record": "assault"
+					}
+				},
+				{
+					"id": "recruit",
+					"text": "Look for someone to join your crew (80 cr)",
+					"cost": 80,
+					"requires": {
+						"not_crew_full": true
+					},
+					"success": {
+						"text": "A quiet figure at the end of the bar nods. \"Heard you have a ship. I've got nothing. Sounds like a match.\"",
+						"effects": {
+							"recruit": "random"
+						}
+					}
+				},
+				{
+					"id": "underage",
+					"text": "Try to order something strong",
+					"requires": {
+						"age": [
+							"teen"
+						]
+					},
+					"chance": 0.3,
+					"success": {
+						"text": "The bartender is too tired to card you. You immediately regret everything.",
+						"effects": {
+							"hp": -5
+						},
+						"rumor": 1
+					},
+					"fail": {
+						"text": "\"Nice try, kid. Here's a juice. It's 6 credits.\"",
+						"effects": {
+							"credits": -6
+						}
+					}
+				},
+				{
+					"id": "war_stories",
+					"text": "Tell war stories for free drinks",
+					"requires": {
+						"age": [
+							"elder",
+							"ancient"
+						]
+					},
+					"chance": 0.75,
+					"success": {
+						"text": "You tell the one about the free-air riots of your youth. The bar listens in silence, then buys you drinks until closing.",
+						"effects": {
+							"hp": 10
+						},
+						"followers": 1,
+						"rumor": 1
+					},
+					"fail": {
+						"text": "Halfway through the story, the bar starts a karaoke song over you. Kids."
+					}
+				},
+				{
+					"id": "heir_tab",
+					"text": "\"Put it on the family account.\"",
+					"requires": {
+						"flag": "heir"
+					},
+					"once": true,
+					"success": {
+						"text": "The bartender sees the crest and quietly opens the top shelf. The whole bar drinks on your family's money tonight. Your family will notice.",
+						"fame": 3,
+						"followers": 1,
+						"axes": {
+							"greed": -1
+						}
+					}
+				}
+			]
+		},
+		"karaoke": {
+			"name": "Karaoke Den",
+			"greet": [
+				"Neon booths, sticky microphones, a pirated song library from three centuries.",
+				"Someone is murdering a power ballad. The crowd loves it."
+			],
+			"options": [
+				{
+					"id": "sing",
+					"text": "Sing a song (5 cr)",
+					"cost": 5,
+					"chance": 0.45,
+					"chance_mods": {
+						"flag:famous_jingle": 0.4,
+						"flag:influencer": 0.2,
+						"flag:charming": 0.15,
+						"flag:preacher": 0.15,
+						"flag:coward": -0.2
+					},
+					"success": {
+						"text": "You hit the high note. The room goes silent, then explodes. Somebody uploads it.",
+						"fame": 3
+					},
+					"fail": {
+						"text": "You miss the high note by a whole octave. The crowd films it anyway. You're a meme now. Not the good kind.",
+						"fame": 1
+					}
+				},
+				{
+					"id": "jingle",
+					"text": "Sing the OxyGenix breathing jingle - ironically",
+					"requires": {
+						"any_flag": [
+							"cynic",
+							"joker",
+							"famous_jingle"
+						]
+					},
+					"success": {
+						"text": "The whole den sings along, mockingly, then sincerely, then mockingly again. OxyGenix's lawyers are already drafting.",
+						"fame": 3,
+						"effects": {
+							"rep": {
+								"oxy": -3
+							}
+						},
+						"followers": 1
+					}
+				},
+				{
+					"id": "duet",
+					"text": "Duet with a stranger",
+					"success": {
+						"text": "Your stranger can't sing either. It's perfect. They slip you a note with a rumour on it.",
+						"rumor": 1,
+						"effects": {
+							"hp": 10
+						}
+					}
+				}
+			]
+		},
+		"arcade": {
+			"name": "Arcade",
+			"greet": [
+				"Cabinets from four centuries blink in the dark. 'DEBT INVADERS', 'PASTE-MAN', 'ESCAPE THE SPRAWL'.",
+				"Kids, retirees and one very sweaty executive, all chasing high scores."
+			],
+			"options": [
+				{
+					"id": "play",
+					"text": "Play 'Debt Invaders' for credits (5 cr)",
+					"cost": 5,
+					"chance": 0.4,
+					"chance_mods": {
+						"age:teen": 0.2,
+						"flag:gambler": 0.1,
+						"flag:hacker": 0.1
+					},
+					"success": {
+						"text": "You clear wave 40. The machine spits out a ticket worth actual credits.",
+						"effects": {
+							"credits": 30
+						}
+					},
+					"fail": {
+						"text": "Game over on wave 3. The machine laughs. It has a loyalty programme."
+					}
+				},
+				{
+					"id": "rig",
+					"text": "Rig the jackpot machine",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"ai_ghost",
+							"synthetic"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "Two wires, one exploit. The jackpot lights up like a Lumen premiere.",
+						"effects": {
+							"credits": 90
+						},
+						"axes": {
+							"greed": 1
+						},
+						"record": "theft"
+					}
+				},
+				{
+					"id": "high_score",
+					"text": "Go for the all-time high score",
+					"requires": {
+						"age": [
+							"teen",
+							"young"
+						]
+					},
+					"chance": 0.35,
+					"once": true,
+					"success": {
+						"text": "NEW HIGH SCORE. Your initials replace a Paragon captain's. The arcade chants your name.",
+						"fame": 4
+					},
+					"fail": {
+						"text": "So close. The leaderboard keeps its Paragon captain."
+					}
+				}
+			]
+		},
+		"clinic": {
+			"name": "Back-Alley Clinic",
+			"greet": [
+				"A cracked green cross. Inside: a medic with tired eyes and very clean hands.",
+				"\"Unlicensed means cheap, not bad. Usually.\""
+			],
+			"options": [
+				{
+					"id": "treat",
+					"text": "Full treatment, no questions (20 cr)",
+					"cost": 20,
+					"success": {
+						"text": "Stitches, stims and a lollipop. You walk out whole.",
+						"effects": {
+							"heal_full": true
+						}
+					}
+				},
+				{
+					"id": "medkit",
+					"text": "Buy a medkit (28 cr)",
+					"cost": 28,
+					"success": {
+						"text": "\"Don't tell Halcyon where you got it.\"",
+						"effects": {
+							"items": {
+								"medkit": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "volunteer",
+					"text": "Volunteer a shift",
+					"requires": {
+						"any_flag": [
+							"medic",
+							"chemist",
+							"idealist"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "Eight hours, forty patients, no invoices. The medic offers you a job. You offer them your number.",
+						"effects": {
+							"credits": 20,
+							"items": {
+								"medkit": 1
+							}
+						},
+						"axes": {
+							"mercy": 2
+						},
+						"followers": 2
+					}
+				},
+				{
+					"id": "cure",
+					"text": "Ask about the cure for your condition",
+					"requires_any": [
+						{
+							"goal": "cure"
+						},
+						{
+							"flag": "dying"
+						}
+					],
+					"once": true,
+					"success": {
+						"text": "The medic lowers their voice. \"The real formula exists. {antagonist}'s people keep it under lock. Here - painkillers, for the road.\"",
+						"effects": {
+							"items": {
+								"painkillers": 2
+							}
+						},
+						"rumor": 1
+					}
+				},
+				{
+					"id": "repair",
+					"text": "Get your chassis serviced",
+					"requires": {
+						"flag": "synthetic"
+					},
+					"success": {
+						"text": "The medic shrugs and fixes you anyway. \"Bodies are bodies.\"",
+						"effects": {
+							"heal_full": true
+						}
+					}
+				}
+			]
+		},
+		"pawn": {
+			"name": "Pawn Shop",
+			"greet": [
+				"Every object in here has a story and a price tag. The stories are free.",
+				"\"I buy anything. I sell anything. I don't remember anything.\""
+			],
+			"options": [
+				{
+					"id": "sell_scrap",
+					"text": "Sell all your scrap",
+					"requires": {
+						"item": "scrap"
+					},
+					"success": {
+						"text": "The pawnbroker weighs your junk with the reverence of a jeweller.",
+						"effects": {
+							"sell_all": "scrap"
+						}
+					}
+				},
+				{
+					"id": "sell_watch",
+					"text": "Pawn the heirloom watch (300 cr)",
+					"requires": {
+						"item": "heirloom_watch"
+					},
+					"success": {
+						"text": "\"Pre-Consortium gold. Haven't seen one of these in years.\" Your ancestors sigh, collectively.",
+						"effects": {
+							"items": {
+								"heirloom_watch": -1
+							},
+							"credits": 300
+						}
+					}
+				},
+				{
+					"id": "sell_coin",
+					"text": "Sell the pre-war coin (150 cr)",
+					"requires": {
+						"item": "pre_war_coin"
+					},
+					"success": {
+						"text": "\"Is this... a real pre-war coin?\" It is. You are one too.",
+						"effects": {
+							"items": {
+								"pre_war_coin": -1
+							},
+							"credits": 150
+						}
+					}
+				},
+				{
+					"id": "sell_shard",
+					"text": "Sell a ledger shard (80 cr)",
+					"requires": {
+						"item": "data_shard"
+					},
+					"success": {
+						"text": "\"I don't want to know what's on it.\" They want to know what's on it.",
+						"effects": {
+							"items": {
+								"data_shard": -1
+							},
+							"credits": 80
+						}
+					}
+				},
+				{
+					"id": "browse",
+					"text": "Browse the shelves",
+					"success": {
+						"text": "Lockpicks, fake IDs, a cyberdeck with someone's initials on it.",
+						"shop": [
+							"lockpick",
+							"fake_id",
+							"cyberdeck",
+							"loaded_dice",
+							"bribe_voucher"
+						]
+					}
+				},
+				{
+					"id": "lift",
+					"text": "Pocket something while they're not looking",
+					"chance": 0.4,
+					"chance_mods": {
+						"flag:klepto": 0.35,
+						"item:lockpick": 0.1
+					},
+					"once": true,
+					"success": {
+						"text": "A bribe voucher finds its way into your sleeve.",
+						"effects": {
+							"items": {
+								"bribe_voucher": 1
+							}
+						},
+						"record": "theft"
+					},
+					"fail": {
+						"text": "\"I've been robbed by better. Out.\"",
+						"record": "theft"
+					}
+				}
+			]
+		},
+		"motel": {
+			"name": "Cryo-Motel",
+			"greet": [
+				"Coffin-sized sleep pods stacked eight high. The sign promises 'up to four hours of unbilled dreams'.",
+				"\"Pod or suite? The suite is a pod with a window. The window is a screen.\""
+			],
+			"options": [
+				{
+					"id": "rest",
+					"text": "Rent a pod and sleep (15 cr)",
+					"cost": 15,
+					"success": {
+						"text": "You sleep like the dead. Fully healed. Progress saved.",
+						"effects": {
+							"heal_full": true
+						},
+						"save": true
+					}
+				},
+				{
+					"id": "suite",
+					"text": "Book the 'suite' (60 cr)",
+					"cost": 60,
+					"success": {
+						"text": "The screen-window shows a forest. You dream of rain that nobody bills. You wake up stronger.",
+						"effects": {
+							"heal_full": true,
+							"mods": {
+								"add": {
+									"max_hp": 2
+								}
+							}
+						},
+						"save": true
+					}
+				},
+				{
+					"id": "old_room",
+					"text": "Ask for the room you had two hundred years ago",
+					"requires": {
+						"tag": [
+							"ancient"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "The receptionist checks. Your old room still exists - as storage. Inside, under dust: your name scratched into the wall, and a coin.",
+						"effects": {
+							"items": {
+								"pre_war_coin": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "sneak",
+					"text": "Sneak into an empty pod",
+					"requires": {
+						"max_wealth": 1
+					},
+					"chance": 0.55,
+					"chance_mods": {
+						"flag:invisible": 0.2,
+						"flag:ghost": 0.2,
+						"age:teen": 0.1
+					},
+					"success": {
+						"text": "Four free hours in a stranger's pod. Best sleep of your life.",
+						"effects": {
+							"heal_full": true
+						},
+						"save": true
+					},
+					"fail": {
+						"text": "The pod's alarm screams 'UNPAID OCCUPANT'. You leave with dignity and no sleep.",
+						"record": "trespass"
+					}
+				}
+			]
+		},
+		"loans": {
+			"name": "Halcyon Loans",
+			"greet": [
+				"A smiling hologram: \"Debt is just a future you haven't paid for yet!\"",
+				"Pastel walls, soft music, a single exit that locks from outside."
+			],
+			"options": [
+				{
+					"id": "loan",
+					"text": "Take a 200 cr loan (+300 air debt)",
+					"success": {
+						"text": "The credits arrive instantly. The terms arrive later. In installments.",
+						"effects": {
+							"credits": 200,
+							"air_debt": 300,
+							"rep": {
+								"halcyon": 2
+							}
+						},
+						"axes": {
+							"greed": 0.5
+						}
+					}
+				},
+				{
+					"id": "pay",
+					"text": "Pay 100 cr off your debt",
+					"cost": 100,
+					"requires": {
+						"min_air_debt": 1
+					},
+					"success": {
+						"text": "The hologram claps. Somewhere, an interest rate weeps.",
+						"effects": {
+							"air_debt": -100,
+							"rep": {
+								"halcyon": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "clause",
+					"text": "Find the illegal clause in your contract",
+					"requires": {
+						"any_flag": [
+							"lawyer",
+							"knows_ledgers"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "Page 212, footnote 9: the interest formula divides by zero. Your debt shrinks by legal necessity.",
+						"effects": {
+							"air_debt": -150
+						}
+					}
+				},
+				{
+					"id": "family",
+					"text": "\"I'm family. Waive it.\"",
+					"requires": {
+						"tag": [
+							"heir_halcyon"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "The hologram glitches, bows, and deletes your debt. It will be mentioned at Thanksgiving.",
+						"effects": {
+							"air_debt": -999
+						}
+					}
+				},
+				{
+					"id": "rob",
+					"text": "Rob the loan office",
+					"requires": {
+						"any_flag": [
+							"ruthless",
+							"convict",
+							"hothead"
+						]
+					},
+					"chance": 0.5,
+					"once": true,
+					"success": {
+						"text": "You walk out with a bag of credits and the loan files of half the block. You burn the files on the street. People cheer.",
+						"effects": {
+							"credits": 180
+						},
+						"axes": {
+							"order": -2,
+							"mercy": 1
+						},
+						"followers": 2,
+						"record": "theft"
+					},
+					"fail": {
+						"text": "The exit locks from outside, as advertised. Security takes its time.",
+						"effects": {
+							"hp": -20
+						},
+						"record": "theft"
+					}
+				}
+			]
+		},
+		"tattoo": {
+			"name": "Tattoo Parlour",
+			"greet": [
+				"Ink, needles and neon. The artist has a tattoo of their own tattoo.",
+				"\"Pick a design. Or let me pick. I'm better at it.\""
+			],
+			"options": [
+				{
+					"id": "koi",
+					"text": "Neon koi down your arm (40 cr) - +5% speed",
+					"cost": 40,
+					"once": true,
+					"success": {
+						"text": "The koi swims when you move. You swear you're faster.",
+						"effects": {
+							"mods": {
+								"mul": {
+									"move_speed": 0.05
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "eye",
+					"text": "A third eye on your neck (40 cr) - +4% accuracy",
+					"cost": 40,
+					"once": true,
+					"success": {
+						"text": "It watches your back. Metaphorically. Mostly.",
+						"effects": {
+							"mods": {
+								"add": {
+									"accuracy": 0.04
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "fist",
+					"text": "A union fist (25 cr)",
+					"cost": 25,
+					"once": true,
+					"success": {
+						"text": "Workers nod at you in the street now.",
+						"followers": 1,
+						"effects": {
+							"mods": {
+								"mul": {
+									"crew_approval_mult": 0.05
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "cover_barcode",
+					"text": "Cover up your owner's barcode (60 cr)",
+					"cost": 60,
+					"requires": {
+						"flag": "owned"
+					},
+					"once": true,
+					"success": {
+						"text": "The barcode becomes a blooming flower. Scanners read it as 'NOT FOR SALE'.",
+						"effects": {
+							"items": {
+								"barcode_tattoo": -1
+							},
+							"mods": {
+								"mul": {
+									"witness_time_mult": 0.08
+								}
+							}
+						},
+						"axes": {
+							"mercy": 0.5
+						}
+					}
+				}
+			]
+		},
+		"tapes": {
+			"name": "Tape Shop",
+			"greet": [
+				"Walls of cassettes. Real ones. The shopkeeper hasn't looked up in a decade.",
+				"\"No streaming. No ads. No refunds.\""
+			],
+			"options": [
+				{
+					"id": "mixtape",
+					"text": "Buy a random mixtape (10 cr)",
+					"cost": 10,
+					"success": {
+						"text": "You slot it into the ship's deck. Something old and beautiful fills the air.",
+						"music": true,
+						"effects": {
+							"hp": 5
+						}
+					}
+				},
+				{
+					"id": "own_hit",
+					"text": "Dig for your own hit in the bargain bin",
+					"requires": {
+						"flag": "famous_jingle"
+					},
+					"once": true,
+					"success": {
+						"text": "There it is. 1 credit. You buy every copy. The shopkeeper finally looks up.",
+						"fame": 2
+					}
+				},
+				{
+					"id": "sell_keytar",
+					"text": "Sell your old keytar (12 cr)",
+					"requires": {
+						"item": "synth_keytar"
+					},
+					"success": {
+						"text": "\"Vintage.\" The shopkeeper hangs it on the wall, between two legends.",
+						"effects": {
+							"items": {
+								"synth_keytar": -1
+							},
+							"credits": 12
+						}
+					}
+				}
+			]
+		},
+		"air": {
+			"name": "Air Kiosk",
+			"greet": [
+				"\"AIR 2GO - Now 3% Less Nitrogen!\"",
+				"A bored teenager guards tanks of air like they're gold. They basically are."
+			],
+			"options": [
+				{
+					"id": "canister",
+					"text": "Buy an air canister (25 cr)",
+					"cost": 25,
+					"success": {
+						"text": "Bottled at the source. The source is a vent.",
+						"effects": {
+							"items": {
+								"air_canister": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "expose",
+					"text": "Point out the blend is 90% nitrogen",
+					"requires": {
+						"flag": "chemist"
+					},
+					"once": true,
+					"success": {
+						"text": "The teenager goes pale. \"Please don't tell anyone. Here - two on the house.\"",
+						"effects": {
+							"items": {
+								"air_canister": 2
+							}
+						}
+					}
+				},
+				{
+					"id": "free_breath",
+					"text": "Breathe deep from the sample tank",
+					"chance": 0.6,
+					"success": {
+						"text": "A free lungful. It tastes like a forest that's never existed.",
+						"effects": {
+							"hp": 8
+						}
+					},
+					"fail": {
+						"text": "\"SAMPLE FEE: 3 CREDITS,\" says the tank.",
+						"effects": {
+							"credits": -3
+						}
+					}
+				}
+			]
+		},
+		"implants": {
+			"name": "Implant Workshop",
+			"greet": [
+				"Robot arms twitch on hooks. A mechanic with mismatched eyes waves you in.",
+				"\"Upgrades, repairs, regrets. Pick two.\""
+			],
+			"options": [
+				{
+					"id": "reflex",
+					"text": "Reflex booster (120 cr) - faster dodge recovery",
+					"cost": 120,
+					"once": true,
+					"success": {
+						"text": "The world slows down a hair. You don't.",
+						"effects": {
+							"mods": {
+								"mul": {
+									"roll_cooldown": -0.1
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "optic",
+					"text": "Optic upgrade (100 cr) - +5% accuracy",
+					"cost": 100,
+					"once": true,
+					"success": {
+						"text": "Everything is sharper. Including the ads. Especially the ads.",
+						"effects": {
+							"mods": {
+								"add": {
+									"accuracy": 0.05
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "lungs",
+					"text": "Filter lungs (150 cr) - air costs 15% less",
+					"cost": 150,
+					"once": true,
+					"success": {
+						"text": "You breathe half as much and enjoy it twice as much.",
+						"effects": {
+							"mods": {
+								"mul": {
+									"air_cost_mult": -0.15
+								}
+							}
+						}
+					}
+				},
+				{
+					"id": "tuneup",
+					"text": "Full tune-up",
+					"requires": {
+						"flag": "synthetic"
+					},
+					"success": {
+						"text": "The mechanic whistles. \"Nice chassis. Who did your firmware?\" You did.",
+						"effects": {
+							"heal_full": true
+						}
+					}
+				}
+			]
+		},
+		"fortune": {
+			"name": "Fortune Teller",
+			"greet": [
+				"Incense, a cracked crystal ball and a card reader. The fortune teller accepts all major currencies and souls.",
+				"\"I see... a debt. I always see a debt.\""
+			],
+			"options": [
+				{
+					"id": "read",
+					"text": "Have your fortune read (5 cr)",
+					"cost": 5,
+					"success": {
+						"text": "The cards slap down: The Debtor, The Tower, The Duck.",
+						"fortune": true
+					}
+				},
+				{
+					"id": "weird",
+					"text": "Read THEIR fortune",
+					"requires": {
+						"any_flag": [
+							"ai_ghost",
+							"preacher",
+							"relic"
+						]
+					},
+					"once": true,
+					"success": {
+						"text": "You tell them something about their mother they never told anyone. They give you your money back and close early.",
+						"effects": {
+							"credits": 15
+						},
+						"fortune": true
+					}
+				}
+			]
+		},
+		"corp_store": {
+			"name": "Consortium Store",
+			"greet": [
+				"Bright, clean, scentless. A greeter-drone sings the store's name in four-part harmony.",
+				"\"Welcome, valued customer! Your loyalty tier has been noted. Silently. Forever.\""
+			],
+			"options": [
+				{
+					"id": "browse",
+					"text": "Browse the shelves",
+					"success": {
+						"text": "Everything is shiny and slightly overpriced.",
+						"shop": [
+							"medkit",
+							"air_canister",
+							"antihistamine",
+							"painkillers",
+							"paste_ration"
+						]
+					}
+				},
+				{
+					"id": "job",
+					"text": "Work a shift for them",
+					"once": true,
+					"success": {
+						"text": "Eight hours of smiling at customers. Your face hurts. Your wallet doesn't.",
+						"effects": {
+							"credits": 45
+						},
+						"axes": {
+							"order": 1
+						}
+					}
+				},
+				{
+					"id": "family_discount",
+					"text": "\"Family discount.\" (Take something)",
+					"requires": {
+						"flag": "heir"
+					},
+					"once": true,
+					"success": {
+						"text": "The greeter-drone scans your crest and plays a fanfare. You walk out with an armful.",
+						"effects": {
+							"items": {
+								"medkit": 2,
+								"air_canister": 2
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

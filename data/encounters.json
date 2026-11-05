@@ -1,5 +1,5 @@
 {
-	"_doc": "Space encounters rolled during warp. Choice keys: cost (credits, x bribe_mult when bribe=true), requires {flag|min_credits|has_item|crew_size_min}, chance (0..1) + chance_mods {'flag:liar': 0.2, 'perk:silver_tongue': 0.15}, then success/fail or result -> {text, effects}. Effects: credits, credits_pct, hp, rep{}, bounty{}, clear_bounty, items{}, record{verb,target_faction,public}, recruit (id|'random'), skill_points, flag{}, mishap, air_debt, ai (ShipAI line key). Text tokens: {bounty} {credits} {air_debt} {bribe}.",
+	"_doc": "Space encounters rolled during warp. Choice keys: cost (credits, x bribe_mult when bribe=true), requires {flag|min_credits|has_item|crew_size_min}, chance (0..1) + chance_mods {'flag:liar': 0.2, 'perk:silver_tongue': 0.15}, then success/fail or result -> {text, effects}. Effects: credits, credits_pct, hp, rep{}, bounty{}, clear_bounty, items{}, record{verb,target_faction,public}, recruit (id|'random'), skill_points, flag{}, mishap, air_debt, ai (ShipAI line key). Text tokens: {bounty} {credits} {air_debt} {bribe}. requires/choice requires also accept the shared requirement grammar (any_flag, tag, age, min_wealth, min_air_debt...; see data/interactions.json). Effects also: mods (permanent stat source), heal_full, sell_all.",
 	"chance_per_warp": 0.7,
 	"list": [
 		{
@@ -13,21 +13,60 @@
 					"id": "board",
 					"text": "Board and salvage",
 					"chance": 0.6,
-					"chance_mods": {"perk:loot_goblin": 0.1},
-					"success": {"text": "You find a stash of unclaimed severance packages and a working medkit. Nobody is left to claim them.", "effects": {"credits": 90, "items": {"medkit": 1, "scrap": 3}}},
-					"fail": {"text": "Something in the dark bills you for the visit. In blood. You leave with a scrap of hull and a new fear.", "effects": {"hp": -25, "items": {"scrap": 1}, "mishap": "spooked"}}
+					"chance_mods": {
+						"perk:loot_goblin": 0.1
+					},
+					"success": {
+						"text": "You find a stash of unclaimed severance packages and a working medkit. Nobody is left to claim them.",
+						"effects": {
+							"credits": 90,
+							"items": {
+								"medkit": 1,
+								"scrap": 3
+							}
+						}
+					},
+					"fail": {
+						"text": "Something in the dark bills you for the visit. In blood. You leave with a scrap of hull and a new fear.",
+						"effects": {
+							"hp": -25,
+							"items": {
+								"scrap": 1
+							},
+							"mishap": "spooked"
+						}
+					}
 				},
 				{
 					"id": "scan_cryo",
 					"text": "Scan for survivors in cryo",
 					"chance": 0.5,
-					"success": {"text": "One pod still hums. You thaw its occupant. They look at you, then at the Odd Duck, and decide you're the lesser evil.", "effects": {"recruit": "random", "record": {"verb": "mercy", "public": false}}},
-					"fail": {"text": "All pods read EMPTY - REPOSSESSED. You mark the wreck for the next fool.", "effects": {"items": {"scrap": 1}}}
+					"success": {
+						"text": "One pod still hums. You thaw its occupant. They look at you, then at the Odd Duck, and decide you're the lesser evil.",
+						"effects": {
+							"recruit": "random",
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					},
+					"fail": {
+						"text": "All pods read EMPTY - REPOSSESSED. You mark the wreck for the next fool.",
+						"effects": {
+							"items": {
+								"scrap": 1
+							}
+						}
+					}
 				},
 				{
 					"id": "leave",
 					"text": "Leave it alone",
-					"result": {"text": "QUACK plays a mournful kazoo solo as the ghost ship fades behind you.", "effects": {}}
+					"result": {
+						"text": "QUACK plays a mournful kazoo solo as the ghost ship fades behind you.",
+						"effects": {}
+					}
 				}
 			]
 		},
@@ -42,18 +81,52 @@
 					"id": "answer",
 					"text": "Answer the call",
 					"chance": 0.35,
-					"success": {"text": "It's real. A smuggler named Pip is stuck in a leaking shuttle. They're grateful. Suspiciously grateful.", "effects": {"recruit": "pip", "record": {"verb": "mercy", "public": false}}},
-					"fail": {"text": "It's a pirate ambush. They board, take a 'convenience fee', and leave you a one-star review.", "effects": {"credits_pct": -0.3, "hp": -15, "ai": "on_scammed"}}
+					"success": {
+						"text": "It's real. A smuggler named Pip is stuck in a leaking shuttle. They're grateful. Suspiciously grateful.",
+						"effects": {
+							"recruit": "pip",
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					},
+					"fail": {
+						"text": "It's a pirate ambush. They board, take a 'convenience fee', and leave you a one-star review.",
+						"effects": {
+							"credits_pct": -0.3,
+							"hp": -15,
+							"ai": "on_scammed"
+						}
+					}
 				},
 				{
 					"id": "ignore",
 					"text": "Ignore it",
-					"result": {"text": "The signal fades. You'll never know. Your crew will bring it up later, though.", "effects": {"record": {"verb": "desert", "public": false}}}
+					"result": {
+						"text": "The signal fades. You'll never know. Your crew will bring it up later, though.",
+						"effects": {
+							"record": {
+								"verb": "desert",
+								"public": false
+							}
+						}
+					}
 				},
 				{
 					"id": "report",
 					"text": "Forward it to Paragon Compliance",
-					"result": {"text": "Paragon thanks you for your civic engagement and charges you a 5-credit processing fee.", "effects": {"credits": -5, "record": {"verb": "comply", "target_faction": "paragon", "public": true}}}
+					"result": {
+						"text": "Paragon thanks you for your civic engagement and charges you a 5-credit processing fee.",
+						"effects": {
+							"credits": -5,
+							"record": {
+								"verb": "comply",
+								"target_faction": "paragon",
+								"public": true
+							}
+						}
+					}
 				}
 			]
 		},
@@ -68,7 +141,17 @@
 				{
 					"id": "comply",
 					"text": "Comply and pay the 'inspection fee'",
-					"result": {"text": "They scan you, fine you 10% of your savings for 'having savings', and wish you a compliant day.", "effects": {"credits_pct": -0.1, "record": {"verb": "comply", "target_faction": "paragon", "public": true}}}
+					"result": {
+						"text": "They scan you, fine you 10% of your savings for 'having savings', and wish you a compliant day.",
+						"effects": {
+							"credits_pct": -0.1,
+							"record": {
+								"verb": "comply",
+								"target_faction": "paragon",
+								"public": true
+							}
+						}
+					}
 				},
 				{
 					"id": "bribe",
@@ -76,17 +159,62 @@
 					"cost": 60,
 					"bribe": true,
 					"chance": 0.75,
-					"chance_mods": {"flag:liar": 0.15, "perk:silver_tongue": 0.15},
-					"success": {"text": "The officer pockets it. \"Have a safe flight, valued customer.\"", "effects": {"record": {"verb": "bribe", "target_faction": "paragon", "public": true}}},
-					"fail": {"text": "\"Attempted bribery of a Compliance Officer is a premium offence.\" They keep the money anyway.", "effects": {"rep": {"paragon": -10}, "bounty": {"paragon": 80}}}
+					"chance_mods": {
+						"flag:liar": 0.15,
+						"perk:silver_tongue": 0.15
+					},
+					"success": {
+						"text": "The officer pockets it. \"Have a safe flight, valued customer.\"",
+						"effects": {
+							"record": {
+								"verb": "bribe",
+								"target_faction": "paragon",
+								"public": true
+							}
+						}
+					},
+					"fail": {
+						"text": "\"Attempted bribery of a Compliance Officer is a premium offence.\" They keep the money anyway.",
+						"effects": {
+							"rep": {
+								"paragon": -10
+							},
+							"bounty": {
+								"paragon": 80
+							}
+						}
+					}
 				},
 				{
 					"id": "run",
 					"text": "Punch it and run",
 					"chance": 0.5,
-					"chance_mods": {"perk:quick_roll": 0.1},
-					"success": {"text": "The Odd Duck coughs, wheezes and somehow outruns a military cruiser. QUACK is insufferable about it.", "effects": {"rep": {"paragon": -8}, "bounty": {"paragon": 50}}},
-					"fail": {"text": "They clip your engines with a 'warning shot' that was not a warning.", "effects": {"hp": -25, "rep": {"paragon": -5}, "bounty": {"paragon": 30}}}
+					"chance_mods": {
+						"perk:quick_roll": 0.1
+					},
+					"success": {
+						"text": "The Odd Duck coughs, wheezes and somehow outruns a military cruiser. QUACK is insufferable about it.",
+						"effects": {
+							"rep": {
+								"paragon": -8
+							},
+							"bounty": {
+								"paragon": 50
+							}
+						}
+					},
+					"fail": {
+						"text": "They clip your engines with a 'warning shot' that was not a warning.",
+						"effects": {
+							"hp": -25,
+							"rep": {
+								"paragon": -5
+							},
+							"bounty": {
+								"paragon": 30
+							}
+						}
+					}
 				}
 			]
 		},
@@ -100,20 +228,53 @@
 				{
 					"id": "watch",
 					"text": "Watch the ad",
-					"result": {"text": "You watch a man in a suit eat Protein Paste and weep with joy. You receive 15 credits and a faint craving.", "effects": {"credits": 15, "rep": {"lumen": 2}}}
+					"result": {
+						"text": "You watch a man in a suit eat Protein Paste and weep with joy. You receive 15 credits and a faint craving.",
+						"effects": {
+							"credits": 15,
+							"rep": {
+								"lumen": 2
+							}
+						}
+					}
 				},
 				{
 					"id": "shoot",
 					"text": "Blast it off the hull",
-					"result": {"text": "The drone explodes mid-jingle. Lumen's legal department has been notified automatically.", "effects": {"items": {"scrap": 2}, "record": {"verb": "vandalism", "target_faction": "lumen", "public": true}}}
+					"result": {
+						"text": "The drone explodes mid-jingle. Lumen's legal department has been notified automatically.",
+						"effects": {
+							"items": {
+								"scrap": 2
+							},
+							"record": {
+								"verb": "vandalism",
+								"target_faction": "lumen",
+								"public": true
+							}
+						}
+					}
 				},
 				{
 					"id": "hack",
 					"text": "Hack its payment chip",
 					"chance": 0.5,
-					"chance_mods": {"flag:knows_ledgers": 0.25},
-					"success": {"text": "You redirect its advertising budget to yourself. Capitalism works!", "effects": {"credits": 70}},
-					"fail": {"text": "The drone counter-hacks you and subscribes the Odd Duck to 40 newsletters.", "effects": {"credits": -10, "mishap": "hacked"}}
+					"chance_mods": {
+						"flag:knows_ledgers": 0.25
+					},
+					"success": {
+						"text": "You redirect its advertising budget to yourself. Capitalism works!",
+						"effects": {
+							"credits": 70
+						}
+					},
+					"fail": {
+						"text": "The drone counter-hacks you and subscribes the Odd Duck to 40 newsletters.",
+						"effects": {
+							"credits": -10,
+							"mishap": "hacked"
+						}
+					}
 				}
 			]
 		},
@@ -123,30 +284,69 @@
 			"text": "A hunter-ship named 'Due Diligence' matches your velocity. \"There's {bounty} credits on your head, friend. Nothing personal. It's in my KPIs.\"",
 			"weight": 4,
 			"weight_bounty": 0.02,
-			"requires": {"min_bounty": 100},
+			"requires": {
+				"min_bounty": 100
+			},
 			"choices": [
 				{
 					"id": "pay",
 					"text": "Pay off the bounty ({bounty} cr)",
 					"cost_bounty": true,
-					"result": {"text": "The hunter accepts payment and emails you a receipt titled 'Your Freedom (Temporary)'.", "effects": {"clear_bounty": true}}
+					"result": {
+						"text": "The hunter accepts payment and emails you a receipt titled 'Your Freedom (Temporary)'.",
+						"effects": {
+							"clear_bounty": true
+						}
+					}
 				},
 				{
 					"id": "fight",
 					"text": "Fight",
 					"chance": 0.55,
-					"chance_mods": {"perk:trigger_happy": 0.1, "perk:iron_gut": 0.1},
-					"success": {"text": "The 'Due Diligence' limps away. You salvage its bounty board, which oddly lists you as 'paid'.", "effects": {"credits": 60, "bounty": {"paragon": -100}, "record": {"verb": "kill_hostile", "target_faction": "paragon", "public": true}}},
-					"fail": {"text": "You barely escape. The hunter leaves a sticky note on your hull: 'See you next quarter.'", "effects": {"hp": -40}}
+					"chance_mods": {
+						"perk:trigger_happy": 0.1,
+						"perk:iron_gut": 0.1
+					},
+					"success": {
+						"text": "The 'Due Diligence' limps away. You salvage its bounty board, which oddly lists you as 'paid'.",
+						"effects": {
+							"credits": 60,
+							"bounty": {
+								"paragon": -100
+							},
+							"record": {
+								"verb": "kill_hostile",
+								"target_faction": "paragon",
+								"public": true
+							}
+						}
+					},
+					"fail": {
+						"text": "You barely escape. The hunter leaves a sticky note on your hull: 'See you next quarter.'",
+						"effects": {
+							"hp": -40
+						}
+					}
 				},
 				{
 					"id": "bluff",
 					"text": "Claim you're your own evil twin",
 					"requires": {},
 					"chance": 0.25,
-					"chance_mods": {"flag:liar": 0.45, "flag:clone": 0.3},
-					"success": {"text": "\"Oh. Sorry. Wrong twin.\" The hunter leaves to harass your nonexistent sibling.", "effects": {}},
-					"fail": {"text": "\"That's what the real one would say.\" Shots fired.", "effects": {"hp": -30}}
+					"chance_mods": {
+						"flag:liar": 0.45,
+						"flag:clone": 0.3
+					},
+					"success": {
+						"text": "\"Oh. Sorry. Wrong twin.\" The hunter leaves to harass your nonexistent sibling.",
+						"effects": {}
+					},
+					"fail": {
+						"text": "\"That's what the real one would say.\" Shots fired.",
+						"effects": {
+							"hp": -30
+						}
+					}
 				}
 			]
 		},
@@ -155,25 +355,70 @@
 			"title": "LUMEN EXCLUSIVE",
 			"text": "A Lumen news-skiff pulls alongside. A reporter with nine cameras for a face asks for 'your side of the story'. Which story? Every story.",
 			"weight": 2,
-			"requires": {"min_reported": 1},
+			"requires": {
+				"min_reported": 1
+			},
 			"choices": [
 				{
 					"id": "spin",
 					"text": "Spin it. You're the hero here.",
 					"chance": 0.6,
-					"chance_mods": {"flag:liar": 0.25, "flag:famous_jingle": 0.15},
-					"success": {"text": "The segment airs. You're 'a misunderstood entrepreneur'. Paragon lowers your bounty to avoid bad press.", "effects": {"rep": {"lumen": 5}, "bounty": {"paragon": -60}}},
-					"fail": {"text": "They edit your interview into a crime documentary. It's a hit.", "effects": {"rep": {"lumen": 3, "paragon": -5}, "bounty": {"paragon": 40}}}
+					"chance_mods": {
+						"flag:liar": 0.25,
+						"flag:famous_jingle": 0.15
+					},
+					"success": {
+						"text": "The segment airs. You're 'a misunderstood entrepreneur'. Paragon lowers your bounty to avoid bad press.",
+						"effects": {
+							"rep": {
+								"lumen": 5
+							},
+							"bounty": {
+								"paragon": -60
+							}
+						}
+					},
+					"fail": {
+						"text": "They edit your interview into a crime documentary. It's a hit.",
+						"effects": {
+							"rep": {
+								"lumen": 3,
+								"paragon": -5
+							},
+							"bounty": {
+								"paragon": 40
+							}
+						}
+					}
 				},
 				{
 					"id": "confess",
 					"text": "Tell the truth",
-					"result": {"text": "Lumen has never aired the truth before. Ratings explode. Your crew looks at you differently.", "effects": {"rep": {"lumen": 8}, "skill_points": 1, "record": {"verb": "comply", "public": true}}}
+					"result": {
+						"text": "Lumen has never aired the truth before. Ratings explode. Your crew looks at you differently.",
+						"effects": {
+							"rep": {
+								"lumen": 8
+							},
+							"skill_points": 1,
+							"record": {
+								"verb": "comply",
+								"public": true
+							}
+						}
+					}
 				},
 				{
 					"id": "decline",
 					"text": "No comment",
-					"result": {"text": "The headline reads: DRIFTER REFUSES TO DENY EVERYTHING.", "effects": {"rep": {"lumen": -3}}}
+					"result": {
+						"text": "The headline reads: DRIFTER REFUSES TO DENY EVERYTHING.",
+						"effects": {
+							"rep": {
+								"lumen": -3
+							}
+						}
+					}
 				}
 			]
 		},
@@ -188,19 +433,48 @@
 					"id": "eat",
 					"text": "Eat it",
 					"chance": 0.5,
-					"success": {"text": "Surprisingly nutritious. You feel 12% less mysterious.", "effects": {"hp": 30, "rep": {"gristle": 2}}},
-					"fail": {"text": "It was the recalled batch. It contained a tooth. Not yours. Not human.", "effects": {"hp": -10, "mishap": "food_poisoning"}}
+					"success": {
+						"text": "Surprisingly nutritious. You feel 12% less mysterious.",
+						"effects": {
+							"hp": 30,
+							"rep": {
+								"gristle": 2
+							}
+						}
+					},
+					"fail": {
+						"text": "It was the recalled batch. It contained a tooth. Not yours. Not human.",
+						"effects": {
+							"hp": -10,
+							"mishap": "food_poisoning"
+						}
+					}
 				},
 				{
 					"id": "sell",
 					"text": "Resell it to your crew at a markup",
-					"requires": {"crew_size_min": 1},
-					"result": {"text": "Your crew pays 20 credits. Some of them will remember this.", "effects": {"credits": 20, "record": {"verb": "smuggle", "target_faction": "gristle", "public": false}}}
+					"requires": {
+						"crew_size_min": 1
+					},
+					"result": {
+						"text": "Your crew pays 20 credits. Some of them will remember this.",
+						"effects": {
+							"credits": 20,
+							"record": {
+								"verb": "smuggle",
+								"target_faction": "gristle",
+								"public": false
+							}
+						}
+					}
 				},
 				{
 					"id": "decline",
 					"text": "Politely decline",
-					"result": {"text": "The pod plays a sad trombone and logs you as a 'low-value consumer'.", "effects": {}}
+					"result": {
+						"text": "The pod plays a sad trombone and logs you as a 'low-value consumer'.",
+						"effects": {}
+					}
 				}
 			]
 		},
@@ -209,26 +483,62 @@
 			"title": "OVERDUE NOTICE",
 			"text": "Halcyon Debt & Trust: \"Our records show {air_debt} credits of unpaid breathing. Please remit, or we will be forced to repossess your lungs.\"",
 			"weight": 4,
-			"requires": {"min_air_debt": 1},
+			"requires": {
+				"min_air_debt": 1
+			},
 			"choices": [
 				{
 					"id": "pay",
 					"text": "Pay the debt ({air_debt} cr)",
 					"cost_air_debt": true,
-					"result": {"text": "Debt cleared. Halcyon sends a 'We'll miss you' card. It's a threat.", "effects": {"air_debt": -999999, "rep": {"halcyon": 4}}}
+					"result": {
+						"text": "Debt cleared. Halcyon sends a 'We'll miss you' card. It's a threat.",
+						"effects": {
+							"air_debt": -999999,
+							"rep": {
+								"halcyon": 4
+							}
+						}
+					}
 				},
 				{
 					"id": "negotiate",
 					"text": "Negotiate a 'restructuring'",
 					"chance": 0.5,
-					"chance_mods": {"flag:knows_ledgers": 0.3, "perk:silver_tongue": 0.2},
-					"success": {"text": "You restructure the debt into a smaller debt with a bigger font. Halcyon accepts.", "effects": {"air_debt": -40}},
-					"fail": {"text": "They restructure your debt upward. With fees for restructuring.", "effects": {"air_debt": 25, "rep": {"halcyon": -3}}}
+					"chance_mods": {
+						"flag:knows_ledgers": 0.3,
+						"perk:silver_tongue": 0.2
+					},
+					"success": {
+						"text": "You restructure the debt into a smaller debt with a bigger font. Halcyon accepts.",
+						"effects": {
+							"air_debt": -40
+						}
+					},
+					"fail": {
+						"text": "They restructure your debt upward. With fees for restructuring.",
+						"effects": {
+							"air_debt": 25,
+							"rep": {
+								"halcyon": -3
+							}
+						}
+					}
 				},
 				{
 					"id": "ignore",
 					"text": "Hang up",
-					"result": {"text": "Halcyon flags your account. A repossession drone has your scent now.", "effects": {"rep": {"halcyon": -10}, "bounty": {"halcyon": 60}}}
+					"result": {
+						"text": "Halcyon flags your account. A repossession drone has your scent now.",
+						"effects": {
+							"rep": {
+								"halcyon": -10
+							},
+							"bounty": {
+								"halcyon": 60
+							}
+						}
+					}
 				}
 			]
 		},
@@ -237,26 +547,721 @@
 			"title": "CRYO AUCTION",
 			"text": "A Halcyon auction barge is selling 'pre-owned humans' in cryo. One pod's label reads: 'Barely used. Has opinions.'",
 			"weight": 1,
-			"requires": {"max_crew": 3},
+			"requires": {
+				"max_crew": 3
+			},
 			"choices": [
 				{
 					"id": "buy",
 					"text": "Buy the pod (120 cr)",
 					"cost": 120,
-					"result": {"text": "You buy a person to set them free. Halcyon calls it 'a great deal'. Your new crewmate calls it 'complicated'.", "effects": {"recruit": "random", "record": {"verb": "charity", "public": true}}}
+					"result": {
+						"text": "You buy a person to set them free. Halcyon calls it 'a great deal'. Your new crewmate calls it 'complicated'.",
+						"effects": {
+							"recruit": "random",
+							"record": {
+								"verb": "charity",
+								"public": true
+							}
+						}
+					}
 				},
 				{
 					"id": "steal",
 					"text": "Steal the pod during the auction",
 					"chance": 0.45,
-					"chance_mods": {"flag:klepto": 0.25},
-					"success": {"text": "You swap the pod with a crate of Protein Paste. Nobody notices for hours.", "effects": {"recruit": "random", "record": {"verb": "theft", "target_faction": "halcyon", "public": false}}},
-					"fail": {"text": "Alarms. You escape empty-handed and very much on camera.", "effects": {"record": {"verb": "theft", "target_faction": "halcyon", "public": true}}}
+					"chance_mods": {
+						"flag:klepto": 0.25
+					},
+					"success": {
+						"text": "You swap the pod with a crate of Protein Paste. Nobody notices for hours.",
+						"effects": {
+							"recruit": "random",
+							"record": {
+								"verb": "theft",
+								"target_faction": "halcyon",
+								"public": false
+							}
+						}
+					},
+					"fail": {
+						"text": "Alarms. You escape empty-handed and very much on camera.",
+						"effects": {
+							"record": {
+								"verb": "theft",
+								"target_faction": "halcyon",
+								"public": true
+							}
+						}
+					}
 				},
 				{
 					"id": "leave",
 					"text": "Fly on",
-					"result": {"text": "The auctioneer shouts 'SOLD!' behind you. To whom, you'll never know.", "effects": {}}
+					"result": {
+						"text": "The auctioneer shouts 'SOLD!' behind you. To whom, you'll never know.",
+						"effects": {}
+					}
+				}
+			]
+		},
+		{
+			"id": "family_yacht",
+			"title": "FAMILY YACHT",
+			"weight": 4,
+			"requires": {
+				"flag": "heir"
+			},
+			"text": "A gold-plated yacht drops out of warp beside you. Your family crest fills the viewscreen. \"Come home. The board is asking questions.\"",
+			"choices": [
+				{
+					"id": "visit",
+					"text": "Dock for dinner and play the dutiful heir",
+					"result": {
+						"text": "Twelve courses, eleven threats, one cheque. You leave richer and colder.",
+						"effects": {
+							"credits": 500,
+							"record": {
+								"verb": "comply",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "refuse",
+					"text": "\"I'm not coming back.\"",
+					"result": {
+						"text": "Silence on the line. Then: \"Then you're cut off.\" The yacht leaves. You feel lighter. And poorer.",
+						"effects": {
+							"credits_pct": -0.2,
+							"record": {
+								"verb": "choice",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "rob",
+					"text": "Dock - and empty the family vault on the way out",
+					"chance": 0.6,
+					"chance_mods": {
+						"flag:klepto": 0.2,
+						"flag:hacker": 0.15
+					},
+					"success": {
+						"text": "You leave with the silverware, the art, and a hard drive of family secrets.",
+						"effects": {
+							"credits": 900,
+							"items": {
+								"data_shard": 1
+							},
+							"record": {
+								"verb": "theft",
+								"public": false
+							}
+						}
+					},
+					"fail": {
+						"text": "Security was waiting. They always are, in this family.",
+						"effects": {
+							"hp": -25,
+							"bounty": {
+								"paragon": 200
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "refugee_pod",
+			"title": "DRIFTING POD",
+			"weight": 3,
+			"requires": {},
+			"text": "A battered escape pod tumbles past. Inside: three people with Halcyon collateral barcodes, waving frantically.",
+			"choices": [
+				{
+					"id": "rescue",
+					"text": "Bring them aboard",
+					"result": {
+						"text": "They cry, they eat everything, they promise to repay you. One of them actually might.",
+						"effects": {
+							"recruit": "random",
+							"rep": {
+								"halcyon": -5
+							},
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "supplies",
+					"text": "Pass them supplies and a star chart (a medkit)",
+					"requires": {
+						"has_item": "medkit"
+					},
+					"result": {
+						"text": "You float a crate across. They salute you through the glass.",
+						"effects": {
+							"items": {
+								"medkit": -1
+							},
+							"record": {
+								"verb": "charity",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "turn_in",
+					"text": "Report the escaped assets to Halcyon",
+					"result": {
+						"text": "Halcyon's tow-drone arrives in minutes. The finder's fee is generous. The silence afterwards is not.",
+						"effects": {
+							"credits": 150,
+							"rep": {
+								"halcyon": 8
+							},
+							"record": {
+								"verb": "desert",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "kin",
+					"text": "\"I've got a barcode too.\" Tell them where to hide",
+					"requires": {
+						"flag": "owned"
+					},
+					"result": {
+						"text": "You give them coordinates for a moon Halcyon forgot it owns. They'll be safe there. So might you, one day.",
+						"effects": {
+							"skill_points": 1,
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "gameshow",
+			"title": "LUMEN LIVE: DEBT OR DOUBLE",
+			"weight": 3,
+			"requires": {
+				"min_credits": 40
+			},
+			"text": "A Lumen camera-drone locks onto your ship. \"CONGRATULATIONS! You've been selected for DEBT OR DOUBLE! Bet your credits - live!\"",
+			"choices": [
+				{
+					"id": "play",
+					"text": "Bet half your credits",
+					"chance": 0.5,
+					"chance_mods": {
+						"flag:gambler": 0.15,
+						"flag:charming": 0.05
+					},
+					"success": {
+						"text": "DOUBLE! The studio audience screams. Your mum calls. You don't have a mum. Someone calls.",
+						"effects": {
+							"credits_pct": 0.5
+						}
+					},
+					"fail": {
+						"text": "DEBT! The confetti is billed to you.",
+						"effects": {
+							"credits_pct": -0.5,
+							"air_debt": 20
+						}
+					}
+				},
+				{
+					"id": "plug",
+					"text": "Use the airtime to plug yourself",
+					"requires": {
+						"flag": "famous"
+					},
+					"result": {
+						"text": "You hijack the segment. Ratings spike. Lumen pays you to leave.",
+						"effects": {
+							"credits": 120
+						}
+					}
+				},
+				{
+					"id": "refuse",
+					"text": "Decline on live TV",
+					"result": {
+						"text": "\"WOW. Okay. A REFUSER, folks!\" Somewhere, a meme is born.",
+						"effects": {}
+					}
+				}
+			]
+		},
+		{
+			"id": "church_ship",
+			"title": "THE FREE BREATH",
+			"weight": 2,
+			"requires": {},
+			"text": "A patched-together cathedral ship broadcasts hymns about free air. \"Brother, sister, other - will you breathe with us?\"",
+			"choices": [
+				{
+					"id": "donate",
+					"text": "Donate 30 credits",
+					"cost": 30,
+					"result": {
+						"text": "They sing your name. Badly. Beautifully.",
+						"effects": {
+							"record": {
+								"verb": "charity",
+								"public": false
+							},
+							"flag": {
+								"church_friend": true
+							}
+						}
+					}
+				},
+				{
+					"id": "preach",
+					"text": "Take the pulpit",
+					"requires": {
+						"any_flag": [
+							"preacher",
+							"idealist",
+							"charming"
+						]
+					},
+					"result": {
+						"text": "Your sermon is broadcast to six systems. Pilgrims will look for you now.",
+						"effects": {
+							"skill_points": 1,
+							"flag": {
+								"church_friend": true
+							}
+						}
+					}
+				},
+				{
+					"id": "mock",
+					"text": "Mock them over the open channel",
+					"requires": {
+						"any_flag": [
+							"cynic",
+							"joker"
+						]
+					},
+					"result": {
+						"text": "Half the congregation laughs. The other half adds you to a prayer list. It's unclear which list.",
+						"effects": {}
+					}
+				},
+				{
+					"id": "ignore",
+					"text": "Keep flying",
+					"result": {
+						"text": "The hymns follow you for a while, then fade into static.",
+						"effects": {}
+					}
+				}
+			]
+		},
+		{
+			"id": "paste_spill",
+			"title": "PASTE SPILL",
+			"weight": 3,
+			"requires": {},
+			"text": "A Gristle freighter has split open. A slow river of grey paste drifts through space, glinting under the stars.",
+			"choices": [
+				{
+					"id": "salvage",
+					"text": "Scoop up sealed rations",
+					"result": {
+						"text": "You fill the hold with paste. The ship smells of it for weeks.",
+						"effects": {
+							"items": {
+								"paste_ration": 5
+							},
+							"record": {
+								"verb": "theft",
+								"target_faction": "gristle",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "report",
+					"text": "Report the spill to Gristle",
+					"result": {
+						"text": "Gristle thanks you with a coupon. For paste.",
+						"effects": {
+							"credits": 40,
+							"rep": {
+								"gristle": 5
+							}
+						}
+					}
+				},
+				{
+					"id": "sell",
+					"text": "Sell the wreck's location to scavengers",
+					"result": {
+						"text": "By the time Gristle arrives, there's nothing left but a very clean hole in space.",
+						"effects": {
+							"credits": 90,
+							"record": {
+								"verb": "smuggle",
+								"target_faction": "gristle",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "workers",
+					"text": "Check on the crew",
+					"requires": {
+						"any_flag": [
+							"paste",
+							"union",
+							"medic"
+						]
+					},
+					"result": {
+						"text": "The crew is alive, abandoned by Gristle. You patch them up and take them to port. They won't forget it.",
+						"effects": {
+							"skill_points": 1,
+							"rep": {
+								"gristle": -5
+							},
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "old_satellite",
+			"title": "PRE-WAR SIGNAL",
+			"weight": 2,
+			"requires": {},
+			"text": "An ancient satellite, older than the Consortium, broadcasts a looping message in a language almost like yours.",
+			"choices": [
+				{
+					"id": "listen",
+					"text": "Listen",
+					"result": {
+						"text": "It's a weather report. Rain, light winds, no charge. Your crew listens in silence.",
+						"effects": {
+							"hp": 20
+						}
+					}
+				},
+				{
+					"id": "remember",
+					"text": "Translate it",
+					"requires": {
+						"flag": "relic"
+					},
+					"result": {
+						"text": "You understand every word. It's a lullaby your mother sang. Nobody else on board can see why you're crying.",
+						"effects": {
+							"hp": 40,
+							"skill_points": 1
+						}
+					}
+				},
+				{
+					"id": "salvage",
+					"text": "Strip it for parts",
+					"requires": {
+						"any_flag": [
+							"hacker",
+							"smuggler",
+							"synthetic"
+						]
+					},
+					"result": {
+						"text": "Pre-war circuits sell high. The lullaby stops mid-verse.",
+						"effects": {
+							"credits": 120,
+							"items": {
+								"pre_war_coin": 1
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "repo_blockade",
+			"title": "HALCYON REPO BLOCKADE",
+			"weight": 3,
+			"requires": {
+				"min_air_debt": 50
+			},
+			"text": "Halcyon repo-cutters surround the Odd Duck. \"ACCOUNT {air_debt} CR OVERDUE. SURRENDER THE VESSEL OR PAY.\"",
+			"choices": [
+				{
+					"id": "pay",
+					"text": "Pay what you can",
+					"result": {
+						"text": "They take everything you have and leave you the ship. For now.",
+						"effects": {
+							"credits_pct": -0.6,
+							"air_debt": -60
+						}
+					}
+				},
+				{
+					"id": "outrun",
+					"text": "Punch it",
+					"chance": 0.45,
+					"chance_mods": {
+						"flag:smuggler": 0.3,
+						"flag:courier": 0.2
+					},
+					"success": {
+						"text": "The Duck screams through the blockade with paint scraping off both sides.",
+						"effects": {
+							"bounty": {
+								"halcyon": 60
+							}
+						}
+					},
+					"fail": {
+						"text": "A tractor beam. A fine. A very long apology form.",
+						"effects": {
+							"hp": -20,
+							"air_debt": 80
+						}
+					}
+				},
+				{
+					"id": "lawyer",
+					"text": "Cite the Deep Space Grace Period",
+					"requires": {
+						"any_flag": [
+							"lawyer",
+							"knows_ledgers"
+						]
+					},
+					"result": {
+						"text": "There is no such thing. You say it with such confidence that the cutters back off to check.",
+						"effects": {}
+					}
+				},
+				{
+					"id": "family",
+					"text": "Hail them with the Halcyon family code",
+					"requires": {
+						"tag": [
+							"heir_halcyon"
+						]
+					},
+					"result": {
+						"text": "The cutters scatter like startled birds. Somebody's getting fired for this.",
+						"effects": {
+							"air_debt": -999
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "strike_convoy",
+			"title": "STRIKE CONVOY",
+			"weight": 2,
+			"requires": {},
+			"text": "A rag-tag convoy of striking miners hails you. \"Paragon's hunting us. Escort us to the next system?\"",
+			"choices": [
+				{
+					"id": "escort",
+					"text": "Escort them",
+					"chance": 0.65,
+					"chance_mods": {
+						"flag:union": 0.2,
+						"flag:ex_paragon": -0.1
+					},
+					"success": {
+						"text": "You lead them through an asteroid field Paragon won't follow into. They name a mining drill after you.",
+						"effects": {
+							"rep": {
+								"paragon": -8
+							},
+							"skill_points": 1,
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					},
+					"fail": {
+						"text": "Paragon catches up. The Duck takes hits covering the convoy's escape. Most of them make it.",
+						"effects": {
+							"hp": -30,
+							"rep": {
+								"paragon": -12
+							}
+						}
+					}
+				},
+				{
+					"id": "sell",
+					"text": "Sell their route to Paragon",
+					"result": {
+						"text": "Paragon pays promptly. The convoy's distress calls do not stop for a long time.",
+						"effects": {
+							"credits": 200,
+							"rep": {
+								"paragon": 10
+							},
+							"record": {
+								"verb": "desert",
+								"public": false
+							}
+						}
+					}
+				},
+				{
+					"id": "decline",
+					"text": "\"Not my fight.\"",
+					"result": {
+						"text": "They fly on without you. Some of them wave.",
+						"effects": {}
+					}
+				}
+			]
+		},
+		{
+			"id": "space_clinic",
+			"title": "BLACK-MARKET CLINIC",
+			"weight": 2,
+			"requires": {},
+			"text": "A medical barge with no registration offers 'discount upgrades, no questions, minimal screaming'.",
+			"choices": [
+				{
+					"id": "implant",
+					"text": "Get a cheap reflex implant (90 cr)",
+					"cost": 90,
+					"chance": 0.75,
+					"success": {
+						"text": "It works. Your hands move before you think. Mostly in a good way.",
+						"effects": {
+							"mods": {
+								"mul": {
+									"roll_cooldown": -0.08
+								}
+							}
+						}
+					},
+					"fail": {
+						"text": "It works, sort of. It also plays an ad jingle when you sneeze.",
+						"effects": {
+							"hp": -10
+						}
+					}
+				},
+				{
+					"id": "blood",
+					"text": "Sell some blood",
+					"result": {
+						"text": "They take a little more than agreed. Everyone does.",
+						"effects": {
+							"credits": 60,
+							"hp": -20
+						}
+					}
+				},
+				{
+					"id": "volunteer",
+					"text": "Help out for a shift",
+					"requires": {
+						"any_flag": [
+							"medic",
+							"chemist"
+						]
+					},
+					"result": {
+						"text": "You fix six botched implants and save a life. They pay you in meds.",
+						"effects": {
+							"items": {
+								"medkit": 2
+							},
+							"record": {
+								"verb": "mercy",
+								"public": false
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "mirror_ship",
+			"title": "THE OTHER DUCK",
+			"weight": 2,
+			"requires": {},
+			"text": "A ship identical to the Odd Duck drops out of warp. On the viewscreen: a face exactly like yours.",
+			"choices": [
+				{
+					"id": "hail",
+					"text": "\"Who are you?\"",
+					"result": {
+						"text": "\"I was going to ask you the same thing.\" The other ship warps away. QUACK refuses to discuss it.",
+						"effects": {}
+					}
+				},
+				{
+					"id": "batch",
+					"text": "\"...Batch-mate?\"",
+					"requires": {
+						"any_flag": [
+							"clone",
+							"identity_thief",
+							"bloodline"
+						]
+					},
+					"result": {
+						"text": "They nod slowly. \"There are more of us. Find the others.\" They transmit a list of names. Yours is crossed out.",
+						"effects": {
+							"skill_points": 1,
+							"items": {
+								"data_shard": 1
+							}
+						}
+					}
+				},
+				{
+					"id": "fire",
+					"text": "Open fire",
+					"chance": 0.5,
+					"success": {
+						"text": "They flee, trailing smoke. You feel strangely guilty, like you shot a mirror.",
+						"effects": {
+							"credits": 60
+						}
+					},
+					"fail": {
+						"text": "They shoot back exactly like you would. It's very annoying.",
+						"effects": {
+							"hp": -25
+						}
+					}
 				}
 			]
 		}

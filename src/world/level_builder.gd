@@ -52,6 +52,9 @@ var _mats: Dictionary = {}
 var _neon_index := 0
 var _walls_body: StaticBody3D
 var _roofs: Array = []  # [top_center: Vector3, half_size: Vector2] per building, for overhead cables
+var _glow_spots: Array = []  # [ground position, colour, strength] -> fake wet-street reflections
+var _city := false
+var road_lanes: Array = []  # [from: Vector3, to: Vector3] straight one-way lanes for street traffic
 
 
 func _init(p_root: Node3D, p_palette: Dictionary, p_seed: int, p_outdoor: bool = false, p_owner_faction: String = "") -> void:
@@ -86,6 +89,9 @@ func build(layout: Array) -> Dictionary:
 	if outdoor:
 		_build_outdoor()
 		_build_cables()
+		_build_street_details()
+		_build_reflections()
+		_build_biome_extras()
 	return result
 
 
@@ -154,8 +160,11 @@ func emissive(color: Color, energy: float = 3.0) -> StandardMaterial3D:
 
 
 func _make_materials() -> void:
+	var hr: Array = palette.get("building_h", [4.0, 8.5])
+	_city = outdoor and float(hr[1]) >= 9.0
 	var floor_tex: String = palette.get("ground_tex", "ground_rock") if outdoor else "floor_metal"
-	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, 0.85 if outdoor else 0.38, 0.1 if outdoor else 0.45, 1.4)
+	var wet: bool = outdoor and str(palette.get("weather", "")) == "rain"
+	var floor_mat := _textured(floor_tex, Color.WHITE, 0.5, (0.3 if wet else 0.85) if outdoor else 0.38, (0.25 if wet else 0.1) if outdoor else 0.45, 1.4)
 	floor_mat.vertex_color_use_as_albedo = true
 	_mats["floor"] = floor_mat
 	for kind in [["grate", "floor_grate", 0.5, 0.6], ["tile", "floor_tile", 0.5, 0.2], ["hazard", "hazard", 0.5, 0.5]]:
@@ -163,7 +172,7 @@ func _make_materials() -> void:
 		m.vertex_color_use_as_albedo = true
 		_mats["floor_" + kind[0]] = m
 	var path_tex: String = palette.get("path_tex", "floor_grate")
-	var path := _textured(path_tex, Color.WHITE, 0.5, 0.35 if path_tex == "asphalt" else 0.7, 0.25, 1.3)
+	var path := _textured(path_tex, Color.WHITE, 0.5, (0.12 if wet else 0.35) if path_tex == "asphalt" else 0.7, 0.35 if wet else 0.25, 1.3)
 	path.vertex_color_use_as_albedo = true
 	_mats["floor_path"] = path
 	var water := ShaderMaterial.new()
@@ -501,6 +510,11 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 	label.position = Vector3(shop_x, 2.55, front + 0.08)
 	body.add_child(label)
 	deco.append(label)
+	_add_venue(body, label.text, fid if corp_label else "", Vector3(shop_x, 0.8, front + 0.95))
+	if rng.randf() < 0.18:
+		var fl := Flicker.new()
+		fl.seed_value = rng.randi()
+		label.add_child(fl)
 	if rng.randf() < 0.6:
 		var shop_light := OmniLight3D.new()
 		shop_light.light_color = sign_color.lerp(Color(1, 0.9, 0.7), 0.4)
@@ -536,6 +550,21 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 	for i in rng.randi_range(1, 3):
 		var ac_pos := Vector3(rng.randf_range(-w * 0.5 + 0.4, w * 0.5 - 0.4), rng.randf_range(3.2, maxf(3.3, h - 0.8)), front + 0.2)
 		deco.append(add_mesh(body, box(Vector3(0.6, 0.45, 0.4)), _mats["metal"], ac_pos, 0.0, true))
+	_wanted_poster(body, w, front, deco)
+	_glow_spots.append([pos + Vector3(shop_x, 0, front + 0.6), sign_color, 1.0])
+	if _city and rng.randf() < 0.55:
+		# Neon tubes tracing the facade edges.
+		var tube := next_neon()
+		for sx in [-1.0, 1.0]:
+			deco.append(add_mesh(body, box(Vector3(0.07, h - 2.8, 0.07)), emissive(tube, 4.5), Vector3(sx * (w * 0.5 + 0.02), 1.4 + h * 0.5, front + 0.04), 0.0, false))
+		deco.append(add_mesh(body, box(Vector3(w + 0.1, 0.07, 0.07)), emissive(tube, 4.5), Vector3(0, h - 0.1, front + 0.05), 0.0, false))
+	if _city and h > 8.0 and rng.randf() < 0.14:
+		var rh := Hologram.new()
+		rh.figure_scale = rng.randf_range(3.0, 4.2)
+		rh.seed_value = rng.randi()
+		rh.with_base = false
+		rh.position = pos + Vector3(0, h + 0.3, 0)
+		root.add_child(rh)
 	if floors > 1 and rng.randf() < 0.5:
 		var bal_y := 3.0 + rng.randi_range(1, floors - 1) * 1.4 - 0.45
 		deco.append(add_mesh(body, box(Vector3(minf(w * 0.6, 3.0), 0.08, 0.6)), _mats["dark"], Vector3(rng.randf_range(-w * 0.2, w * 0.2), bal_y, front + 0.3), 0.0, true))
@@ -565,6 +594,301 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 		body.add_child(al)
 
 
+## Wanted posters with your name appear once Paragon (or anyone) puts a price on you.
+func _wanted_poster(body: Node3D, w: float, front: float, deco: Array[Node]) -> void:
+	var bounty := Factions.total_bounty()
+	if bounty < 100 or rng.randf() > clampf(bounty / 1200.0, 0.15, 0.6):
+		return
+	var x := rng.randf_range(-w * 0.5 + 0.5, w * 0.5 - 0.5)
+	var paper := add_mesh(body, box(Vector3(0.62, 0.82, 0.02)), emissive(Color(0.95, 0.85, 0.6), 0.35), Vector3(x, 1.55, front + 0.04), 0.0, false)
+	paper.rotation.z = rng.randf_range(-0.08, 0.08)
+	deco.append(paper)
+	var l := Label3D.new()
+	l.text = "WANTED\n%s\n%d CR" % [Game.player_name.to_upper(), bounty]
+	l.font_size = 30
+	l.pixel_size = 0.004
+	l.modulate = Color(0.35, 0.05, 0.05)
+	l.outline_size = 0
+	l.position = Vector3(x, 1.55, front + 0.06)
+	l.rotation.z = paper.rotation.z
+	body.add_child(l)
+	deco.append(l)
+
+
+## Little things that make each biome feel inhabited by weather and nature.
+func _build_biome_extras() -> void:
+	var water := []
+	var open := []
+	for z in range(1, height - 1):
+		for x in range(1, width - 1):
+			if cell(x, z) == "~":
+				water.append(center(x, z))
+			elif cell(x, z) == ".":
+				open.append(center(x, z))
+	var plant := pcolor("plant", "#7ad06a")
+	var glow := float(palette.get("plant_glow", 0.0))
+	# Lily pads / ice floes / crystal shards floating on water.
+	var pads: Array[Transform3D] = []
+	for w in water:
+		if rng.randf() < 0.3:
+			var b := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.6, 1.3))
+			pads.append(Transform3D(b, w + Vector3(rng.randf_range(-0.7, 0.7), -0.2, rng.randf_range(-0.7, 0.7))))
+	if not pads.is_empty():
+		_paint_multimesh(pads, Vector2(0.55, 0.55), plant.darkened(0.2), glow * 0.8)
+	# Low mist rolling over swamps and crystal pools.
+	if not water.is_empty() and glow > 0.0:
+		var mist := CPUParticles3D.new()
+		mist.amount = 60
+		mist.lifetime = 9.0
+		mist.preprocess = 9.0
+		mist.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		mist.emission_box_extents = Vector3(width * TILE * 0.5, 0.2, height * TILE * 0.5)
+		mist.position = Vector3(width * TILE * 0.5, 0.35, height * TILE * 0.5)
+		mist.direction = Vector3(1, 0, 0.2)
+		mist.spread = 20.0
+		mist.gravity = Vector3.ZERO
+		mist.initial_velocity_min = 0.2
+		mist.initial_velocity_max = 0.5
+		var q := QuadMesh.new()
+		q.size = Vector2(4.0, 1.4)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		m.billboard_keep_scale = true
+		m.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+		m.albedo_texture = load(SHAFT_TEX) if ResourceLoader.exists(SHAFT_TEX) else null
+		var fog := pcolor("fog", "#3a6040").lightened(0.3)
+		m.albedo_color = Color(fog.r, fog.g, fog.b, 0.18)
+		q.material = m
+		mist.mesh = q
+		root.add_child(mist)
+	# Dust devils on dry worlds.
+	var dry: bool = str(palette.get("weather", "")) in ["embers", "snow"] or str(palette.get("ground_tex", "")) in ["ground_sand", "ground_rust"]
+	if dry and not open.is_empty():
+		for i in 3:
+			var c: Vector3 = open[rng.randi() % open.size()]
+			var dd := CPUParticles3D.new()
+			dd.amount = 50
+			dd.lifetime = 2.5
+			dd.preprocess = 2.5
+			dd.emission_shape = CPUParticles3D.EMISSION_SHAPE_RING
+			dd.emission_ring_axis = Vector3.UP
+			dd.emission_ring_radius = 0.6
+			dd.emission_ring_inner_radius = 0.2
+			dd.emission_ring_height = 0.2
+			dd.direction = Vector3.UP
+			dd.spread = 15.0
+			dd.gravity = Vector3(0, 0.6, 0)
+			dd.initial_velocity_min = 0.8
+			dd.initial_velocity_max = 1.6
+			dd.orbit_velocity_min = 0.6
+			dd.orbit_velocity_max = 1.0
+			dd.scale_amount_min = 0.6
+			dd.scale_amount_max = 1.4
+			var dq := QuadMesh.new()
+			dq.size = Vector2(0.18, 0.18)
+			var dm := StandardMaterial3D.new()
+			dm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			dm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+			dm.billboard_keep_scale = true
+			var gc := pcolor("ground_alt", "#a08060").lightened(0.2)
+			dm.albedo_color = Color(gc.r, gc.g, gc.b, 0.5)
+			dq.material = dm
+			dd.mesh = dq
+			dd.position = c
+			root.add_child(dd)
+			var tw := dd.create_tween().set_loops()
+			var to: Vector3 = open[rng.randi() % open.size()]
+			tw.tween_property(dd, "position", to, rng.randf_range(10.0, 18.0)).set_trans(Tween.TRANS_SINE)
+			tw.tween_property(dd, "position", c, rng.randf_range(10.0, 18.0)).set_trans(Tween.TRANS_SINE)
+	# Glowing pebbles on luminous worlds.
+	if glow >= 0.5 and not open.is_empty():
+		var peb: Array[Transform3D] = []
+		var cols: Array = []
+		var neon: Array = palette.get("neon", ["#c07dff"])
+		for i in 260:
+			var c: Vector3 = open[rng.randi() % open.size()]
+			peb.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.4, 1.0)), c + Vector3(rng.randf_range(-0.9, 0.9), 0.03, rng.randf_range(-0.9, 0.9))))
+			cols.append(Color.from_string(str(neon[rng.randi() % neon.size()]), Color.MAGENTA))
+		_paint_multimesh(peb, Vector2(0.12, 0.12), Color.WHITE, 0.0, cols)
+
+
+## Wet-street look: every neon source smears a long coloured reflection toward the camera.
+func _build_reflections() -> void:
+	var wet: bool = str(palette.get("weather", "")) == "rain" or str(palette.get("puddles", "")) != ""
+	var base_alpha := 0.32 if wet else 0.12
+	var tex: Texture2D = load(SHAFT_TEX) if ResourceLoader.exists(SHAFT_TEX) else null
+	for g in _glow_spots:
+		var p: Vector3 = g[0]
+		var col: Color = g[1]
+		var strength: float = g[2]
+		var q := QuadMesh.new()
+		q.size = Vector2(rng.randf_range(0.9, 1.5) * strength, rng.randf_range(2.6, 4.2) * strength)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		m.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+		m.albedo_texture = tex
+		m.albedo_color = Color(col.r, col.g, col.b, base_alpha * strength)
+		q.material = m
+		var mi := MeshInstance3D.new()
+		mi.mesh = q
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.rotation_degrees.x = -90.0
+		mi.position = Vector3(p.x + rng.randf_range(-0.15, 0.15), 0.025, p.z + q.size.y * 0.42)
+		root.add_child(mi)
+
+
+## Road paint, crosswalks, manholes, litter and stains: the ground tells stories too.
+func _build_street_details() -> void:
+	var dash_pos: Array[Transform3D] = []
+	var zebra_pos: Array[Transform3D] = []
+	if _city:
+		for z in height:
+			for x in width:
+				if cell(x, z) != ",":
+					continue
+				var hrun := _run(x, z, 1, 0)
+				var vrun := _run(x, z, 0, 1)
+				var c := center(x, z)
+				var inter := hrun > 2 and vrun > 2
+				if z == 1 and hrun == 2 and cell(x + 1, z) == "," and cell(x - 1, z) != ",":
+					# Two-lane avenue running the full height: one lane each way.
+					road_lanes.append([center(x, 1), center(x, height - 2)])
+					road_lanes.append([center(x + 1, height - 2), center(x + 1, 1)])
+				if x == 1 and vrun == 2 and cell(x, z + 1) == "," and cell(x, z - 1) != ",":
+					road_lanes.append([center(1, z), center(width - 2, z)])
+					road_lanes.append([center(width - 2, z + 1), center(1, z + 1)])
+				if not inter and hrun == 2 and cell(x + 1, z) == "," and cell(x - 1, z) != ",":
+					# Vertical two-lane road: dashed centre line on the shared edge.
+					if z % 2 == 0:
+						dash_pos.append(Transform3D(Basis(), c + Vector3(TILE * 0.5, 0.02, 0)))
+					if _is_inter(x, z - 1) or _is_inter(x, z + 1):
+						for k in 6:
+							zebra_pos.append(Transform3D(Basis(), c + Vector3(-0.85 + k * 0.62, 0.021, 0)))
+				elif not inter and vrun == 2 and cell(x, z + 1) == "," and cell(x, z - 1) != ",":
+					if x % 2 == 0:
+						dash_pos.append(Transform3D(Basis(Vector3.UP, PI * 0.5), c + Vector3(0, 0.02, TILE * 0.5)))
+					if _is_inter(x - 1, z) or _is_inter(x + 1, z):
+						for k in 6:
+							zebra_pos.append(Transform3D(Basis(Vector3.UP, PI * 0.5), c + Vector3(0, 0.021, -0.85 + k * 0.62)))
+				elif inter and rng.randf() < 0.08 or (not inter and rng.randf() < 0.035):
+					_manhole(c)
+		_paint_multimesh(dash_pos, Vector2(0.12, 1.1), Color(0.95, 0.8, 0.35), 0.6)
+		_paint_multimesh(zebra_pos, Vector2(0.32, 1.7), Color(0.85, 0.85, 0.9), 0.5)
+	# Litter & stains everywhere people live.
+	var litter: Array[Transform3D] = []
+	var litter_cols: Array[Color] = []
+	var count := 520 if _city else 200
+	var paper := [Color(0.92, 0.9, 0.85), Color(1.0, 0.4, 0.75), Color(0.35, 0.9, 1.0), Color(1.0, 0.85, 0.3), Color(0.6, 0.6, 0.65)]
+	for i in count:
+		var x := rng.randi_range(1, width - 2)
+		var z := rng.randi_range(1, height - 2)
+		if not walkable(x, z) or cell(x, z) == "D":
+			continue
+		var p := center(x, z) + Vector3(rng.randf_range(-0.95, 0.95), 0.018, rng.randf_range(-0.95, 0.95))
+		var b := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.6, 1.4))
+		litter.append(Transform3D(b, p))
+		litter_cols.append(paper[rng.randi() % paper.size()])
+	_paint_multimesh(litter, Vector2(0.22, 0.16), Color.WHITE, 0.0, litter_cols)
+	var stains: Array[Transform3D] = []
+	for i in (60 if _city else 25):
+		var x := rng.randi_range(1, width - 2)
+		var z := rng.randi_range(1, height - 2)
+		if walkable(x, z):
+			var b := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(rng.randf_range(0.8, 2.0), 1, rng.randf_range(0.6, 1.4)))
+			stains.append(Transform3D(b, center(x, z) + Vector3(rng.randf_range(-0.6, 0.6), 0.015, rng.randf_range(-0.6, 0.6))))
+	_paint_multimesh(stains, Vector2(0.9, 0.7), Color(0.02, 0.02, 0.04, 0.55), 0.0, [], true)
+
+
+func _run(x: int, z: int, dx: int, dz: int) -> int:
+	var n := 1
+	var i := 1
+	while cell(x + dx * i, z + dz * i) == ",":
+		n += 1
+		i += 1
+	i = 1
+	while cell(x - dx * i, z - dz * i) == ",":
+		n += 1
+		i += 1
+	return n
+
+
+func _is_inter(x: int, z: int) -> bool:
+	return cell(x, z) == "," and _run(x, z, 1, 0) > 2 and _run(x, z, 0, 1) > 2
+
+
+func _manhole(c: Vector3) -> void:
+	var p := c + Vector3(rng.randf_range(-0.4, 0.4), 0.02, rng.randf_range(-0.4, 0.4))
+	add_mesh(root, cylinder(0.42, 0.03, 12), _textured("floor_grate", Color(0.35, 0.33, 0.4), 1.0, 0.5, 0.6), p, rng.randf() * TAU, false)
+	if rng.randf() < 0.35:
+		_vent(p)
+
+
+## One draw call for many flat ground decals.
+func _paint_multimesh(xforms: Array[Transform3D], size: Vector2, color: Color, emit: float, colors: Array = [], dark: bool = false) -> void:
+	if xforms.is_empty():
+		return
+	var q := QuadMesh.new()
+	q.size = size
+	q.orientation = PlaneMesh.FACE_Y
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = not colors.is_empty()
+	mm.mesh = q
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+		if mm.use_colors:
+			mm.set_instance_color(i, colors[i])
+	var m := StandardMaterial3D.new()
+	m.albedo_color = color
+	m.roughness = 0.7
+	if mm.use_colors:
+		m.vertex_color_use_as_albedo = true
+	if dark:
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.roughness = 0.15
+		m.metallic = 0.4
+	if emit > 0.0:
+		m.emission_enabled = true
+		m.emission = color
+		m.emission_energy_multiplier = emit
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.material_override = m
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(mmi)
+
+
+## Where NPCs go to live a little (Npc._pick_activity): benches, queues, dance floors.
+func _life_spot(pos: Vector3, kind: String, face: Vector3) -> void:
+	var m := Marker3D.new()
+	m.add_to_group("life_spot")
+	m.set_meta("kind", kind)
+	m.set_meta("face", Vector3(face.x, 0, face.z).normalized())
+	m.position = Vector3(pos.x, 0.0, pos.z)
+	root.add_child(m)
+
+
+## A usable door/counter for whatever the sign says (data/venues.json).
+func _add_venue(parent: Node3D, sign_text: String, faction: String, local_pos: Vector3) -> void:
+	var venue := Interactions.venue_for_sign(sign_text)
+	if venue == "":
+		return
+	var it := PropInteractable.new()
+	it.kind = "venue"
+	it.venue_id = venue
+	it.venue_sign = sign_text
+	it.owner_faction = faction
+	it.prompt = "Enter %s" % sign_text if venue != "food" and venue != "air" and venue != "fortune" else "Visit %s" % sign_text
+	it.position = local_pos
+	parent.add_child(it)
+
+
 ## Sagging power/data cables with paper lanterns strung between nearby rooftops.
 func _build_cables() -> void:
 	if _roofs.size() < 2:
@@ -573,17 +897,18 @@ func _build_cables() -> void:
 	var count := 0
 	for i in _roofs.size():
 		for j in range(i + 1, _roofs.size()):
-			if count > 26:
+			if count > 40:
 				return
 			var a: Vector3 = _roofs[i][0]
 			var b: Vector3 = _roofs[j][0]
 			var dist := Vector2(a.x - b.x, a.z - b.z).length()
-			if dist < 6.0 or dist > 16.0 or rng.randf() < 0.5:
+			if dist < 5.0 or dist > 15.0 or rng.randf() < 0.35:
 				continue
 			count += 1
-			a.y -= rng.randf_range(0.4, 1.6)
-			b.y -= rng.randf_range(0.4, 1.6)
-			var sag := rng.randf_range(0.8, 2.0)
+			# Strung low across the street, where the camera actually looks.
+			a.y = minf(a.y - 0.3, rng.randf_range(3.8, 5.6))
+			b.y = minf(b.y - 0.3, rng.randf_range(3.8, 5.6))
+			var sag := rng.randf_range(0.5, 1.2)
 			var segs := 8
 			var prev := a
 			var lantern_col := next_neon()
@@ -740,9 +1065,27 @@ func _vending(p: Vector3) -> void:
 	body.add_child(it)
 
 
+## The world talks about you: billboards run Lumen headlines about your deeds, or your face if you're famous.
+func _reactive_ad() -> Dictionary:
+	var heads := Causality.latest_headlines(4)
+	var fame := int(Game.flags.get("fame", 0))
+	var roll := rng.randf()
+	if not heads.is_empty() and roll < 0.4:
+		return {"faction": "lumen", "headline": "LUMEN NEWS", "text": str(heads[rng.randi() % heads.size()])}
+	if fame >= 15 and roll < 0.6:
+		var lines := ["%s breathes OxyGenix. Shouldn't you?", "%s: 'I only eat Gristle paste.' (Paid statement.)", "Be like %s. Take out a Halcyon loan today!", "%s is watching Lumen. Are YOU?"]
+		var fids := ["oxy", "gristle", "halcyon", "lumen"]
+		var i := rng.randi() % lines.size()
+		return {"faction": fids[i], "headline": Game.player_name.to_upper(), "text": lines[i] % Game.player_name}
+	return {}
+
+
 func _ad_sign(p: Vector3) -> void:
 	var ads: Array = DataDB.ads.get("list", [])
 	var ad: Dictionary = ads[rng.randi() % ads.size()] if not ads.is_empty() else {"faction": "lumen", "headline": "LUMEN", "text": "Watch more."}
+	var reactive := _reactive_ad()
+	if not reactive.is_empty():
+		ad = reactive
 	var board := ShootableProp.new()
 	board.kind = "ad"
 	board.owner_faction = ad.get("faction", "lumen")
@@ -766,6 +1109,8 @@ func _ad_sign(p: Vector3) -> void:
 	body_text.pixel_size = 0.0065
 	body_text.modulate = Color(1.6, 1.6, 1.8)
 	body_text.position = Vector3(0, 2.45, 0.06)
+	body_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body_text.width = 340.0
 	board.add_child(body_text)
 	var light := OmniLight3D.new()
 	light.light_color = col
@@ -774,6 +1119,7 @@ func _ad_sign(p: Vector3) -> void:
 	light.position = Vector3(0, 2.4, 1.0)
 	board.add_child(light)
 	board.glow_nodes = [frame, border, border2, head, body_text, light]
+	_glow_spots.append([p, col, 1.0])
 	board.add_collision(Vector3(2.4, 1.3, 0.3), Vector3(0, 2.6, 0))
 	board.flicker = rng.randf() < 0.35
 
@@ -785,6 +1131,7 @@ func _lamp(p: Vector3) -> void:
 		add_mesh(body, cylinder(0.08, 3.2, 6), _mats["dark"], Vector3(0, 1.6, 0))
 		add_mesh(body, box(Vector3(0.9, 0.12, 0.3)), emissive(col, 4.0), Vector3(0.3, 3.2, 0), 0.0, false)
 		add_box_collider(body, Vector3(0.3, 3.2, 0.3), Vector3(0, 1.6, 0))
+		_glow_spots.append([p + Vector3(0.4, 0, 0.2), col, 1.2])
 		add_light(p + Vector3(0.4, 2.9, 0.2), col, 3.2, 9.5)
 		light_shaft(p + Vector3(0.3, 1.5, 0.05), col, 2.4, 3.0, 0.14)
 	else:
@@ -1006,9 +1353,14 @@ func _stall(p: Vector3) -> void:
 	label.outline_size = 0
 	label.position = Vector3(0, 2.45, 0.6)
 	body.add_child(label)
+	_add_venue(body, label.text, "", Vector3(0, 0.8, 0.95))
+	_glow_spots.append([p, col, 0.7])
 	if rng.randf() < 0.45:
 		add_light(p + Vector3(0, 1.7, 0.8), Color(1.0, 0.8, 0.5), 1.2, 4.5)
 	add_box_collider(body, Vector3(1.7, 1.0, 0.8), Vector3(0, 0.5, 0))
+	var front := body.basis * Vector3.BACK
+	for k in 2:
+		_life_spot(p + front * (1.3 + k * 0.9) + body.basis * Vector3(rng.randf_range(-0.3, 0.3), 0, 0), "queue", -front)
 
 
 func _hovercar(p: Vector3) -> void:
@@ -1084,6 +1436,9 @@ func _bench(p: Vector3) -> void:
 	for sx in [-0.65, 0.65]:
 		add_mesh(body, box(Vector3(0.08, 0.45, 0.45)), _mats["dark"], Vector3(sx, 0.22, 0))
 	add_box_collider(body, Vector3(1.6, 0.5, 0.5), Vector3(0, 0.25, 0))
+	var fwd := body.basis * Vector3.BACK
+	for sx in [-0.45, 0.45]:
+		_life_spot(p + body.basis * Vector3(sx, 0, 0.55), "sit", fwd)
 
 
 func _street_sign(p: Vector3) -> void:
@@ -1361,6 +1716,23 @@ func _window(x: int, z: int) -> void:
 
 
 func _holo_projector(p: Vector3) -> void:
+	if outdoor:
+		var holo := Hologram.new()
+		holo.figure_scale = rng.randf_range(4.5, 6.5)
+		holo.seed_value = rng.randi()
+		var pair: Array = [[Color(0.25, 0.95, 1.0), Color(1.0, 0.25, 0.85)], [Color(1.0, 0.8, 0.3), Color(1.0, 0.3, 0.4)], [Color(0.5, 1.0, 0.5), Color(0.3, 0.6, 1.0)]][rng.randi() % 3]
+		holo.color_a = pair[0]
+		holo.color_b = pair[1]
+		holo.position = p
+		root.add_child(holo)
+		for k in 5:
+			var a := TAU * k / 5.0 + rng.randf_range(-0.3, 0.3)
+			var off := Vector3(sin(a), 0, cos(a)) * rng.randf_range(2.6, 3.6)
+			_life_spot(p + off, "dance", -off.normalized())
+		var body0 := static_body(p)
+		add_box_collider(body0, Vector3(2.6, 0.4, 2.6), Vector3(0, 0.2, 0))
+		_glow_spots.append([p, pair[0], 1.4])
+		return
 	var body := static_body(p)
 	add_mesh(body, cylinder(0.7, 0.35, 12), _mats["metal"], Vector3(0, 0.17, 0))
 	add_mesh(body, cylinder(0.55, 0.05, 12), emissive(Color(0.3, 0.9, 1.0), 4.0), Vector3(0, 0.37, 0), 0.0, false)

@@ -82,6 +82,18 @@
 - **Planet stories**: each world's crisis becomes a local arc with 5 resolutions that change the planet (crisis
   resolved/worse, prices, air, liberation). **Street events**: 16 incidents, 69 gated choices.
 
+## 3e. A living, reactive world (v0.5)
+- **Venues**: every shop sign is a place (bar, karaoke, arcade, clinic, pawn, cryo-motel, loans, tattoo, tapes,
+  air kiosk, implants, fortune teller, corporate stores, food stalls): 59 options gated by who you are, with
+  permanent upgrades (tattoos, implants), rest + save, gambling, recruiting, fortunes that hint at your story.
+- **The world talks about you**: billboards run Lumen headlines about your deeds or your face once famous;
+  wanted posters show your name and bounty; crowds react to your fame, bounty, class, age, the biome and how
+  you resolved the planet's story; NPCs wave when they like you and cheer when you do good.
+- **Daily life**: NPCs sit on benches, scroll wristpads, queue at stalls, dance around giant holograms;
+  city traffic drives the avenues and brakes for people; sky traffic whooshes through the frame.
+- **Wow pass**: giant dancing holograms, neon facade tubes, wet-street reflections, road paint, litter, rain
+  splashes + lightning + thunder, flickering signs, mist, dust devils, a music track per biome.
+
 ## 4. Next milestones (proposal)
 - [x] HD-2D art pass v1 (sprite forge, normal-mapped kits, lens post, weather, foliage, cutscenes).
 - [ ] Hand-painted hero portraits for dialogue; [x] more building/prop kits per biome (v0.3).

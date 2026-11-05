@@ -71,6 +71,9 @@ func _requirements_met(req: Dictionary) -> bool:
 		return false
 	if req.has("has_item") and Game.item_count(req["has_item"]) <= 0:
 		return false
+	# Shared requirement grammar (who you are: flags, tags, age, wealth...).
+	if not Interactions.requirements_met({"requires": req}, null):
+		return false
 	return true
 
 
@@ -152,6 +155,24 @@ func apply_effects(effects: Dictionary) -> Array[String]:
 		var amount := roundi(Game.credits * float(effects["credits_pct"]))
 		Game.add_credits(amount)
 		lines.append("%+d credits" % amount)
+	if effects.get("heal_full", false):
+		Game.heal(Game.max_hp())
+		lines.append("Fully healed")
+	if effects.has("mods"):
+		# Permanent upgrades (tattoos, implants, a good night's sleep...).
+		var n := int(Game.flags.get("upgrade_count", 0)) + 1
+		Game.flags["upgrade_count"] = n
+		Game.stats.set_source("upgrade:%d" % n, effects["mods"])
+		var desc := StatBlock.describe_mods(effects["mods"])
+		lines.append("Upgrade: " + desc if desc != "" else "Upgraded")
+	if effects.has("sell_all"):
+		var item_id: String = effects["sell_all"]
+		var count := Game.item_count(item_id)
+		if count > 0:
+			var price := Game.sell_price_of(item_id) * count
+			Game.add_item(item_id, -count)
+			Game.add_credits(price)
+			lines.append("Sold %d %s for %d cr" % [count, DataDB.item_name(item_id), price])
 	if effects.has("hp"):
 		Game.heal(float(effects["hp"]))
 		Game.hp = maxf(Game.hp, 1.0)  # space encounters hurt, but never kill

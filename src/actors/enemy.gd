@@ -316,6 +316,8 @@ func _animate(move: Vector3) -> void:
 				sprite.play("shoot" if _is_ranged() else ("slash3" if armored else "slash1"), true)
 		"broken":
 			sprite.play("hurt")
+		"surrender":
+			sprite.play("surrender" if sprite.has_anim("surrender") else "hurt")
 
 
 # --- Movement helpers ------------------------------------------------------------------------
@@ -541,7 +543,7 @@ func _surrender() -> void:
 	_burst_left = 0
 	_knock = Vector3.ZERO
 	velocity = Vector3.ZERO
-	sprite.play("hurt", true)
+	sprite.play("surrender" if sprite.has_anim("surrender") else "hurt", true)
 	_show_alert("?", Color(1.0, 0.9, 0.3), 3.0)
 	FX.slowmo(get_tree(), 0.3, 0.35)
 	for e in get_tree().get_nodes_in_group("enemy"):

@@ -3,8 +3,10 @@ extends Interactable
 ## Interactive level props. Stealing records THEFT in the Causality Graph at
 ## the player's position, so anyone who can see you becomes a witness.
 
-@export_enum("stash", "vending", "terminal", "dock", "cryo", "medstation", "quest_item") var kind := "stash"
+@export_enum("stash", "vending", "terminal", "dock", "cryo", "medstation", "quest_item", "venue") var kind := "stash"
 @export var quest_tag := ""
+@export var venue_id := ""
+@export var venue_sign := ""
 @export var owner_faction := "halcyon"
 
 var _looted := false
@@ -35,6 +37,9 @@ func _on_interact(player: Node) -> void:
 			if m:
 				m.queue_free()
 			Saga.on_item_taken(quest_tag)
+		"venue":
+			Audio.play_sfx("blip", 0.1, -4.0)
+			Interactions.open_venue(venue_id, venue_sign, owner_faction)
 
 
 func _owner_name() -> String:

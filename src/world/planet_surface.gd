@@ -34,7 +34,8 @@ func _setup() -> void:
 	camera_pitch = 30.0
 	camera_distance = 16.0
 	camera_fov = 32.0
-	music = "derelict_ambient"
+	music = {"neon_sprawl": "neon_city", "toxic_swamp": "bog_hymn", "ad_desert": "glacier_static",
+		"rust_canyon": "rust_run", "crystal_moon": "crystal_lull"}.get(str(env_layer.get("id", "")), "derelict_ambient")
 	spawn_key = "default"
 	var fx: Dictionary = anomaly_layer.get("effects", {})
 	gravity_scale = float(fx.get("gravity_scale", 1.0))
@@ -120,6 +121,16 @@ func _ambient_life() -> void:
 		d.bounds = area
 		d.seed_value = level_seed + i
 		add_child(d)
+	# Street traffic along the avenues (city only).
+	var lanes: Array = builder.road_lanes.duplicate()
+	lanes.shuffle()
+	for i in mini(lanes.size(), 8):
+		var sc := Critter.new()
+		sc.kind = "streetcar"
+		sc.lane_from = lanes[i][0]
+		sc.lane_to = lanes[i][1]
+		sc.seed_value = level_seed * 11 + i
+		add_child(sc)
 	# Sky traffic over the rooftops (sparser out in the wilds).
 	for i in (14 if city else 4):
 		var car := Critter.new()
@@ -135,6 +146,12 @@ func _landing() -> void:
 	player.set_cutscene(true)
 	player.visible = false
 	hud.cinematic(true)
+	# Establishing crane shot: start high and wide over the district, glide down into play.
+	camera_rig.pitch_degrees = 56.0
+	camera_rig.distance = 36.0
+	var crane := create_tween().set_parallel()
+	crane.tween_property(camera_rig, "pitch_degrees", camera_pitch, 4.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	crane.tween_property(camera_rig, "distance", camera_distance, 4.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	if ship:
 		var final_y := ship.position.y
 		ship.position.y = final_y + 14.0

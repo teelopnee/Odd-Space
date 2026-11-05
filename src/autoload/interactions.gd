@@ -139,6 +139,10 @@ func requirements_met(d: Dictionary, npc: Node) -> bool:
 		return false
 	if req.has("min_credits") and Game.credits < int(req["min_credits"]):
 		return false
+	if req.get("not_crew_full", false) and Crew.is_full():
+		return false
+	if req.has("min_air_debt") and Game.air_debt < int(req["min_air_debt"]):
+		return false
 	if req.has("min_wealth") and Origin.wealth() < int(req["min_wealth"]):
 		return false
 	if req.has("max_wealth") and Origin.wealth() > int(req["max_wealth"]):
@@ -325,3 +329,121 @@ func _rumor_vars() -> Dictionary:
 	vars["local_hint"] = local.get("hint", "Something about the bills.")
 	vars["local_name"] = local.get("leader", "the locals")
 	return vars
+
+
+# --- Venues (shops, bars, clinics... behind every sign) ------------------------------------
+
+var _venue_ctx := {}
+
+
+func venue_for_sign(sign_text: String) -> String:
+	var signs: Dictionary = DataDB.venues.get("signs", {})
+	if signs.has(sign_text):
+		return signs[sign_text]
+	# Corporate storefronts show the owner's short name.
+	for fid in DataDB.factions:
+		if str(DataDB.factions[fid].get("short", "")) == sign_text:
+			return "corp_store"
+	return ""
+
+
+func open_venue(venue_id: String, sign_text: String, faction: String) -> void:
+	var v: Dictionary = DataDB.venues.get("venues", {}).get(venue_id, {})
+	if v.is_empty():
+		return
+	_venue_ctx = {"id": venue_id, "sign": sign_text, "faction": faction}
+	var greet: Array = v.get("greet", ["..."])
+	var title := "%s  //  %s" % [sign_text, v.get("name", "")]
+	var choices := []
+	for o in v.get("options", []):
+		if not Saga.choice_ok(o) or (o.get("once", false) and _venue_used(venue_id, str(o.id))):
+			continue
+		var text := str(o.get("text", o.id))
+		var cost := int(o.get("cost", 0))
+		if o.has("chance"):
+			text += "  [%d%%]" % roundi(chance_of(o, null) * 100.0)
+		choices.append({"id": o.id, "text": text, "disabled": cost > 0 and not Game.can_afford(cost)})
+	choices.append({"id": "leave", "text": "Leave"})
+	EventBus.dialogue_requested.emit(title, str(greet[_rng.randi() % greet.size()]), choices, _on_venue_choice)
+
+
+func _venue_used(venue_id: String, opt: String) -> bool:
+	var used: Dictionary = Game.flags.get("venue_once", {})
+	return used.has("%s:%s:%s" % [Game.location_id, venue_id, opt])
+
+
+func _on_venue_choice(choice: String) -> void:
+	if choice == "leave" or _venue_ctx.is_empty():
+		return
+	var vid: String = _venue_ctx.id
+	var v: Dictionary = DataDB.venues.get("venues", {}).get(vid, {})
+	var o: Dictionary = {}
+	for x in v.get("options", []):
+		if x.get("id", "") == choice:
+			o = x
+	if o.is_empty():
+		return
+	var cost := int(o.get("cost", 0))
+	if cost > 0 and not Game.spend(cost):
+		return
+	if o.get("once", false):
+		var used: Dictionary = Game.flags.get("venue_once", {})
+		used["%s:%s:%s" % [Game.location_id, vid, choice]] = true
+		Game.flags["venue_once"] = used
+	var success := _rng.randf() < chance_of(o, null)
+	var r: Dictionary = o.get("success" if success else "fail", o.get("success", {}))
+	var text := Saga.fill(str(r.get("text", "...")))
+	var lines := Encounters.apply_effects(r.get("effects", {}))
+	var ax: Dictionary = r.get("axes", {})
+	for k in ax:
+		Saga.axes[k] = float(Saga.axes.get(k, 0.0)) + float(ax[k])
+	if r.has("fame"):
+		Game.flags["fame"] = Saga.fame() + int(r.fame)
+		lines.append("Fame +%d" % int(r.fame))
+	if r.has("followers"):
+		Game.flags["followers"] = Saga.followers() + int(r.followers)
+		lines.append("+%d follower%s" % [int(r.followers), "" if int(r.followers) == 1 else "s"])
+	if r.has("record"):
+		var p := get_tree().get_first_node_in_group("player") as Node3D
+		Causality.record(str(r.record), {"target": str(_venue_ctx.sign), "target_faction": str(_venue_ctx.faction), "position": p.global_position if p else Vector3.ZERO})
+	for i in int(r.get("rumor", 0)):
+		text += "\n\n" + rumor(null)
+	if r.get("fortune", false):
+		text += "\n\n[color=#c07dff]" + fortune() + "[/color]"
+	if r.get("music", false):
+		Audio.play_music(["odd_duck_theme", "neon_city", "bog_hymn", "glacier_static", "rust_run", "crystal_lull"][_rng.randi() % 6])
+	if not lines.is_empty():
+		text += "\n[color=#ffd23e]" + "  ".join(PackedStringArray(lines)) + "[/color]"
+	if r.get("save", false):
+		Game.save_game()
+		text += "\n[color=#7dff4a]Progress saved.[/color]"
+	EventBus.interaction_done.emit("venue:" + vid + ":" + choice, success, null)
+	if r.has("shop"):
+		Game.shop_discount = 0.0
+		EventBus.shop_requested.emit(str(_venue_ctx.sign), str(_venue_ctx.faction), r.shop)
+		return
+	EventBus.dialogue_requested.emit(str(_venue_ctx.sign), text, [], Callable())
+
+
+## Cryptic but true: hints about where the story goes and how it could end.
+func fortune() -> String:
+	var pool := []
+	if not Saga.is_complete():
+		var b := Saga.current()
+		var pname: String = Game.planet_by_id(Saga.objective_planet()).get("name", "?")
+		pool.append("\"Your road bends toward %s. Something waits there: %s.\"" % [pname, str(b.get("title", "a door")).to_lower()])
+		if int(Saga.state.get("ally_trust", 0)) <= 0 and Saga.index < 5:
+			pool.append("\"The one who found you... their smile hides an invoice. Ask them what they owe, before they ask you.\"")
+		if Saga.index < 6:
+			pool.append("\"At the end, a thing in your hands. Burn it, sell it, give it, keep it - the cards don't care. The cards are watching anyway.\"")
+	var e: Dictionary = Saga.data().get("early", {}).get(Game.tags.get("motivation", ""), {})
+	if not e.is_empty():
+		pool.append("\"There is a shorter road to what you want. It looks like this: '%s'. Few take it.\"" % Saga.fill(str(e.get("text", ""))))
+	var ax := Saga.axes
+	if float(ax.get("mercy", 0)) >= 3:
+		pool.append("\"The gutters already sing about you. Keep going, saint.\"")
+	elif float(ax.get("mercy", 0)) <= -3:
+		pool.append("\"I see blood on the ledger. Yours will come due.\"")
+	if pool.is_empty():
+		pool.append("\"I see... a debt. I always see a debt.\"")
+	return pool[_rng.randi() % pool.size()]
