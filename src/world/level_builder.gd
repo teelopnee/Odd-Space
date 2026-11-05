@@ -584,20 +584,9 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 	elif roll < 0.6:
 		add_mesh(body, cylinder(0.55, 1.1, 8), _mats["metal"], Vector3(-w * 0.25, h + 0.8, -d * 0.2))
 		add_mesh(body, cylinder(0.05, 0.6, 4), _mats["dark"], Vector3(-w * 0.25, h + 0.25, -d * 0.2))
-	elif roll < 0.85 and w > 3.0:
-		var ads: Array = DataDB.ads.get("list", [])
-		var ad: Dictionary = ads[rng.randi() % ads.size()] if not ads.is_empty() else {"faction": "lumen", "headline": "LUMEN"}
-		var ad_col := DataDB.faction_color(ad.get("faction", "lumen"))
-		add_mesh(body, box(Vector3(w * 0.8, 1.6, 0.1)), emissive(ad_col.darkened(0.55), 1.2), Vector3(0, h + 1.3, -d * 0.1), 0.0, true)
-		add_mesh(body, box(Vector3(w * 0.8 + 0.1, 0.06, 0.12)), emissive(ad_col, 4.0), Vector3(0, h + 2.12, -d * 0.1), 0.0, false)
-		var al := Label3D.new()
-		al.text = str(ad.get("headline", ""))
-		al.font_size = 96
-		al.pixel_size = 0.009
-		al.modulate = ad_col * 2.4
-		al.outline_size = 0
-		al.position = Vector3(0, h + 1.3, -d * 0.1 + 0.07)
-		body.add_child(al)
+	elif roll < 0.8:
+		# Rooftop vent stack puffing steam (rooftop billboards floated through the camera).
+		add_mesh(body, cylinder(0.3, 0.9, 8), _mats["metal"], Vector3(w * 0.2, h + 0.55, d * 0.15))
 
 
 ## Wanted posters with your name appear once Paragon (or anyone) puts a price on you.
