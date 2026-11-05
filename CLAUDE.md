@@ -60,6 +60,8 @@ godot --headless --path . --script res://tools/smoke_test.gd        # station ->
 Screenshots (software Vulkan): `apt-get install mesa-vulkan-drivers xvfb`, then
 `VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --resolution 1280x800 --script res://tools/capture_screens.gd -- <out_dir>`
 (options: `--quick`, `--biome=<env>`, `--street` = also walk to the nearest shop front, `--creator`; ~10 min per biome on lavapipe).
+`--street --probe` also works with `--headless` (no images): prints the ASCII map around the hero plus every mesh/collider
+on the camera sight line - the fastest way to find out what is blocking or darkening a shot.
 
 Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 
@@ -67,6 +69,8 @@ Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 - Outdoor camera (pitch 30, fov 32, distance 16) only sees ground ~8-32 m ahead and things below ~5 m:
   sky, rooftop props and anything taller never appear in frame. Put "wow" at street level; keep holograms ~2.4-3x.
 - Thin particles (rain < ~0.05 m wide) turn into screen noise; prefer fewer, larger streaks.
+- Outdoor low walls (southern map rim, river banks) are built as `_street_edge` (pale kerb + slim barrier/rail): the camera
+  looks down on their 2 m-deep top face, which read as a black band in front of the hero when it was a dark wall box.
 - Occluder cut-away (`CameraRig._update_occluders`) sweeps a 5 m box along the sight line (layer 128), so a whole
   row of buildings across a narrow street fades together; a single ray left a dark band over the hero.
 - Never run `--import` while `tools/sprite_forge.py` is still writing sheets: a half-written PNG gets imported as

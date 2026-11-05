@@ -7,6 +7,8 @@ uniform vec4 deep : source_color = vec4(0.02, 0.04, 0.08, 1.0);
 uniform vec4 glow : source_color = vec4(0.2, 0.9, 1.0, 1.0);
 uniform float glow_strength = 0.1;
 uniform float pixel = 6.0; // world-space quantisation of the ripples (texels per metre)
+uniform vec4 glow_b : source_color = vec4(1.0, 0.25, 0.8, 1.0); // second sign colour for reflections
+uniform float reflect_strength = 0.0; // fake neon-sign reflections (city canals)
 
 void fragment() {
 	vec3 wp = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -34,4 +36,14 @@ void fragment() {
 	EMISSION = glow.rgb * glow_strength * (0.55 + 0.45 * band + 0.25 * w)
 		+ glow.rgb * sparkle * max(glow_strength, 0.15)
 		+ mix(vec3(1.0), glow.rgb, 0.5) * foam * max(glow_strength, 0.2) * 1.5;
+	// Fake neon reflections: soft vertical smears of sign colour, broken up by the ripples,
+	// so a city canal reads as wet glass instead of a black void.
+	if (reflect_strength > 0.0) {
+		float lane = floor(p.x * 0.9);
+		float h = fract(sin(lane * 12.9898 + 4.1) * 43758.5453);
+		float smear = smoothstep(0.35, 0.95, sin(p.y * 0.45 + h * 31.0 + t * 0.25) * 0.5 + 0.5) * step(0.4, h);
+		float wob = 0.55 + 0.45 * sin(p.y * 6.0 + t * 2.6 + h * 9.0 + w * 2.0);
+		vec3 rcol = mix(glow.rgb, glow_b.rgb, step(0.7, h));
+		EMISSION += rcol * smear * wob * reflect_strength;
+	}
 }

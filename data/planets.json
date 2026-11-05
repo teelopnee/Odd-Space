@@ -45,9 +45,11 @@
 			"puddles": "water",
 			"weather": "rain",
 			"path_tex": "asphalt",
-			"water": "#0a0e1c",
+			"water": "#0e1630",
 			"water_glow": "#3ee6ff",
-			"water_glow_strength": 0.1,
+			"water_glow_strength": 0.14,
+			"water_glow_b": "#ff3ec8",
+			"water_reflect": 0.55,
 			"building_h": [
 				5.0,
 				11.0

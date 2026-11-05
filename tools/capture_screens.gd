@@ -164,6 +164,8 @@ func _process(_delta: float) -> bool:
 				if cam and cam.has_method("snap_to_target"):
 					cam.snap_to_target()
 		13:
+			if OS.get_cmdline_user_args().has("--probe"):
+				_probe_sightline()
 			_shot(_current + "_street")
 			_step = 10
 		30:
@@ -177,6 +179,42 @@ func _process(_delta: float) -> bool:
 	return false
 
 
+## Debug: list every mesh / collider between the camera and the hero (what's blocking the view?).
+func _probe_sightline() -> void:
+	var cam := root.get_viewport().get_camera_3d()
+	var pl = get_first_node_in_group("player")
+	if cam == null or pl == null:
+		return
+	var a: Vector3 = cam.global_position
+	var b: Vector3 = pl.global_position + Vector3(0, 0.5, 0)
+	print("PROBE cam ", a, " -> hero ", b)
+	for mi in current_scene.find_children("*", "GeometryInstance3D", true, false):
+		var g := mi as GeometryInstance3D
+		if not g.is_visible_in_tree():
+			continue
+		var box: AABB = g.global_transform * g.get_aabb()
+		if box.intersects_segment(a, b):
+			print("  MESH ", g.get_path(), "  aabb ", box, "  mat ", g.material_override)
+	var bld = current_scene.get("builder")
+	if bld:
+		var hx := int(b.x / 2.0)
+		var hz := int(b.z / 2.0)
+		for z in range(hz - 4, hz + 8):
+			var row := ""
+			for x in range(hx - 8, hx + 9):
+				row += ("@" if x == hx and z == hz else bld.cell(x, z))
+			print("  MAP z=%d  %s" % [z, row])
+	var space = pl.get_world_3d().direct_space_state
+	var ex: Array[RID] = []
+	for i in 6:
+		var q := PhysicsRayQueryParameters3D.create(a, b, 0xFFFFFFFF, ex)
+		var hit: Dictionary = space.intersect_ray(q)
+		if hit.is_empty():
+			break
+		print("  BODY ", hit.collider.get_path(), " layer ", hit.collider.collision_layer, " fade_mats ", hit.collider.has_meta("fade_mats"))
+		ex.append(hit.rid)
+
+
 func _next(frames: int) -> void:
 	_step += 1
 	_wait = frames
@@ -184,6 +222,9 @@ func _next(frames: int) -> void:
 
 func _shot(shot_name: String) -> void:
 	var img := root.get_texture().get_image()
+	if img == null:
+		print("(headless, no image) ", shot_name)
+		return
 	var path := "%s/%s.png" % [_out, shot_name]
 	img.save_png(path)
 	print("saved ", path)

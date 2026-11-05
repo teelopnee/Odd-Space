@@ -183,6 +183,8 @@ func _make_materials() -> void:
 	water.set_shader_parameter("deep", pcolor("water", "#05060c"))
 	water.set_shader_parameter("glow", pcolor("water_glow", "#3ee6ff"))
 	water.set_shader_parameter("glow_strength", float(palette.get("water_glow_strength", 0.1)))
+	water.set_shader_parameter("glow_b", pcolor("water_glow_b", "#ff3ec8"))
+	water.set_shader_parameter("reflect_strength", float(palette.get("water_reflect", 0.0)))
 	_mats["water"] = water
 	_mats["wall"] = _textured("rock_cliff" if outdoor else "wall_panel", pcolor("wall", "#4a3f6b"), 0.5, 0.8, 0.25, 1.6)
 	_mats["crate"] = _textured("crate", Color(0.85, 0.75, 0.6), 0.75, 0.8, 0.1, 1.4)
@@ -395,16 +397,19 @@ func _wall_run(x0: int, x1: int, z: int, low: bool) -> void:
 	var h := LOW_WALL_H if low else WALL_H
 	var cx := (x0 + x1 + 1) * TILE * 0.5
 	var cz := z * TILE + TILE * 0.5
+	if not _mats.has("cliff_cap"):
+		_mats["cliff_cap"] = _textured(str(palette.get("ground_tex", "ground_rock")), pcolor("ground_alt", "#556070").lightened(0.15), 0.5, 0.9, 0.0, 1.4)
+	# Collision is always full height so low walls still block movement.
+	add_box_collider(_walls_body, Vector3(length, WALL_H, TILE), Vector3(cx, WALL_H * 0.5, cz))
+	if outdoor and low:
+		_street_edge(x0, x1, z, length, cx, cz)
+		return
 	if outdoor and not low:
 		h = WALL_H + rng.randf_range(-0.6, 1.2)
 	add_mesh(root, box(Vector3(length, h, TILE)), _mats["wall"], Vector3(cx, h * 0.5, cz))
 	if outdoor and not low:
 		# Plateau cap: moss / sand / crystal dust on top so cliffs aren't black slabs from above.
-		if not _mats.has("cliff_cap"):
-			_mats["cliff_cap"] = _textured(str(palette.get("ground_tex", "ground_rock")), pcolor("ground_alt", "#556070").lightened(0.15), 0.5, 0.9, 0.0, 1.4)
 		add_mesh(root, box(Vector3(length + 0.06, 0.12, TILE + 0.06)), _mats["cliff_cap"], Vector3(cx, h + 0.05, cz), 0.0, false)
-	# Collision is always full height so low walls still block movement.
-	add_box_collider(_walls_body, Vector3(length, WALL_H, TILE), Vector3(cx, WALL_H * 0.5, cz))
 	var faces_room := walkable(x0, z + 1) or walkable(x1, z + 1)
 	if outdoor:
 		return
@@ -421,6 +426,31 @@ func _wall_run(x0: int, x1: int, z: int, low: bool) -> void:
 	# Ceiling cap: a dark beam on top of tall walls frames the diorama.
 	if not low:
 		add_mesh(root, box(Vector3(length + 0.05, 0.25, TILE + 0.1)), _mats["dark"], Vector3(cx, h + 0.12, cz), 0.0, false)
+
+
+## The map's southern rim and river banks, seen from above by the camera: a pale kerb slab with a
+## slim barrier on the walkable side (glowing rail in the city, posts elsewhere) - never a dark 2 m slab.
+func _street_edge(x0: int, x1: int, z: int, length: float, cx: float, cz: float) -> void:
+	add_mesh(root, box(Vector3(length, 0.16, TILE)), _mats["cliff_cap"], Vector3(cx, 0.08, cz))
+	var north := walkable(x0, z - 1) or walkable(x1, z - 1)
+	var bz := cz + (-TILE * 0.5 + 0.2 if north else TILE * 0.5 - 0.2)
+	if _city:
+		# Concrete jersey barrier + neon rail + hazard chevrons.
+		add_mesh(root, box(Vector3(length, 0.62, 0.26)), _mats["wall"], Vector3(cx, 0.31, bz))
+		add_mesh(root, box(Vector3(length, 0.04, 0.08)), emissive(next_neon(), 1.1), Vector3(cx, 0.65, bz), 0.0, false)
+		var stripe := emissive(Color(1.0, 0.75, 0.15), 0.6)
+		var n := int(length / 4.0)
+		for i in n:
+			var sx := cx - length * 0.5 + 2.0 + i * 4.0
+			# On the +Z face: the one the camera actually sees.
+			add_mesh(root, box(Vector3(0.5, 0.12, 0.02)), stripe, Vector3(sx, 0.36, bz + 0.14), 0.0, false)
+	else:
+		# Frontier rail: posts and a single bar.
+		add_mesh(root, box(Vector3(length, 0.08, 0.08)), _mats["dark"], Vector3(cx, 0.72, bz), 0.0, false)
+		var posts := int(length / 3.0) + 1
+		for i in posts:
+			var px := cx - length * 0.5 + 0.15 + i * (length - 0.3) / maxf(1.0, posts - 1)
+			add_mesh(root, box(Vector3(0.1, 0.75, 0.1)), _mats["dark"], Vector3(px, 0.37, bz), 0.0, false)
 
 
 # --- Buildings (planets) --------------------------------------------------------------------
