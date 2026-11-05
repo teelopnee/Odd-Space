@@ -237,6 +237,23 @@ static func add_street_memory(kind: String) -> void:
 	Game.flags[key] = d
 
 
+## How the street's stories about you colour a stranger's first impression (-30..30).
+static func street_bias(npc: Node) -> int:
+	var street := street_memory()
+	var w := {"approve": 3, "amused": 1, "disapprove": -3, "fear": -4}
+	var total := 0
+	for kind in street:
+		total += int(w.get(stance_for(npc, kind), 0)) * mini(int(street[kind]), 5)
+	return clampi(total, -30, 30)
+
+
+## A planet where you've killed in the street is a planet where people cross the road.
+static func street_feared(npc: Node) -> bool:
+	var street := street_memory()
+	var bloody := int(street.get("murder", 0)) * 2 + int(street.get("kill_cop", 0)) + int(street.get("fight", 0))
+	return bloody >= 4 and stance_for(npc, "murder") == "fear"
+
+
 ## Summary for "Ask what people say about you".
 static func street_rep(npc: Node, rng: RandomNumberGenerator) -> String:
 	var street := street_memory()

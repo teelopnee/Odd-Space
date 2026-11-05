@@ -46,8 +46,20 @@ func _ready() -> void:
 	EventBus.action_status_changed.connect(_on_status_changed)
 
 
+## Would they phone it in? (In range, line of sight, and willing.)
 func can_witness(pos: Vector3) -> bool:
-	if not active or not is_inside_tree():
+	if not active:
+		return false
+	# Friends (and people you've bought) look the other way.
+	var owner_node := get_parent()
+	if owner_node.has_method("will_report") and not owner_node.will_report():
+		return false
+	return can_see(pos)
+
+
+## Can they see it at all? (Memory and reactions work even for friends and bought witnesses.)
+func can_see(pos: Vector3) -> bool:
+	if not is_inside_tree():
 		return false
 	var owner_node := get_parent()
 	if owner_node.has_method("is_alive") and not owner_node.is_alive():
@@ -92,6 +104,9 @@ func silence(how: String = "killed") -> void:
 	for id in ids:
 		EventBus.witness_silenced.emit(self, id)
 		Causality.witness_silenced(id, witness_id)
+	# The owner is off the phone: back to normal life (was stuck "reporting" forever).
+	if get_parent().has_method("on_report_finished"):
+		get_parent().on_report_finished()
 
 
 func _process(delta: float) -> void:
@@ -125,6 +140,10 @@ func _compute_duration(node_id: int) -> float:
 		t *= 1.3
 	# Informants you've bought on this planet "lose signal" for a while.
 	t *= 1.0 + float(Game.flags.get("informants_" + Game.location_id, 0.0))
+	# People who like you dawdle on the phone; people you've wronged speed-dial.
+	var att = get_parent().get("attitude")
+	if att != null:
+		t *= clampf(1.0 + float(att) / 60.0, 0.55, 1.75)
 	return maxf(1.2, t)
 
 

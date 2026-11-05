@@ -53,6 +53,15 @@ static var _barks: Dictionary = {}
 ## What they saw you do (NPCVoice): [{kind, stance, target, t}], newest first.
 var memories: Array = []
 var tic := ""  ## personal verbal tic ("Swear on my lungs.") - see NPCVoice.say
+## Consequences of what you did to them (see "Impact" below).
+var owes_favour := false
+var grudge := false
+var repossessed := false
+var scared_until := 0.0
+var _favour_wait := 0.0
+var _grudge_wait := 0.0
+var _mood_bark := 0.0
+var _leaving := false
 static var _act_seen := {}  # "frame:kind" -> how many bystanders already reacted out loud
 
 
@@ -104,6 +113,7 @@ func _ready() -> void:
 	tic = Copy.make("tic", _rng) if _rng.randf() < 0.7 else ""
 	name_label.text = npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
 	_update_prompt()
+	refresh_label()
 
 
 func is_alive() -> bool:
@@ -119,7 +129,7 @@ func _physics_process(delta: float) -> void:
 	var move := Vector3.ZERO
 	match state:
 		"idle":
-			if role != "merchant":
+			if role != "merchant" or activity == "kneel":
 				move = _activity(delta) if activity != "" else _wander()
 				if activity == "" and story_id == "" and persona_id == "":
 					_act_check -= delta
@@ -220,6 +230,8 @@ func _activity_anim() -> String:
 			return "wave"
 		"queue":
 			return "talk" if fmod(_act_time, 7.0) < 2.0 else "idle"
+		"kneel":
+			return "surrender"
 	return "idle"
 
 
@@ -275,6 +287,11 @@ func on_report_finished() -> void:
 	if state == "reporting":
 		state = "idle"
 	_update_prompt()
+
+
+## Witness contract: friends and people you've bought won't pick up the phone.
+func will_report() -> bool:
+	return not loyal and attitude < 45
 
 
 func _update_prompt() -> void:
@@ -376,7 +393,11 @@ func _talk_witness() -> void:
 	]
 	choices.append_array(Interactions.choices_for(self, "witness").slice(0, 4))
 	choices.append({"id": "leave", "text": "Let them finish the call"})
-	EventBus.dialogue_requested.emit(npc_name, "\"Stay back! I'm on with %s right now. They're putting me through to a supervisor!\"" % witness.calls_faction.capitalize(), choices, _on_witness_choice)
+	var text := "\"Stay back! I'm on with %s right now. They're putting me through to a supervisor!\"" % witness.calls_faction.capitalize()
+	text += "\n[color=#ffd23e]> The call is %d%% done. Win them over (pay, charm, scare...) and it dies; botch it and they talk faster.[/color]" % roundi(witness.progress * 100.0)
+	for l in Interactions._other_callers(self):
+		text += "\n> " + l
+	EventBus.dialogue_requested.emit(npc_name, text, choices, _on_witness_choice)
 
 
 func _threaten_chance() -> float:
@@ -404,21 +425,38 @@ func _on_witness_choice(choice: String) -> void:
 			if _rng.randf() < _threaten_chance():
 				witness.silence("threatened")
 				Causality.record("intimidate", {"target": npc_name, "target_faction": faction})
-				EventBus.dialogue_requested.emit(npc_name, "\"...Line's dead. Must be static. I didn't see anything. I don't even have eyes.\"", [], Callable())
-				state = "flee"
-				_timer = 4.0
-				_flee_from = global_position
+				scared_until = Game.play_time + 150.0
+				attitude = mini(attitude, -20)
+				EventBus.dialogue_requested.emit(npc_name, "\"...Line's dead. Must be static. I didn't see anything. I don't even have eyes.\"" + _call_footer(true), [], Callable())
+				flee_from_player()
 			else:
 				# Botched threat: they talk faster.
 				witness.progress = minf(0.95, witness.progress + 0.35)
-				EventBus.dialogue_requested.emit(npc_name, "\"Are you THREATENING me? Supervisor, are you getting this?!\"", [], Callable())
+				attitude = mini(attitude, -30)
+				EventBus.dialogue_requested.emit(npc_name, "\"Are you THREATENING me? Supervisor, are you getting this?!\"" + _call_footer(false), [], Callable())
+	refresh_label()
 	_update_prompt()
 
 
 func _silence_by_bribe(method: String) -> void:
 	witness.silence("bribed")
 	Causality.record("bribe", {"target": npc_name, "target_faction": faction, "note": method})
-	EventBus.dialogue_requested.emit(npc_name, "\"Sorry, Paragon, wrong number. Just ordering a pizza.\" They pocket the cash and look away.", [], Callable())
+	make_loyal()
+	attitude = maxi(attitude, 10)
+	FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), "CALL CUT", Color(0.5, 1.0, 0.6), true)
+	EventBus.dialogue_requested.emit(npc_name, "\"Sorry, Paragon, wrong number. Just ordering a pizza.\" They pocket the cash and look away." + _call_footer(true), [], Callable())
+
+
+## Result block for the stop-the-call dialogue: did it work, who else is still calling.
+func _call_footer(cut: bool) -> String:
+	var t := "\n\n[color=#9adfff]> "
+	if cut:
+		t += "[color=#7dff4a]CALL CUT - %s hangs up and won't report you.[/color]" % npc_name
+	else:
+		t += "[color=#ff5a5a]That made it worse - %d%% through the call.[/color]" % roundi(witness.progress * 100.0)
+	for l in Interactions._other_callers(self):
+		t += "\n> " + l
+	return t + "[/color]"
 
 
 func _talk_merchant() -> void:
@@ -523,7 +561,7 @@ func witness_act(kind: String, target: String = "", victim: Node = null) -> void
 		if _player == null:
 			return
 	var me := victim == self
-	if not me and not witness.can_witness(_player.global_position):
+	if not me and not witness.can_see(_player.global_position):
 		return
 	if not memories.is_empty() and memories[0]["kind"] == kind and absf(float(memories[0]["t"]) - Game.play_time) < 0.5:
 		return  # same act reported twice (verb + Causality record)
@@ -537,6 +575,9 @@ func witness_act(kind: String, target: String = "", victim: Node = null) -> void
 		memories.resize(NPCVoice.MAX_MEMORIES)
 	var shift: int = {"approve": 6, "amused": 3, "disapprove": -8, "fear": -5}.get(st, 0)
 	attitude = clampi(attitude + shift, -100, 100)
+	if st == "fear" and kind in ["murder", "kill_cop", "fight", "threat"]:
+		scared_until = maxf(scared_until, Game.play_time + 90.0)
+	refresh_label()
 	if me or state != "idle" or int(_act_seen[stamp]) >= 2:
 		return
 	_act_seen[stamp] = int(_act_seen[stamp]) + 1
@@ -587,6 +628,232 @@ func make_loyal() -> void:
 		witness.silence("talked")
 	witness.active = false
 	_update_prompt()
+	refresh_label()
+
+
+# --- Impact: what you did to them shows, and changes how they live ---------------------------
+
+func is_scared() -> bool:
+	return scared_until > Game.play_time
+
+
+## The relationship tag over their head (empty = nothing special).
+func relation_label() -> String:
+	if name_label and name_label.text.contains("INFORMANT"):
+		return "YOUR INFORMANT"
+	if repossessed:
+		return "REPOSSESSED"
+	if is_scared():
+		return "SCARED OF YOU"
+	if attitude >= 45:
+		return "DEVOTED TO YOU"
+	if owes_favour:
+		return "OWES YOU ONE"
+	if attitude >= 15:
+		return "FRIENDLY"
+	if attitude <= -40:
+		return "FURIOUS"
+	if attitude <= -15:
+		return "DISLIKES YOU"
+	if loyal:
+		return "KEEPS QUIET"
+	return ""
+
+
+const REL_COLORS := {"YOUR INFORMANT": Color(0.6, 0.9, 1.0), "REPOSSESSED": Color(0.7, 0.7, 0.75),
+	"SCARED OF YOU": Color(0.75, 0.55, 1.0), "DEVOTED TO YOU": Color(1.0, 0.85, 0.3), "OWES YOU ONE": Color(0.5, 1.0, 0.6),
+	"FRIENDLY": Color(0.5, 1.0, 0.6), "FURIOUS": Color(1.0, 0.3, 0.3), "DISLIKES YOU": Color(1.0, 0.6, 0.45),
+	"KEEPS QUIET": Color(0.75, 0.85, 0.9)}
+
+
+func refresh_label() -> void:
+	if name_label == null or story_id != "" or persona_id != "":
+		return
+	var base := npc_name + ("\n<TRADER>" if role == "merchant" else ("\n<LOOKING FOR WORK>" if role == "recruit" else ""))
+	var rel := relation_label()
+	if rel == "YOUR INFORMANT":
+		return
+	name_label.text = base + ("\n<%s>" % rel if rel != "" else "")
+	name_label.modulate = REL_COLORS.get(rel, Color.WHITE)
+
+
+## Called by Interactions after a verb resolves: show it, and set up what happens next.
+func after_interaction(before_rel: String, before_att: int) -> String:
+	refresh_label()
+	var rel := relation_label()
+	var d := attitude - before_att
+	var col: Color = REL_COLORS.get(rel, Color(1, 1, 1))
+	if rel != before_rel and rel != "":
+		FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), rel, col, true)
+	elif d != 0:
+		FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), "%+d" % d, Color(0.5, 1, 0.6) if d > 0 else Color(1, 0.4, 0.4))
+	if rel != before_rel:
+		return "%s: %s -> %s" % [npc_name, before_rel.capitalize() if before_rel != "" else "Neutral", rel.capitalize() if rel != "" else "Neutral"]
+	return ""
+
+
+## Behaviour reactions requested by interaction effects ("react" key in data/interactions.json).
+## Returns a line describing the consequence for the dialogue.
+func react(kind: String) -> String:
+	match kind:
+		"grateful":
+			owes_favour = true
+			_favour_wait = _rng.randf_range(15.0, 35.0)
+			react_cheer()
+			if (traits as Array).has("poor") and _rng.randf() < 0.7:
+				_go_spend()
+				return "They head straight for the food stall. First real meal in a while. They owe you one."
+			return "They won't forget this. They owe you one."
+		"scared":
+			scared_until = Game.play_time + 150.0
+			flee_from_player()
+			return "They're scared of you now. They'll keep their distance."
+		"bow":
+			_kneel(1.4)
+			return "They know exactly who your family is. They'll keep quiet - and give you the family discount."
+		"leave":
+			_kneel(1.2)
+			_leaving = true
+			return "Served. They pack up and leave the street for good."
+		"repossessed":
+			repossessed = true
+			_strip_look()
+			_kneel(3.0)
+			grudge = true
+			_grudge_wait = _rng.randf_range(8.0, 14.0)
+			return "Repossessed. They're left with nothing - and they look like they're about to call Paragon."
+		"grudge":
+			grudge = true
+			_grudge_wait = _rng.randf_range(5.0, 10.0)
+			return "They're furious. Looks like they're about to file a complaint about you."
+		"smitten":
+			react_cheer()
+			return "They're blushing. Somebody has a crush."
+	return ""
+
+
+func _kneel(t: float) -> void:
+	end_activity()
+	state = "idle"
+	activity = "kneel"
+	_act_target = global_position
+	_act_time = t
+	_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1) if _player and is_instance_valid(_player) else Vector3.BACK
+
+
+## Spend the money you gave them: walk to the nearest food stall queue.
+func _go_spend() -> void:
+	var best: Node3D = null
+	var best_d := 40.0
+	for sp in get_tree().get_nodes_in_group("life_spot"):
+		if str(sp.get_meta("kind", "")) != "queue" or sp.get_meta("taken", false):
+			continue
+		var dd: float = (sp as Node3D).global_position.distance_to(global_position)
+		if dd < best_d:
+			best = sp
+			best_d = dd
+	if best == null:
+		return
+	end_activity()
+	_act_spot = best
+	best.set_meta("taken", true)
+	activity = "queue"
+	_act_target = best.global_position
+	_act_face = best.get_meta("face", Vector3.BACK)
+	_act_time = -1.0
+
+
+## Repo men took the good clothes: grey, threadbare, coatless.
+func _strip_look() -> void:
+	var l: Dictionary = look.duplicate(true)
+	var cols: Dictionary = l.get("colors", {})
+	for slot in ["coat", "top", "accent", "gear", "boots"]:
+		if cols.has(slot):
+			cols[slot] = ["#5a5a60", "#6a6a6e", "#4a4a50"][_rng.randi() % 3]
+	l["colors"] = cols
+	look = l
+	sprite.set_look(look)
+
+
+## Ongoing consequences, ticked from _life().
+func _impact_tick(delta: float) -> void:
+	if _player == null or not is_instance_valid(_player) or state == "dead":
+		return
+	var d := global_position.distance_to(_player.global_position)
+	_mood_bark -= delta
+	# A favour, returned.
+	if owes_favour and state == "idle":
+		_favour_wait -= delta
+		if _favour_wait <= 0.0 and d < 6.0:
+			_give_favour()
+	# A grudge becomes a complaint to Paragon (a real report: stop them or eat the bounty).
+	if grudge and not loyal:
+		_grudge_wait -= delta
+		if _grudge_wait <= 0.0 and state == "idle":
+			grudge = false
+			if attitude <= -15:
+				say(Copy.expand("#grudge_call#", _rng), 2.6)
+				EventBus.toast.emit("%s is filing a complaint about you with Paragon!" % npc_name, Color(1.0, 0.6, 0.3))
+				witness.active = true
+				Causality.record("complaint", {"target": npc_name, "target_faction": "paragon", "position": global_position})
+	# Fear and fury show in how they act around you.
+	if is_scared() and d < 3.2 and state == "idle" and _talking <= 0.0 and _mood_bark <= 0.0:
+		_mood_bark = 8.0
+		say(Copy.expand("#scared_bark#", _rng), 2.0)
+		flee_from_player()
+	elif attitude <= -40 and d < 5.0 and state == "idle" and _mood_bark <= 0.0:
+		_mood_bark = 14.0
+		say(Copy.expand("#furious_bark#", _rng, {"name": Game.player_name}), 2.6)
+	elif attitude >= 45 and d < 5.0 and state == "idle" and _mood_bark <= 0.0 and _rng.randf() < 0.02:
+		_mood_bark = 25.0
+		say(Copy.expand("#devoted_bark#", _rng, {"name": Game.player_name}), 2.4)
+	# Served papers: walk off and never come back.
+	if _leaving and activity != "kneel":
+		_leaving = false
+		flee_from_player()
+		var tw := create_tween()
+		tw.tween_interval(3.5)
+		tw.tween_callback(sprite.fade_to.bind(0.0, 0.8))
+		tw.tween_interval(0.8)
+		tw.tween_callback(queue_free)
+
+
+func _give_favour() -> void:
+	owes_favour = false
+	_act_face = (_player.global_position - global_position) * Vector3(1, 0, 1)
+	var key := NPCVoice.voice(self)
+	var what := ""
+	match key:
+		"corporate":
+			Game.add_credits(30)
+			what = "+30 CR"
+		"worker", "merchant":
+			Game.add_credits(15)
+			what = "+15 CR"
+		"artsy":
+			Game.flags["fame"] = int(Game.flags.get("fame", 0)) + 2
+			what = "FAME +2 (they wrote a song about you)"
+		"rebel":
+			Game.flags["followers"] = int(Game.flags.get("followers", 0)) + 1
+			what = "+1 FOLLOWER"
+		"robot":
+			Game.add_item("medkit", 1)
+			what = "+1 MEDKIT"
+		"weird":
+			Game.add_item(["lockpick", "loaded_dice", "antihistamine"][_rng.randi() % 3], 1)
+			what = "A strange gift"
+		_:
+			Game.add_item("paste_ration", 1)
+			what = "+1 PASTE RATION + a tip"
+			EventBus.toast.emit(Interactions.rumor(self), Color(0.9, 0.9, 0.7))
+	say(Copy.expand("#favour_line#", _rng, {"name": Game.player_name}), 3.0)
+	FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), "GIFT!", Color(0.5, 1.0, 0.6), true)
+	EventBus.toast.emit("%s returns the favour: %s" % [npc_name, what], Color(0.5, 1.0, 0.6))
+	attitude = mini(100, attitude + 5)
+	refresh_label()
+
+
+## Bought, charmed or scared into loyalty: they stop reporting you.
 
 
 ## A story/street character's part is over: drop the marker and go back to normal life.
@@ -626,10 +893,12 @@ static func barks() -> Dictionary:
 func _life(delta: float) -> void:
 	if _player == null or not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
+	_impact_tick(delta)
 	_bark_timer -= delta
 	if _player != null and is_instance_valid(_player) and name_label:
 		# Only nearby or important people show their name - keeps crowds readable.
-		var important: bool = story_id != "" or persona_id != "" or role != "civilian" or state == "reporting"
+		var important: bool = story_id != "" or persona_id != "" or role != "civilian" or state == "reporting" \
+			or name_label.text.contains("<")
 		name_label.visible = important or global_position.distance_squared_to(_player.global_position) < 30.0
 	if not _waved and _player != null and state == "idle" and attitude >= 20 and activity in ["", "phone"] \
 			and global_position.distance_to(_player.global_position) < 5.0:

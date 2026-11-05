@@ -239,5 +239,22 @@
 			"order": 0,
 			"greed": 0
 		}
+	},
+	"complaint": {
+		"label": "Public Complaint",
+		"severity": 1,
+		"rep": {
+			"$target": -1
+		},
+		"bounty": 10,
+		"news": [
+			"LOCAL: Resident of {location} files complaint about 'that person'. Paragon 'looking into it'.",
+			"LUMEN COMMUNITY WATCH: Citizen reports rudeness at {location}. Rudeness now a billable offence."
+		],
+		"moral": {
+			"mercy": 0,
+			"order": 0,
+			"greed": 0
+		}
 	}
 }

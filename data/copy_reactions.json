@@ -534,6 +534,45 @@
 			"Today only: prices. Tomorrow: higher prices.",
 			"Got something to sell? I've got something to sell you back.",
 			"What'll it be, {name}?"
+		],
+		"grudge_call": [
+			"Paragon? Yes. I'd like to report a person.",
+			"Hello, complaints? You're going to love this one.",
+			"I'm calling it in. Don't try to stop me.",
+			"Paragon? I have a name and a face for you.",
+			"Yes, a complaint. Several, actually."
+		],
+		"scared_bark": [
+			"Stay away!",
+			"Don't hurt me!",
+			"I'm going, I'm going!",
+			"Not again - please!",
+			"Somebody help!",
+			"I didn't say anything!",
+			"Please, I've got #kin.a#!"
+		],
+		"furious_bark": [
+			"Oh, look who it is.",
+			"You've got some nerve showing your face.",
+			"I hope your air runs out, {name}.",
+			"Keep walking. Keep. Walking.",
+			"Everyone - that's the one I told you about!",
+			"I'm still not over what you did.",
+			"Paragon has your description, you know."
+		],
+		"devoted_bark": [
+			"{name}! Need anything? Anything at all?",
+			"My hero, everyone!",
+			"If anyone gives you trouble, they answer to me.",
+			"I told the whole block about you.",
+			"You're always welcome at mine, {name}."
+		],
+		"favour_line": [
+			"Hey - {name}! I owe you. Take this.",
+			"I said I'd pay you back. I'm a person of my word. Mostly.",
+			"For what you did before. Don't argue.",
+			"Here. It's not much, but it's yours.",
+			"You helped me. Now I help you. That's how it should work."
 		]
 	}
 }

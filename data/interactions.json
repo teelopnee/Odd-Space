@@ -57,7 +57,8 @@
 				],
 				"effects": {
 					"attitude": 20,
-					"rumor": true
+					"rumor": true,
+					"react": "grateful"
 				}
 			}
 		},
@@ -82,7 +83,8 @@
 				"effects": {
 					"attitude": 25,
 					"rumor": true,
-					"hp": 5
+					"hp": 5,
+					"react": "grateful"
 				}
 			}
 		},
@@ -112,7 +114,7 @@
 				"effects": {
 					"credits": 20,
 					"attitude": -30,
-					"npc": "flee"
+					"react": "scared"
 				}
 			},
 			"fail": {
@@ -122,7 +124,8 @@
 				],
 				"effects": {
 					"attitude": -20,
-					"npc": "angry"
+					"npc": "angry",
+					"react": "grudge"
 				}
 			}
 		},
@@ -163,7 +166,8 @@
 				],
 				"effects": {
 					"attitude": -40,
-					"npc": "angry"
+					"npc": "angry",
+					"react": "grudge"
 				}
 			}
 		},
@@ -265,7 +269,8 @@
 				"effects": {
 					"attitude": 10,
 					"npc": "silenced",
-					"discount": 0.3
+					"discount": 0.3,
+					"react": "bow"
 				}
 			},
 			"fail": {
@@ -275,7 +280,8 @@
 				],
 				"effects": {
 					"attitude": -25,
-					"fame": 2
+					"fame": 2,
+					"react": "grudge"
 				}
 			}
 		},
@@ -298,7 +304,8 @@
 				"effects": {
 					"attitude": 40,
 					"npc": "silenced",
-					"rumor": true
+					"rumor": true,
+					"react": "grateful"
 				}
 			}
 		},
@@ -320,14 +327,18 @@
 				],
 				"effects": {
 					"npc": "silenced",
-					"attitude": -10
+					"attitude": -10,
+					"react": "leave"
 				}
 			},
 			"fail": {
 				"lines": [
 					"The lawyer's hologram buffers. And buffers. \"Your subscription has lapsed,\" it says, and vanishes."
 				],
-				"effects": {}
+				"effects": {
+					"react": "grudge",
+					"attitude": -20
+				}
 			}
 		},
 		"beg": {
@@ -679,7 +690,8 @@
 					},
 					"rep": {
 						"halcyon": -1
-					}
+					},
+					"react": "grateful"
 				}
 			}
 		},
@@ -750,7 +762,8 @@
 				],
 				"effects": {
 					"npc": "silenced",
-					"attitude": -5
+					"attitude": -5,
+					"react": "scared"
 				}
 			},
 			"fail": {
@@ -788,7 +801,8 @@
 				],
 				"effects": {
 					"npc": "silenced",
-					"discount": 0.15
+					"discount": 0.15,
+					"react": "scared"
 				}
 			},
 			"fail": {
@@ -796,7 +810,8 @@
 					"\"I have a lawyer too.\" They do. He's worse than you. This could take years."
 				],
 				"effects": {
-					"attitude": -10
+					"attitude": -10,
+					"react": "grudge"
 				}
 			}
 		},
@@ -946,7 +961,8 @@
 					"rumor2": true,
 					"items": {
 						"paste_ration": -1
-					}
+					},
+					"react": "grateful"
 				}
 			}
 		},
@@ -1048,10 +1064,10 @@
 				"effects": {
 					"credits": 45,
 					"attitude": -40,
-					"npc": "flee",
 					"rep": {
 						"halcyon": 2
-					}
+					},
+					"react": "repossessed"
 				}
 			},
 			"fail": {
@@ -1060,7 +1076,8 @@
 				],
 				"effects": {
 					"attitude": -30,
-					"npc": "angry"
+					"npc": "angry",
+					"react": "grudge"
 				}
 			}
 		},
@@ -1081,7 +1098,8 @@
 				"effects": {
 					"credits": 20,
 					"attitude": 20,
-					"rumor": true
+					"rumor": true,
+					"react": "grateful"
 				}
 			}
 		},
@@ -1204,7 +1222,8 @@
 				"effects": {
 					"attitude": 30,
 					"credits": 10,
-					"rumor": true
+					"rumor": true,
+					"react": "grateful"
 				}
 			}
 		},
@@ -1233,7 +1252,8 @@
 				"effects": {
 					"attitude": 25,
 					"discount": 0.15,
-					"npc": "silenced"
+					"npc": "silenced",
+					"react": "smitten"
 				}
 			},
 			"fail": {
@@ -1270,7 +1290,7 @@
 				"effects": {
 					"credits": 40,
 					"attitude": -45,
-					"npc": "flee"
+					"react": "scared"
 				}
 			},
 			"fail": {
@@ -1281,7 +1301,8 @@
 					"attitude": -25,
 					"bounty": {
 						"paragon": 15
-					}
+					},
+					"react": "grudge"
 				}
 			}
 		},
@@ -1374,7 +1395,8 @@
 				"effects": {
 					"credits": 15,
 					"hp": -8,
-					"attitude": 10
+					"attitude": 10,
+					"react": "grudge"
 				}
 			},
 			"fail": {
@@ -1383,7 +1405,8 @@
 				],
 				"effects": {
 					"hp": -18,
-					"attitude": -10
+					"attitude": -10,
+					"react": "grudge"
 				}
 			}
 		},
@@ -1527,7 +1550,8 @@
 					"\"Your story has a plot hole. I'm a plot-hole inspector. Licensed.\""
 				],
 				"effects": {
-					"attitude": -15
+					"attitude": -15,
+					"react": "grudge"
 				}
 			}
 		},
@@ -1727,7 +1751,8 @@
 				],
 				"effects": {
 					"npc": "silenced",
-					"discount": 0.15
+					"discount": 0.15,
+					"react": "scared"
 				}
 			},
 			"fail": {
@@ -2364,7 +2389,8 @@
 				],
 				"effects": {
 					"attitude": 18,
-					"followers": 1
+					"followers": 1,
+					"react": "grateful"
 				}
 			},
 			"chance": 0.6,
@@ -2734,7 +2760,8 @@
 					"\"Why?\" Because. They don't get it. They'll remember it."
 				],
 				"effects": {
-					"attitude": 15
+					"attitude": 15,
+					"react": "grateful"
 				}
 			},
 			"verb": "charity",
@@ -2865,7 +2892,8 @@
 					"\"Huh. You're the most honest thief I've ever met.\""
 				],
 				"effects": {
-					"attitude": 15
+					"attitude": 15,
+					"react": "grateful"
 				}
 			}
 		},
@@ -2886,7 +2914,8 @@
 				],
 				"effects": {
 					"npc": "silenced",
-					"attitude": 5
+					"attitude": 5,
+					"react": "bow"
 				}
 			},
 			"chance": 0.55,
@@ -2963,7 +2992,8 @@
 					"\"Why do you want to know my first pet's name?\" They know that trick."
 				],
 				"effects": {
-					"attitude": -10
+					"attitude": -10,
+					"react": "grudge"
 				}
 			},
 			"verb": "theft",

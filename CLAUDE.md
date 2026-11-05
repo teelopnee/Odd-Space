@@ -53,6 +53,16 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   `data/copy_people.json`, `data/copy_reactions.json` (merged into Copy). Memory-driven verbs use the requirement keys
   `npc_saw` / `npc_heard` / `npc_mood` and effects `forget`, `street_rep`. Test: `tools/voice_test.gd -- <class> <age> <bg>`;
   size of the line space: `python3 tools/count_copy.py`.
+- Impact layer (NPC "Impact" section + `Interactions.resolve`): every verb result ends with a `>` block saying what changed
+  (relationship before -> after, call cut / sped up, who saw it and how they took it, who is still calling Paragon).
+  `relation_label()` tags over heads (FRIENDLY, OWES YOU ONE, DEVOTED, DISLIKES YOU, FURIOUS, SCARED OF YOU, REPOSSESSED,
+  KEEPS QUIET) change behaviour: favours come back as gifts, grudges become `complaint` reports (stoppable calls),
+  scared NPCs back off, furious ones heckle, attitude >= 45 or loyal = they won't report you, attitude scales call speed.
+  Verb effect `"react": grateful|scared|bow|leave|repossessed|grudge|smitten` triggers these. New strangers on a planet
+  start biased by its street memory (`NPCVoice.street_bias/street_feared`). Only `Causality.PHONE_VERBS` get phoned in;
+  other witnessed acts become public at once. `WitnessComponent.can_see` (memory) vs `can_witness` (will report).
+  A silenced witness MUST go back to normal life (`on_report_finished`) - it used to stay "reporting" forever.
+  Test: `tools/impact_test.gd` (exit code = failures).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

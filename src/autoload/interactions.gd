@@ -44,7 +44,11 @@ func setup_npc(npc: Node, rng: RandomNumberGenerator) -> void:
 	if tr_list.has("corporate"):
 		att += (w - 2) * 5
 	att += int(Game.flags.get("followers", 0)) * 2 if tr_list.has("poor") else 0
+	# The planet remembers you: what the street saw you do colours how strangers greet you.
+	att += NPCVoice.street_bias(npc)
 	npc.attitude = clampi(att + rng.randi_range(-8, 8), -60, 60)
+	if NPCVoice.street_feared(npc) and rng.randf() < 0.5:
+		npc.scared_until = Game.play_time + 600.0
 
 
 ## Greeting line that reacts to your class, age, notoriety and the NPC's mood.
@@ -87,8 +91,12 @@ func choices_for(npc: Node, role: String) -> Array:
 	var used: Array = npc.get_meta("used_verbs", [])
 	for id in verbs():
 		var d: Dictionary = verbs()[id]
-		if not d.get("roles", ["civilian"]).has(role):
-			continue
+		var roles: Array = d.get("roles", ["civilian"])
+		if not roles.has(role):
+			# Mid-call you can try anything social on a witness: talk, pay, charm, scare.
+			var k := str(NPCVoice.reactions().get("verb_kind", {}).get(id, "talk"))
+			if not (role == "witness" and roles.has("civilian") and k in ["charity", "threat", "deal", "show", "beg", "weird"]):
+				continue
 		if d.get("once", false) and used.has(id):
 			continue
 		if not requirements_met(d, npc):
@@ -232,6 +240,10 @@ func resolve(npc: Node, verb_id: String) -> bool:
 	var cost := cost_of(d)
 	if cost > 0 and not Game.spend(cost):
 		return false
+	var was_reporting: bool = npc.state == "reporting"
+	var was_loyal: bool = npc.loyal
+	var before_rel: String = npc.relation_label() if npc.has_method("relation_label") else ""
+	var before_att: int = int(npc.attitude)
 	var success := _rng.randf() < chance_of(d, npc)
 	var outcome: Dictionary = d.get("success" if success else "fail", d.get("success", {}))
 	var lines: Array = outcome.get("lines", ["..."])
@@ -252,9 +264,76 @@ func resolve(npc: Node, verb_id: String) -> bool:
 		Causality.record(str(d["verb"]), info)
 	if not result_lines.is_empty():
 		text += "\n[color=#ffd23e]" + "  ".join(PackedStringArray(result_lines)) + "[/color]"
-	EventBus.interaction_done.emit(verb_id, success, npc)
+	var impact: Array[String] = []
+	if was_reporting and is_instance_valid(npc):
+		impact.append(_witness_outcome(npc, verb_id, success))
+	EventBus.interaction_done.emit(verb_id, success, npc)  # bystanders see it now
+	if is_instance_valid(npc):
+		if npc.has_method("react") and effects.has("react") and (success or d.has("fail")):
+			var r := str(npc.react(str(effects["react"])))
+			if r != "":
+				impact.append(r)
+		if npc.has_method("after_interaction"):
+			var change := str(npc.after_interaction(before_rel, before_att))
+			if change != "":
+				impact.append(change)
+		if npc.loyal and not was_loyal:
+			impact.append("They won't report anything you do now.")
+		impact.append_array(_bystander_lines(npc))
+		if was_reporting or not success:
+			impact.append_array(_other_callers(npc))
+	if not impact.is_empty():
+		text += "\n\n[color=#9adfff]" + "\n".join(PackedStringArray(impact.map(func(l): return "> " + l))) + "[/color]"
 	EventBus.dialogue_requested.emit(npc.npc_name, text, [], Callable())
 	return success
+
+
+## A verb tried on someone who is on the phone to Paragon: win them over and the call dies,
+## botch it and they talk faster.
+func _witness_outcome(npc: Node, verb_id: String, success: bool) -> String:
+	if npc.state != "reporting":
+		return "[color=#7dff4a]CALL CUT - %s hangs up.[/color]" % npc.npc_name
+	var kind := str(NPCVoice.reactions().get("verb_kind", {}).get(verb_id, "talk"))
+	if success and kind not in ["theft", "fight"]:
+		npc.witness.silence("talked")
+		if kind in ["charity", "deal"]:
+			npc.make_loyal()
+		elif kind == "threat":
+			npc.scared_until = Game.play_time + 150.0
+		return "[color=#7dff4a]CALL CUT - %s hangs up and won't report you.[/color]" % npc.npc_name
+	npc.witness.progress = minf(0.95, npc.witness.progress + 0.3)
+	return "[color=#ff5a5a]That made it worse - they talk faster (%d%% through the call).[/color]" % roundi(npc.witness.progress * 100.0)
+
+
+## Who saw that, and how they took it.
+func _bystander_lines(npc: Node) -> Array[String]:
+	var tally := {}
+	var n := 0
+	for o in get_tree().get_nodes_in_group("npc"):
+		if o == npc or not ("memories" in o) or o.memories.is_empty():
+			continue
+		var m: Dictionary = o.memories[0]
+		if str(m.get("target", "")) == str(npc.npc_name) and absf(float(m.get("t", -99.0)) - Game.play_time) < 0.6:
+			n += 1
+			tally[m.stance] = int(tally.get(m.stance, 0)) + 1
+	if n == 0:
+		return []
+	var parts: Array[String] = []
+	for st in ["approve", "amused", "disapprove", "fear"]:
+		if tally.has(st):
+			parts.append("%d %s" % [tally[st], {"approve": "approve", "amused": "amused", "disapprove": "disapprove", "fear": "scared"}[st]])
+	return ["Seen by %d %s: %s. Word will spread on %s." % [n, "person" if n == 1 else "people", ", ".join(parts), Game.location_name]]
+
+
+## Everyone else still on the phone about you.
+func _other_callers(npc: Node) -> Array[String]:
+	var others: Array[String] = []
+	for w in get_tree().get_nodes_in_group("witness"):
+		if is_instance_valid(w) and w.is_reporting() and w.get_parent() != npc:
+			others.append("%s (%d%%)" % [str(w.get_parent().get("npc_name") if w.get_parent().get("npc_name") else w.get_parent().name), roundi(w.progress * 100.0)])
+	if others.is_empty():
+		return []
+	return ["[color=#ffd23e]Still calling it in: %s[/color]" % ", ".join(others)]
 
 
 func _dsl_only(effects: Dictionary) -> Dictionary:

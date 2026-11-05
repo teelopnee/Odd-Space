@@ -23,6 +23,9 @@ const STATUS_SUPPRESSED := "suppressed"
 
 ## Verbs that count as crimes for infamy/NPC reactions.
 const CRIME_VERBS := ["theft", "vandalism", "assault", "murder", "smuggle", "trespass", "bribe"]
+## Acts witnesses phone in (and you can try to stop). Anything else that is seen - charity,
+## mercy, compliance - simply becomes public: nobody calls Paragon about a good deed.
+const PHONE_VERBS := ["theft", "vandalism", "assault", "murder", "smuggle", "trespass", "bribe", "intimidate", "complaint"]
 ## Reported nodes with severity >= this are galactic news (known everywhere).
 const GALACTIC_SEVERITY := 4
 
@@ -78,7 +81,11 @@ func record(verb: String, info: Dictionary = {}) -> int:
 		node.status = STATUS_REPORTED
 	elif info.has("position"):
 		var witnesses := _find_witnesses(info["position"], info.get("exclude", []))
-		if not witnesses.is_empty():
+		if not witnesses.is_empty() and not PHONE_VERBS.has(verb):
+			node.status = STATUS_REPORTED
+			for w in witnesses:
+				node.witnesses.append(w.witness_id)
+		elif not witnesses.is_empty():
 			node.status = STATUS_PENDING
 			_pending[node.id] = []
 			for w in witnesses:
