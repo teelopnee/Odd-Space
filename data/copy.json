@@ -1285,6 +1285,47 @@
 			"MORTAL MORTGAGE",
 			"COMPLIANCE KONG",
 			"SHAREHOLDER SMASH"
+		],
+		"station": [
+			"LUMEN FM 88.4",
+			"K-DEBT 101",
+			"RADIO GRISTLE (THE MEATY HITS)",
+			"AIR-WAVE 99",
+			"OXYGENIX SMOOTH BREATHING",
+			"PIRATE STATIC 13.13",
+			"NIGHT SHIFT FM",
+			"COLLECTIONS RADIO"
+		],
+		"radio": [
+			"That was #band# with '#song#'. #radio_tag#",
+			"'#song#' by #band#. #genre.cap#, the way your nan used to pay for it.",
+			"Request line's open. Call in and tell us your debt. Saddest story wins an air canister.",
+			"Traffic on {planet}: #traffic#.",
+			"Coming up: #band#, a word from #brand#, and a word from #brand# about that word.",
+			"A dedication from #first# to #first#: 'Sorry about the air bill.' This is '#song#'.",
+			"This hour of music is brought to you by #product#. #benefit#.",
+			"Caller #small_num#, you're on the air! ...They hung up. Couldn't afford the minute.",
+			"Weather check for {planet}: #weather.lower#. Now here's #band#.",
+			"Still number one for the #small_num#th week running: '#song#'. Nobody knows why. Nobody can stop it.",
+			"#radio_tag# Here's #band#.",
+			"News on the hour: #news.lower#. And now, music."
+		],
+		"radio_tag": [
+			"Stay tuned. Literally: changing stations is a billable event.",
+			"Keep breathing, Sprawl.",
+			"All hits, no refunds.",
+			"The only station that doesn't track you. (It does.)",
+			"Music to owe money to.",
+			"Now with fewer ads*. (*More ads.)",
+			"Don't touch that dial. It's leased."
+		],
+		"traffic": [
+			"sky-lane 4 is jammed by a repo convoy",
+			"an air-truck spill on the overpass - breathe deep while it's free",
+			"smooth, if you can afford the toll",
+			"#pct#% slower than yesterday and #pct#% pricier",
+			"a stray cow on the hover-lane, nobody knows whose",
+			"a hologram fell over on the main drag - mind the dancing"
 		]
 	}
 }

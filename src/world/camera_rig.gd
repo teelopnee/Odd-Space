@@ -20,6 +20,7 @@ const POST := preload("res://assets/shaders/hd2d_post.gdshader")
 @export var dof_near_margin := 6.0
 @export var dof_far_margin := 5.0
 @export var dof_amount := 0.05
+@export var occluder_sweep_width := 5.0  # metres of buildings cut away around the sight line
 
 var target: Node3D
 var camera: Camera3D
@@ -33,6 +34,7 @@ var _punch_time := 0.0
 var _combat_zoom := 0.0
 var _ahead := Vector3.ZERO
 var _faded: Dictionary = {}
+var _occ_shape: BoxShape3D
 
 
 func _ready() -> void:
@@ -150,16 +152,23 @@ func _update_occluders() -> void:
 		return
 	var space := get_world_3d().direct_space_state
 	var hits := {}
-	var exclude: Array[RID] = []
 	var from := camera.global_position
 	var to := target.global_position + Vector3(0, 1.0, 0)
-	for i in 4:
-		var q := PhysicsRayQueryParameters3D.create(from, to, 128, exclude)
-		var hit := space.intersect_ray(q)
-		if hit.is_empty():
-			break
-		hits[hit.collider] = true
-		exclude.append(hit.rid)
+	# Sweep a slab along the sight line, not a thin ray: a whole row of buildings across a
+	# narrow street must cut away together, or the neighbours leave a dark band over the hero.
+	var dir := to - from
+	var length := dir.length()
+	if length > 1.0:
+		if _occ_shape == null:
+			_occ_shape = BoxShape3D.new()
+		_occ_shape.size = Vector3(occluder_sweep_width, 2.2, maxf(0.5, length - 1.2))
+		var q := PhysicsShapeQueryParameters3D.new()
+		q.shape = _occ_shape
+		q.collision_mask = 128
+		var basis := Basis.looking_at(dir.normalized(), Vector3.UP)
+		q.transform = Transform3D(basis, from + dir * 0.5 - dir.normalized() * 0.6)
+		for r in space.intersect_shape(q, 24):
+			hits[r.collider] = true
 	for body in hits:
 		if not _faded.has(body):
 			_set_faded(body, true)

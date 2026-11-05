@@ -154,7 +154,15 @@ func _process(_delta: float) -> bool:
 				for v in spots:
 					if v.global_position.distance_to(pl.global_position) < best.global_position.distance_to(pl.global_position):
 						best = v
-				pl.global_position = best.global_position + Vector3(0, 0.2, 2.2)
+				# Stand on the street in front of the door (venue faces along its shop's +Z).
+				var front: Vector3 = best.global_transform.basis.z
+				front.y = 0.0
+				var p: Vector3 = best.global_position + front.normalized() * 1.8
+				pl.global_position = Vector3(p.x, 0.3, p.z)
+				pl.velocity = Vector3.ZERO
+				var cam = get_first_node_in_group("camera_rig")
+				if cam and cam.has_method("snap_to_target"):
+					cam.snap_to_target()
 		13:
 			_shot(_current + "_street")
 			_step = 10

@@ -38,7 +38,12 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
 - `src/core/character_look.gd` random looks (variant + palette colours); sprites are palette-indexed.
 - `src/core/copy.gd` procedural copywriter over `data/copy.json` (Tracery-style `#symbol#` grammar): billboards,
   hologram slogans, shop/stall/street names, HUD news ticker, wall flyers + graffiti, menus, PA announcements,
-  NPC small talk. Preview: `tools/print_copy.gd -- [symbol] [count]`. Add variety by adding alternatives there.
+  NPC small talk + replies, NPC/robot/merchant names, drone pitches, venue greetings (`<venue>_scene/_keeper`).
+  Preview: `tools/print_copy.gd -- [symbol] [count]`. Add variety by adding alternatives there.
+  Grammar also works inside `barks.json`, `venues.json` greet lines and `interactions.json` lines (`Interactions.fill`).
+  Modifiers: `.cap` `.upper` `.lower` `.a`; vars `{planet}`/`{PLANET}`, `{player}`, barks also `{name}`.
+- Barks: `pair` lines `"A -- B -- C"` alternate between two NPCs (`NPC._converse`); enemies talk via
+  `Enemy.bark()` from `<taunt|hurt|yield|standdown>:<enemy_type>` keys (throttled across the fight).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 
@@ -54,6 +59,7 @@ godot --headless --path . --script res://tools/smoke_test.gd        # station ->
 `tools/print_world.gd -- <biome|all> <seed>` prints generated maps.
 Screenshots (software Vulkan): `apt-get install mesa-vulkan-drivers xvfb`, then
 `VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --resolution 1280x800 --script res://tools/capture_screens.gd -- <out_dir>`
+(options: `--quick`, `--biome=<env>`, `--street` = also walk to the nearest shop front, `--creator`; ~10 min per biome on lavapipe).
 
 Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 
@@ -61,6 +67,8 @@ Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 - Outdoor camera (pitch 30, fov 32, distance 16) only sees ground ~8-32 m ahead and things below ~5 m:
   sky, rooftop props and anything taller never appear in frame. Put "wow" at street level; keep holograms ~2.4-3x.
 - Thin particles (rain < ~0.05 m wide) turn into screen noise; prefer fewer, larger streaks.
+- Occluder cut-away (`CameraRig._update_occluders`) sweeps a 5 m box along the sight line (layer 128), so a whole
+  row of buildings across a narrow street fades together; a single ray left a dark band over the hero.
 - Never run `--import` while `tools/sprite_forge.py` is still writing sheets: a half-written PNG gets imported as
   `valid=false`. Fix: delete that `.png.import` and re-import.
 - `VirtualJoystick` is a **native class** in 4.7 → ours is `TouchStick`. Check `ClassDB.class_exists()` before naming classes.

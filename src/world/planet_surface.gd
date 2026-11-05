@@ -121,15 +121,18 @@ func _ambient_life() -> void:
 		d.bounds = area
 		d.seed_value = level_seed + i
 		add_child(d)
-	# Public-address announcements from whoever owns the place.
-	if owner_faction != "" or city:
-		var pa := Timer.new()
-		pa.wait_time = rng.randf_range(18.0, 30.0)
-		pa.autostart = true
-		pa.timeout.connect(func():
-			pa.wait_time = rng.randf_range(25.0, 50.0)
-			EventBus.toast.emit("PA  //  " + Copy.make("pa", rng), Color(0.7, 0.9, 1.0)))
-		add_child(pa)
+	# Public-address announcements from whoever owns the place; street radio everywhere.
+	var has_pa: bool = owner_faction != "" or city
+	var pa := Timer.new()
+	pa.wait_time = rng.randf_range(18.0, 30.0)
+	pa.autostart = true
+	pa.timeout.connect(func():
+		pa.wait_time = rng.randf_range(25.0, 50.0)
+		if has_pa and rng.randf() < 0.6:
+			EventBus.toast.emit("PA  //  " + Copy.make("pa", rng), Color(0.7, 0.9, 1.0))
+		else:
+			EventBus.toast.emit("%s  //  %s" % [Copy.make("station", rng), Copy.make("radio", rng)], Color(1.0, 0.72, 0.95)))
+	add_child(pa)
 	# Street traffic along the avenues (city only).
 	var lanes: Array = builder.road_lanes.duplicate()
 	lanes.shuffle()
