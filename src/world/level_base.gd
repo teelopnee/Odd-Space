@@ -287,8 +287,8 @@ func _on_player_died() -> void:
 func _rain_extras() -> void:
 	var sp := CPUParticles3D.new()
 	sp.local_coords = false
-	sp.amount = 260
-	sp.lifetime = 0.28
+	sp.amount = 70
+	sp.lifetime = 0.3
 	sp.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
 	sp.emission_box_extents = Vector3(14, 0.02, 10)
 	sp.position = Vector3(0, 0.04, 0)
@@ -298,14 +298,14 @@ func _rain_extras() -> void:
 	sp.initial_velocity_min = 1.2
 	sp.initial_velocity_max = 2.4
 	var q := QuadMesh.new()
-	q.size = Vector2(0.05, 0.05)
+	q.size = Vector2(0.14, 0.1)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	m.billboard_keep_scale = true
-	m.albedo_color = Color(0.75, 0.85, 1.0, 0.55)
+	m.albedo_color = Color(0.75, 0.85, 1.0, 0.35)
 	q.material = m
 	sp.mesh = q
 	camera_rig.add_child(sp)
@@ -353,7 +353,7 @@ func _build_weather(kind: String) -> void:
 	p.mesh = q
 	match kind:
 		"rain":
-			p.amount = 600
+			p.amount = 320
 			p.lifetime = 0.9
 			p.emission_box_extents = Vector3(18, 0.5, 14)
 			p.position = Vector3(0, 10, 0)
@@ -362,9 +362,10 @@ func _build_weather(kind: String) -> void:
 			p.gravity = Vector3(0, -30, 0)
 			p.initial_velocity_min = 14.0
 			p.initial_velocity_max = 18.0
-			q.size = Vector2(0.03, 0.6)
+			# Fewer, longer, wider streaks: thin sub-pixel drops just read as noise.
+			q.size = Vector2(0.06, 1.0)
 			m.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
-			m.albedo_color = Color(0.6, 0.75, 1.0, 0.45)
+			m.albedo_color = Color(0.65, 0.78, 1.0, 0.3)
 			_rain_extras()
 		"snow":
 			p.amount = 360
