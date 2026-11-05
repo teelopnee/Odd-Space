@@ -74,6 +74,13 @@ var _orbit := 1.0
 var _orbit_timer := 0.0
 var _lunge_dir := Vector3.ZERO
 var _telegraph: FXSprite
+## Attack tokens: only a few enemies may wind up at once, so a crowd takes turns instead of
+## firing together (classic action-game pacing). Bosses (saga targets) ignore the limit.
+const MAX_ATTACKERS := 2
+const MAX_SHOOTERS := 1
+const BOLT_SPEED_MULT := 0.78   ## enemy bolts are slower than they look in data: dodge or close in
+static var _attackers: Array = []
+var _kite := false
 var _speech: Label3D
 var _speech_tw: Tween
 var _bark_ready_ms := 0
@@ -102,6 +109,11 @@ func _ready() -> void:
 		var lrng := RandomNumberGenerator.new()
 		lrng.randomize()
 		sprite.set_look(CharacterLook.random_look(lrng, str(def.get("look", "punk"))))
+	if def.has("scale"):
+		sprite.scale_base = float(def["scale"])
+		sprite.scale = Vector3.ONE * float(def["scale"])
+	if def.get("guard", false):
+		_build_riot_shield()
 	if flying:
 		sprite.position.y += FLY_HEIGHT
 	var subs: Dictionary = def.get("subsystems", {})
@@ -212,6 +224,10 @@ func _physics_process(delta: float) -> void:
 				elif not _is_ranged() and _state_time > 0.15:
 					move = _lunge_dir * 2.6  # melee lunge
 				if _state_time <= 0.0:
+					# Shooters stand and reload after a burst: your window to close in.
+					_set_state("recover" if _is_ranged() else "chase", 0.9)
+			"recover":
+				if _state_time <= 0.0:
 					_set_state("chase")
 			"stagger", "down", "broken":
 				if _state_time <= 0.0 and state != "broken":
@@ -235,6 +251,53 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 	_animate(move)
 	_update_shield_visibility(dist)
+	_update_riot_shield()
+
+
+## Riot units carry a big see-through shield that always faces you.
+var _riot_shield: MeshInstance3D
+
+
+func _build_riot_shield() -> void:
+	_riot_shield = MeshInstance3D.new()
+	var b := BoxMesh.new()
+	b.size = Vector3(0.95, 1.35, 0.06)
+	var m := StandardMaterial3D.new()
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(0.45, 0.7, 1.0, 0.35)
+	m.emission_enabled = true
+	m.emission = Color(0.3, 0.55, 1.0)
+	m.emission_energy_multiplier = 0.8
+	m.metallic = 0.6
+	m.roughness = 0.2
+	b.material = m
+	_riot_shield.mesh = b
+	_riot_shield.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_riot_shield)
+
+
+func _update_riot_shield() -> void:
+	if _riot_shield == null:
+		return
+	var up: bool = state not in ["broken", "stagger", "down", "dead", "windup", "attack"]
+	_riot_shield.visible = up
+	if up and _player and is_instance_valid(_player):
+		var to := (_player.global_position - global_position) * Vector3(1, 0, 1)
+		if to.length() > 0.1:
+			_riot_shield.position = to.normalized() * 0.55 + Vector3(0, 0.85, 0)
+			_riot_shield.look_at(_riot_shield.global_position + to.normalized(), Vector3.UP)
+
+
+func _take_token() -> bool:
+	_attackers = _attackers.filter(func(e): return is_instance_valid(e) and e.state in ["windup", "attack"])
+	if _attackers.has(self) or has_meta("saga_tag"):
+		return true
+	if _attackers.size() >= MAX_ATTACKERS:
+		return false
+	if _is_ranged() and _attackers.filter(func(e): return e._is_ranged()).size() >= MAX_SHOOTERS:
+		return false
+	_attackers.append(self)
+	return true
 
 
 func _chase(dist: float, player_ok: bool) -> Vector3:
@@ -244,24 +307,33 @@ func _chase(dist: float, player_ok: bool) -> Vector3:
 	var attack_range := _attack_range()
 	var move := Vector3.ZERO
 	var to := (_player.global_position - global_position) * Vector3(1, 0, 1)
+	if _orbit_timer <= 0.0:
+		_orbit_timer = randf_range(1.5, 3.5)
+		_kite = randf() < 0.3
+		if randf() < 0.35:
+			_orbit = -_orbit
+	var side := Vector3(-to.z, 0, to.x).normalized() * _orbit
 	if _is_ranged():
-		# Keep a band of distance and strafe around the player.
-		if _orbit_timer <= 0.0:
-			_orbit_timer = randf_range(1.5, 3.5)
-			if randf() < 0.35:
-				_orbit = -_orbit
-		var side := Vector3(-to.z, 0, to.x).normalized() * _orbit
+		# Keep a loose band of distance and strafe; only sometimes back off (and slowly),
+		# so closing in to melee them is a real option.
 		if dist > attack_range * 0.85:
 			move = _nav_dir(_player.global_position) + side * 0.3
-		elif dist < attack_range * 0.45:
-			move = -to.normalized() * 0.8 + side * 0.5
+		elif dist < attack_range * 0.3 and _kite:
+			move = -to.normalized() * 0.45 + side * 0.3
 		else:
-			move = side * 0.6
+			move = side * 0.45
 	elif dist > attack_range * 0.85:
 		move = _nav_dir(_player.global_position)
-	move += _separation()
+		if def.get("flank", false) and dist > 2.5:
+			move = (move + side * 0.7).normalized()  # come in from the side
+	var token := false
 	if dist <= attack_range and _attack_cd <= 0.0 and _has_los(_player.global_position):
-		_set_state("windup", float(def.get("telegraph", 0.5)))
+		token = _take_token()
+		if token:
+			_set_state("windup", float(def.get("telegraph", 0.5)))
+		elif not _is_ranged() and dist < attack_range + 1.2:
+			move = side * 0.6 - to.normalized() * 0.2  # wait your turn: circle, don't pile in
+	move += _separation()
 	return move.limit_length(1.0)
 
 
@@ -385,9 +457,13 @@ func provoke() -> void:
 
 
 func _alert_allies() -> void:
+	# Only close friends join in, and not all at the same instant.
 	for e in get_tree().get_nodes_in_group("enemy"):
-		if e != self and e.faction == faction and e.global_position.distance_to(global_position) < 12.0:
-			e.provoke()
+		if e != self and e.faction == faction and e.global_position.distance_to(global_position) < 8.0:
+			var t := get_tree().create_timer(randf_range(0.4, 1.8))
+			t.timeout.connect(func():
+				if is_instance_valid(e):
+					e.provoke())
 
 
 # --- Attacking ----------------------------------------------------------------------------------
@@ -408,6 +484,9 @@ func _do_attack() -> void:
 		_set_state("attack", 0.5)
 		sprite.play("shoot", true)
 		return
+	if def.get("explode", false):
+		_explode(null)
+		return
 	_set_state("attack", 0.42)
 	sprite.play("slash3" if armored else "slash1", true)
 	Audio.play_sfx("swing")
@@ -418,10 +497,38 @@ func _do_attack() -> void:
 	if state != "attack" or _player == null or not is_instance_valid(_player):
 		return
 	var reach := _attack_range() + 0.9
+	if def.get("slam", false):
+		FX.dust(get_parent(), global_position, 2.2)
+		FX.shake(get_tree(), 0.35)
+		Audio.play_sfx("explosion", 0.1, -8.0)
 	if _flat_dist(_player.global_position) <= reach:
 		var dmg := float(def.get("damage", 8)) * (0.5 if _disarmed else 1.0)
 		_player.receive_attack({"damage": dmg, "attacker": self, "kind": "melee", "bug": is_bug,
 			"position": global_position})
+
+
+## Boom bots: blow up (on purpose, or when you shoot them first - chain reactions included).
+var _exploded := false
+
+
+func _explode(killer) -> void:
+	if _exploded:
+		return
+	_exploded = true
+	var r := float(def.get("radius", 2.6))
+	var dmg := float(def.get("damage", 18))
+	var at := global_position + Vector3(0, 0.6, 0)
+	FXSprite.play_at(get_parent(), "explosion", at, 2.2, 2.4)
+	FX.shake(get_tree(), 0.5)
+	Audio.play_sfx("explosion", 0.1)
+	if _player and is_instance_valid(_player) and _player.is_alive() and _flat_dist(_player.global_position) <= r:
+		_player.receive_attack({"damage": dmg, "attacker": self, "kind": "explosion", "position": global_position})
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if e != self and is_instance_valid(e) and e.is_alive() and e.global_position.distance_to(global_position) <= r:
+			e.take_hit({"damage": dmg * 1.2, "attacker": killer if killer else self, "kind": "explosion", "position": e.global_position,
+				"push": ((e.global_position - global_position) * Vector3(1, 0, 1)).normalized() * 6.0})
+	if state != "dead":
+		_die(killer, Vector3.ZERO)
 
 
 func _fire_bolt() -> void:
@@ -432,11 +539,11 @@ func _fire_bolt() -> void:
 	var from := global_position + Vector3(0, 1.0 + (FLY_HEIGHT if flying else 0.0), 0)
 	var aim := _player.global_position + Vector3(0, 0.9, 0)
 	if _player is CharacterBody3D:
-		aim += (_player as CharacterBody3D).velocity * 0.15
+		aim += (_player as CharacterBody3D).velocity * 0.08
 	var spread := (1.0 - 0.8 * _accuracy_mult) * 1.2
 	aim += Vector3(randf_range(-spread, spread), 0, randf_range(-spread, spread))
 	var dir := (aim - from).normalized()
-	Projectile.spawn(get_parent(), from + dir * 0.5, dir, float(def.get("projectile_speed", 14.0)),
+	Projectile.spawn(get_parent(), from + dir * 0.5, dir, float(def.get("projectile_speed", 14.0)) * BOLT_SPEED_MULT,
 		float(def.get("damage", 8)), "enemy", self)
 	FXSprite.play_at(get_parent(), "muzzle", from + dir * 0.6, 0.8, 2.5, Color(1.0, 0.5, 0.6), dir.x < 0)
 	Audio.play_sfx("enemy_shoot", 0.1, -6.0)
@@ -475,6 +582,25 @@ func take_hit(info: Dictionary) -> void:
 	if kind == "explosion" and by_player:
 		dmg *= Game.stat("explosion_damage")
 	var sub: String = info.get("subsystem", "")
+	# --- riot shields: blocked from the front (flank them, parry them, charge-shoot, blow them up, or pull them).
+	if def.get("guard", false) and state not in ["broken", "stagger", "down", "windup"] and kind in ["projectile", "melee"] \
+			and not info.get("charged", false) and not info.get("pierce", false) and attacker is Node3D:
+		var from_dir := ((attacker as Node3D).global_position - global_position) * Vector3(1, 0, 1)
+		var face := (_player.global_position - global_position) * Vector3(1, 0, 1) if _player else from_dir
+		if from_dir.length() > 0.01 and face.length() > 0.01 and from_dir.normalized().dot(face.normalized()) > 0.45:
+			FX.damage_number(get_parent(), global_position + Vector3(0, 2.1, 0), "BLOCKED", Color(0.6, 0.8, 1.0))
+			FX.spark(get_parent(), info.get("position", global_position + Vector3(0, 1.0, 0)), Color(0.6, 0.8, 1.0), 10)
+			Audio.play_sfx("parry", 0.1, -8.0)
+			dmg *= 0.15 if kind == "projectile" else 0.4
+	# --- stun (shock baton, arc thrower) and pull (harpoon)
+	if info.has("stun"):
+		_flinch = maxf(_flinch, float(info["stun"]))
+		if state == "windup":
+			_set_state("chase")
+	if info.has("pull") and (not armored or state == "broken"):
+		_knock = info["pull"]
+		if def.get("guard", false):
+			_set_state("stagger", 0.8)  # yanked off-balance: shield down
 	# --- weaknesses -> shield
 	var keys := ["melee" if kind == "melee" else ("blaster" if kind == "projectile" else kind)]
 	if info.get("charged", false):
@@ -523,7 +649,7 @@ func take_hit(info: Dictionary) -> void:
 	var push: Vector3 = info.get("push", Vector3.ZERO)
 	if push == Vector3.ZERO and attacker is Node3D:
 		push = ((global_position - (attacker as Node3D).global_position) * Vector3(1, 0, 1)).normalized() * 1.5
-	if not armored or state == "broken":
+	if not armored or state == "broken" or info.get("pierce", false):
 		_knock += push * (1.6 if state == "broken" else 1.0)
 		_flinch = 0.16 if kind != "explosion" else 0.4
 		if state == "windup":
@@ -687,6 +813,8 @@ func _deferred_explode(pos: Vector3, attacker) -> void:
 
 
 func _die(attacker, push: Vector3) -> void:
+	if def.get("explode", false) and not _exploded:
+		call_deferred("_explode", attacker)  # shot before it reached you: it still goes off
 	state = "dead"
 	hp = 0.0
 	remove_from_group("enemy")
@@ -714,6 +842,12 @@ func _die(attacker, push: Vector3) -> void:
 		var credits_range: Array = def.get("credits", [0, 0])
 		var loot := roundi(randi_range(int(credits_range[0]), int(credits_range[1])) * Game.stat("loot_mult"))
 		Pickup.spawn_credits(get_parent(), global_position, loot)
+		# Gear drops (data: "drops": {item: chance}); weapons you already own don't drop.
+		var drops: Dictionary = def.get("drops", {})
+		for it in drops:
+			var wid := str(DataDB.items.get(it, {}).get("weapon", ""))
+			if (wid == "" or not Arsenal.owns(wid)) and randf() < float(drops[it]):
+				Pickup.spawn_item(get_parent(), global_position, str(it))
 		if _was_peaceful and _assault_node >= 0:
 			Causality.record("murder", {"target": display_name, "target_faction": faction,
 				"position": global_position, "exclude": [self], "causes": [_assault_node]})

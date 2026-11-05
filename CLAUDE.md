@@ -80,6 +80,19 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   (`reactions.json venue_option_kind`) -> `_keeper_reacts`: mood + reaction (`reactions.json keeper`: regular, grateful,
   banned, robbed, fan, heckler, scared, grudge...) + afterword + counter `counters.venue.keeper_<kind>_<ok|fail>` (falls back
   to the person counters). Test: `tools/keeper_test.gd` (all 14 shop types x outcomes, bans, death, return visit).
+- Combat pacing: `Enemy._take_token()` = attack tokens (max 2 attackers, 1 shooter at a time; saga bosses exempt);
+  ranged foes kite rarely + slowly and stand still 0.9 s after each burst ("recover"); enemy bolts x0.78 speed;
+  allies join within 8 m with a staggered delay; `WorldGen._scatter_enemy` spreads foes as patrols of 1-2 (swarms of 3).
+  Player `DASH` state: MELEE with a hostile 3-9 m away dashes in (i-frames) and starts the combo on arrival.
+- Enemies (`data/enemies.json`, map chars in `LevelBuilder` legend): G officer, E repo drone, B grub, H debt brute,
+  R pirate, U riot unit (`guard`: blocks frontal shots/melee; flank, parry, charge, explode, katana or harpoon it),
+  F gutter punk (`flank`), Q ad-bomb bot (`explode`, chain reactions), J ad-swarm drone (threes), Z vat golem (`slam`).
+  `drops: {item: chance}`, `scale`, barks `<kind>:<type>`.
+- Weapons: `src/core/arsenal.gd` + `data/weapons.json` (BLADE: pipe, baton, chain, katana, hammer; GUN: sidearm,
+  scatter, arc, harpoon, grenade). Owned/equipped in `Game.flags.weapons/equip`; `weapon_<id>` items unlock on pickup
+  (`Game.add_item`), sold by street traders / pawn / corp stores, dropped by enemies, start kit by background.
+  Swap: `swap_melee` (1 / L3 / BLADE) and `swap_ranged` (2 / R3 / GUN). `Grenade` node, Projectile `pull/stun/push_force`.
+  Test: `tools/combat_test.gd` (every enemy, tokens, every weapon, dash, riot guard, boom chain, unlocks).
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 

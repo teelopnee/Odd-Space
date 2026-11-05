@@ -84,6 +84,7 @@ func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Di
 	player_look = look.duplicate(true)
 	world_seed = seed_value if seed_value >= 0 else randi()
 	Origin.apply_new_game(tags)
+	Arsenal.start_kit(tags)
 	hp = max_hp()
 	galaxy = PlanetGenerator.generate_galaxy(world_seed, 7)
 	location_id = "station_lot47"
@@ -220,6 +221,12 @@ func _bill_air() -> void:
 # --- Inventory -------------------------------------------------------------------------
 
 func add_item(item_id: String, count: int = 1) -> void:
+	# Weapons aren't carried as items: picking one up unlocks it in the arsenal.
+	var wid := str(DataDB.items.get(item_id, {}).get("weapon", ""))
+	if wid != "" and count > 0:
+		if not Arsenal.unlock(wid):
+			add_credits(roundi(float(DataDB.items[item_id].get("price", 40)) * 0.4))  # a duplicate: sold for parts
+		return
 	var n: int = int(inventory.get(item_id, 0)) + count
 	if n <= 0:
 		inventory.erase(item_id)

@@ -21,6 +21,9 @@ var _mat: StandardMaterial3D
 var charged := false
 var _hit_bodies: Array = []
 var _mesh: MeshInstance3D
+var push_force := -1.0   ## weapon knockback override (scatter pellets)
+var pull := false        ## harpoon: drag what we hit toward the shooter
+var stun := 0.0          ## seconds of stagger on hit
 
 
 static func spawn(parent: Node, from: Vector3, dir: Vector3, speed: float, p_damage: float, p_team: String, p_shooter: Node, p_subsystem: String = "") -> Projectile:
@@ -111,6 +114,14 @@ func _on_body_entered(body: Node) -> void:
 	var info := {"damage": damage, "attacker": shooter, "kind": "projectile", "subsystem": subsystem,
 		"position": global_position, "projectile": self, "direction": velocity.normalized(),
 		"charged": charged, "shield_damage": 2 if charged else 1, "push": velocity.normalized() * (6.0 if charged else 1.2)}
+	if push_force >= 0.0:
+		info["push"] = velocity.normalized() * push_force
+	if stun > 0.0:
+		info["stun"] = stun
+	if pull and shooter is Node3D and body is Node3D:
+		var back := ((shooter as Node3D).global_position - (body as Node3D).global_position) * Vector3(1, 0, 1)
+		info["pull"] = back.normalized() * clampf(back.length() * 2.4, 6.0, 18.0)
+		info["push"] = Vector3.ZERO
 	if team == "enemy" and body.has_method("receive_attack"):
 		var result: String = body.receive_attack(info)
 		if result == "parried":

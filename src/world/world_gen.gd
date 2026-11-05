@@ -413,16 +413,54 @@ func _population(controller: String, crisis: Dictionary, fx: Dictionary, difficu
 		scatter("N", 1, 2, h - 3, 0)
 	if recruit_ok and r.randf() < 0.6:
 		scatter("W", 1, 2, h - 10, 1)
+	# A mix per owner: shooters are the minority, so there is always someone to brawl with.
+	# G officer  E repo drone  H debt brute  B grub  R pirate  U riot unit  F gutter punk
+	# Q ad-bomb bot  J ad-swarm (comes in threes)  Z vat golem
 	var table := {
-		"paragon": {"G": 4}, "halcyon": {"E": 3, "H": 1}, "gristle": {"B": 5, "G": 1},
-		"oxy": {"G": 2, "E": 2}, "lumen": {"G": 2, "E": 2}, "": {"R": 4, "B": 2}}
+		"paragon": {"G": 2, "U": 2}, "halcyon": {"E": 2, "H": 1, "Q": 2}, "gristle": {"B": 4, "Z": 1},
+		"oxy": {"G": 1, "E": 1, "J": 1, "Q": 1}, "lumen": {"G": 1, "J": 2, "F": 1}, "": {"R": 2, "F": 3, "B": 1}}
 	var t: Dictionary = table.get(controller, table[""])
 	var mult := float(crisis.get("enemy_mult", 1.0)) * (0.8 + 0.25 * difficulty)
 	for ch in t:
 		for i in roundi(int(t[ch]) * mult):
-			scatter(ch, 1, 2, h - 13, 0)
+			_scatter_enemy(ch)
 	for i in int(fx.get("extra_bugs", 0)):
-		scatter("B", 1, 2, h - 13, 0)
+		_scatter_enemy("B")
+
+
+const ENEMY_MAP_CHARS := ["E", "G", "B", "H", "R", "U", "F", "Q", "J", "Z"]
+
+
+## Enemies spread out as small patrols (alone or in pairs) instead of one big blob;
+## swarm drones come in threes.
+func _scatter_enemy(c: String) -> void:
+	var group := 3 if c == "J" else 1
+	for attempt in 40:
+		var x := r.randi_range(1, w - 2)
+		var z := r.randi_range(2, h - 13)
+		if not is_free(x, z):
+			continue
+		var near := _enemies_within(x, z, 4)
+		# Most spots must be clear of other foes; sometimes we deliberately pair up.
+		if near > 1 or (near == 1 and r.randf() > 0.35):
+			continue
+		put(x, z, c)
+		var placed := 1
+		for dz in range(-1, 2):
+			for dx in range(-1, 2):
+				if placed < group and is_free(x + dx, z + dz):
+					put(x + dx, z + dz, c)
+					placed += 1
+		return
+
+
+func _enemies_within(x: int, z: int, rad: int) -> int:
+	var n := 0
+	for dz in range(-rad, rad + 1):
+		for dx in range(-rad, rad + 1):
+			if ENEMY_MAP_CHARS.has(at(x + dx, z + dz)):
+				n += 1
+	return n
 
 
 ## Flood fill from the spawn; carve a path from any unreachable pocket to the reachable area.

@@ -529,7 +529,16 @@ func _on_merchant_choice(choice: String) -> void:
 
 func open_shop() -> void:
 	Game.shop_discount = discount
-	EventBus.shop_requested.emit(npc_name, faction, ["medkit", "air_canister", "antihistamine", "bribe_voucher", "lockpick", "painkillers", "paste_ration", "cyberdeck", "loaded_dice"])
+	var stock := ["medkit", "air_canister", "antihistamine", "bribe_voucher", "lockpick", "painkillers", "paste_ration", "cyberdeck", "loaded_dice"]
+	# Every street trader has a couple of weapons you don't own yet under the tarp.
+	var guns: Array = []
+	for slot in ["melee", "ranged"]:
+		for wid in Arsenal.data().get(slot, {}):
+			if not Arsenal.owns(wid) and DataDB.items.has("weapon_" + wid):
+				guns.append("weapon_" + wid)
+	guns.shuffle()
+	stock.append_array(guns.slice(0, 2))
+	EventBus.shop_requested.emit(npc_name, faction, stock)
 
 
 func _talk_recruit() -> void:

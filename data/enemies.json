@@ -67,7 +67,11 @@
 			"legs",
 			"jetpack"
 		],
-		"look": "cop:paragon"
+		"look": "cop:paragon",
+		"drops": {
+			"weapon_arc": 0.06,
+			"weapon_harpoon": 0.06
+		}
 	},
 	"repo_drone": {
 		"name": "Repo Drone",
@@ -120,7 +124,10 @@
 			"charged",
 			"eye"
 		],
-		"look": "drone:halcyon"
+		"look": "drone:halcyon",
+		"drops": {
+			"weapon_harpoon": 0.05
+		}
 	},
 	"gristle_grub": {
 		"name": "Gristle Grub",
@@ -230,7 +237,11 @@
 			"parry"
 		],
 		"armored": true,
-		"look": "heavy:halcyon"
+		"look": "heavy:halcyon",
+		"drops": {
+			"weapon_hammer": 0.12,
+			"weapon_harpoon": 0.1
+		}
 	},
 	"pirate": {
 		"name": "Rim Pirate",
@@ -290,6 +301,279 @@
 			"jetpack",
 			"melee"
 		],
-		"look": "punk"
+		"look": "punk",
+		"drops": {
+			"weapon_scatter": 0.15,
+			"weapon_grenade": 0.06
+		}
+	},
+	"riot_trooper": {
+		"name": "Riot Unit",
+		"faction": "paragon",
+		"hostility": "rep",
+		"hostile_below": -30,
+		"hp": 60,
+		"speed": 2.9,
+		"aggro_range": 10.0,
+		"attack": "melee",
+		"range": 1.6,
+		"damage": 13,
+		"cooldown": 1.6,
+		"telegraph": 0.6,
+		"guard": true,
+		"credits": [
+			12,
+			28
+		],
+		"shield": 6,
+		"look": "cop:paragon",
+		"scale": 1.12,
+		"drops": {
+			"weapon_baton": 0.22,
+			"weapon_harpoon": 0.08
+		},
+		"subsystems": {
+			"core": {
+				"label": "RIOT SHIELD",
+				"hp": 999,
+				"acc": 1.0,
+				"dmg": 1.0,
+				"y": 0.9,
+				"effect": ""
+			},
+			"head": {
+				"label": "VISOR",
+				"hp": 10,
+				"acc": 0.5,
+				"dmg": 2.0,
+				"y": 1.5,
+				"effect": "crit"
+			},
+			"legs": {
+				"label": "LEGS",
+				"hp": 16,
+				"acc": 0.85,
+				"dmg": 0.7,
+				"y": 0.35,
+				"effect": "crippled"
+			},
+			"weapon": {
+				"label": "BATON",
+				"hp": 12,
+				"acc": 0.6,
+				"dmg": 0.5,
+				"y": 0.85,
+				"effect": "disarmed"
+			}
+		},
+		"weak": [
+			"legs",
+			"charged",
+			"explosion"
+		]
+	},
+	"street_punk": {
+		"name": "Gutter Punk",
+		"faction": "",
+		"hostility": "always",
+		"hp": 22,
+		"speed": 5.0,
+		"aggro_range": 10.0,
+		"attack": "melee",
+		"range": 1.3,
+		"damage": 7,
+		"cooldown": 0.9,
+		"telegraph": 0.3,
+		"flank": true,
+		"credits": [
+			6,
+			16
+		],
+		"shield": 2,
+		"look": "punk",
+		"drops": {
+			"weapon_chain": 0.12,
+			"weapon_scatter": 0.06
+		},
+		"subsystems": {
+			"core": {
+				"label": "JACKET",
+				"hp": 999,
+				"acc": 1.0,
+				"dmg": 1.0,
+				"y": 0.9,
+				"effect": ""
+			},
+			"head": {
+				"label": "MOHAWK",
+				"hp": 6,
+				"acc": 0.55,
+				"dmg": 2.0,
+				"y": 1.45,
+				"effect": "crit"
+			},
+			"legs": {
+				"label": "LEGS",
+				"hp": 8,
+				"acc": 0.85,
+				"dmg": 0.7,
+				"y": 0.35,
+				"effect": "crippled"
+			}
+		},
+		"weak": [
+			"melee",
+			"blaster"
+		]
+	},
+	"boom_bot": {
+		"name": "Ad-Bomb Bot",
+		"faction": "halcyon",
+		"hostility": "always",
+		"hp": 14,
+		"speed": 4.2,
+		"aggro_range": 11.0,
+		"attack": "melee",
+		"range": 1.6,
+		"damage": 20,
+		"cooldown": 1.0,
+		"telegraph": 0.9,
+		"explode": true,
+		"radius": 2.6,
+		"credits": [
+			2,
+			8
+		],
+		"shield": 1,
+		"look": "robot",
+		"scale": 0.8,
+		"drops": {
+			"weapon_grenade": 0.1
+		},
+		"subsystems": {
+			"core": {
+				"label": "WARHEAD",
+				"hp": 999,
+				"acc": 1.0,
+				"dmg": 1.0,
+				"y": 0.6,
+				"effect": ""
+			},
+			"legs": {
+				"label": "WHEELS",
+				"hp": 5,
+				"acc": 0.8,
+				"dmg": 0.7,
+				"y": 0.2,
+				"effect": "crippled"
+			}
+		},
+		"weak": [
+			"blaster"
+		]
+	},
+	"swarm_drone": {
+		"name": "Ad-Swarm Drone",
+		"faction": "lumen",
+		"hostility": "always",
+		"flying": true,
+		"hp": 11,
+		"speed": 5.2,
+		"aggro_range": 11.0,
+		"attack": "melee",
+		"range": 1.2,
+		"damage": 5,
+		"cooldown": 0.8,
+		"telegraph": 0.3,
+		"flank": true,
+		"credits": [
+			1,
+			5
+		],
+		"shield": 1,
+		"look": "drone:lumen",
+		"scale": 0.7,
+		"drops": {
+			"weapon_arc": 0.06
+		},
+		"subsystems": {
+			"core": {
+				"label": "SPEAKER",
+				"hp": 999,
+				"acc": 1.0,
+				"dmg": 1.0,
+				"y": 0.5,
+				"effect": ""
+			},
+			"eye": {
+				"label": "LENS",
+				"hp": 4,
+				"acc": 0.6,
+				"dmg": 2.0,
+				"y": 0.6,
+				"effect": "crit"
+			}
+		},
+		"weak": [
+			"blaster",
+			"melee"
+		]
+	},
+	"vat_golem": {
+		"name": "Vat Golem",
+		"faction": "gristle",
+		"hostility": "always",
+		"hp": 140,
+		"speed": 2.0,
+		"aggro_range": 9.0,
+		"attack": "melee",
+		"range": 2.2,
+		"damage": 24,
+		"cooldown": 2.4,
+		"telegraph": 1.0,
+		"slam": true,
+		"armored": true,
+		"credits": [
+			30,
+			70
+		],
+		"shield": 8,
+		"look": "heavy:gristle",
+		"scale": 1.35,
+		"drops": {
+			"weapon_hammer": 0.3,
+			"weapon_katana": 0.1
+		},
+		"subsystems": {
+			"core": {
+				"label": "PASTE BELLY",
+				"hp": 999,
+				"acc": 1.0,
+				"dmg": 1.0,
+				"y": 1.0,
+				"effect": ""
+			},
+			"head": {
+				"label": "VAT LID",
+				"hp": 20,
+				"acc": 0.5,
+				"dmg": 1.8,
+				"y": 1.8,
+				"effect": "crit"
+			},
+			"legs": {
+				"label": "STUMPS",
+				"hp": 30,
+				"acc": 0.85,
+				"dmg": 0.7,
+				"y": 0.4,
+				"effect": "crippled"
+			}
+		},
+		"weak": [
+			"explosion",
+			"charged",
+			"legs"
+		]
 	}
 }

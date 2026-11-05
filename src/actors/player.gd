@@ -10,7 +10,13 @@ extends CharacterBody3D
 ## Enemy shields: hitting a WEAKNESS chips the shield; at 0 the enemy BREAKS (stunned, x2 damage).
 ## Inputs are InputMap actions, so keyboard, gamepad and the touch HUD all drive the same code.
 
-enum State { NORMAL, ROLL, PARRY, MELEE, HURT, DEAD, LOCKED }
+enum State { NORMAL, ROLL, PARRY, MELEE, HURT, DEAD, LOCKED, DASH }
+
+## Dash strike: press MELEE with a foe 3-9 m away and you close the gap in a blink (i-frames),
+## then the combo starts on arrival. The answer to enemies who keep their distance.
+const DASH_MIN := 3.0
+const DASH_MAX := 9.0
+const DASH_SPEED := 19.0
 
 const GRAVITY := 24.0
 const ACCEL := 48.0
@@ -71,6 +77,9 @@ var _was_on_floor := true
 var _interactables: Array[Area3D] = []
 var _current_interactable: Area3D = null
 var _base_glow := 0.7
+var _dash_target: Node3D = null
+var _dash_time := 0.0
+var _dash_cd := 0.0
 
 
 func _ready() -> void:
@@ -138,6 +147,8 @@ func _physics_process(delta: float) -> void:
 				_last_parry_whiff = Game.play_time
 		State.MELEE:
 			_melee_state(delta, move_dir)
+		State.DASH:
+			_dash_state(delta)
 		State.HURT:
 			_brake(delta, 0.4)
 			if _hurt_time <= 0.0:
@@ -171,6 +182,8 @@ func _tick_timers(delta: float) -> void:
 	_shoot_pose -= delta
 	_hurt_time -= delta
 	_combo_grace -= delta
+	_dash_time -= delta
+	_dash_cd -= delta
 	if overclock_time > 0.0:
 		overclock_time -= delta
 		_ghost_timer -= delta
@@ -210,7 +223,11 @@ func _normal_state(delta: float, move_dir: Vector3, strength: float) -> void:
 	elif Input.is_action_just_pressed("parry") and _parry_recover <= 0.0:
 		_start_parry()
 	elif Input.is_action_just_pressed("melee"):
-		_start_combo(0)
+		_melee_pressed()
+	elif Input.is_action_just_pressed("swap_melee"):
+		_swap("melee")
+	elif Input.is_action_just_pressed("swap_ranged"):
+		_swap("ranged")
 	elif Input.is_action_just_pressed("overclock"):
 		activate_overclock()
 	_shooting(delta)
@@ -225,6 +242,13 @@ func _normal_state(delta: float, move_dir: Vector3, strength: float) -> void:
 # --- Shooting / charge ------------------------------------------------------------------------
 
 func _shooting(delta: float) -> void:
+	var w := Arsenal.stats("ranged")
+	if not w.get("charge", false):
+		# Non-charging guns: hold to keep firing at the weapon's rate.
+		_charge = 0.0
+		if Input.is_action_pressed("attack") and _fire_cd <= 0.0:
+			shoot(false)
+		return
 	if Input.is_action_just_pressed("attack") and _fire_cd <= 0.0:
 		shoot(false)
 		_charge = 0.0001
@@ -243,7 +267,8 @@ func _shooting(delta: float) -> void:
 
 
 func shoot(charged: bool = false) -> void:
-	_fire_cd = 1.0 / maxf(0.5, Game.stat("fire_rate") * _oc_mult(1.5))
+	var w := Arsenal.stats("ranged")
+	_fire_cd = 1.0 / maxf(0.3, Game.stat("fire_rate") * float(w.get("rate", 1.0)) * _oc_mult(1.5))
 	if target == null or not is_instance_valid(target):
 		_auto_target()
 	var from := muzzle.global_position
@@ -264,8 +289,33 @@ func shoot(charged: bool = false) -> void:
 	else:
 		aim_point = from + facing * 10.0
 	var dir := (aim_point - from).normalized()
-	var dmg := Game.stat("damage") * _oc_mult(1.0 + 0.25 * maxi(1, overclock_pips)) * (3.0 if charged else 1.0)
-	var p := Projectile.spawn(get_parent(), from + dir * 0.45, dir, 30.0 if charged else 26.0, dmg, "player", self, sub)
+	var dmg := Game.stat("damage") * _oc_mult(1.0 + 0.25 * maxi(1, overclock_pips)) * (3.0 if charged else 1.0) * float(w.get("dmg", 1.0))
+	match str(w.get("special", "")):
+		"chain":
+			_arc_shot(w, dmg)
+			_shot_feedback(dir, from, false)
+			return
+		"grenade":
+			var land: Vector3 = target.global_position if target != null and is_instance_valid(target) else global_position + facing * 7.0
+			Grenade.throw(get_parent(), from, Vector3(land.x, 0.25, land.z), dmg, float(w.get("radius", 3.0)), self)
+			_shot_feedback(dir, from, false)
+			return
+	var pellets := int(w.get("pellets", 1))
+	var p: Projectile = null
+	for i in pellets:
+		var d := dir
+		if pellets > 1:
+			var ang := deg_to_rad(float(w.get("spread", 20)) * (float(i) / float(pellets - 1) - 0.5) + randf_range(-3.0, 3.0))
+			d = dir.rotated(Vector3.UP, ang)
+		p = Projectile.spawn(get_parent(), from + d * 0.45, d, 30.0 if charged else float(w.get("speed", 26.0)), dmg, "player", self,
+			sub if pellets == 1 else "")
+		p.life = 1.2 if charged else float(w.get("life", 1.6))
+		if w.has("push"):
+			p.push_force = float(w["push"])
+		if str(w.get("special", "")) == "pull":
+			p.pull = true
+		if w.has("stun"):
+			p.stun = float(w["stun"])
 	if charged:
 		p.make_charged()
 		FX.shake(get_tree(), 0.25)
@@ -274,10 +324,89 @@ func shoot(charged: bool = false) -> void:
 		Audio.play_sfx("charge_shot", 0.05)
 	else:
 		Audio.play_sfx("shoot", 0.1, -3.0)
-	FXSprite.play_at(get_parent(), "muzzle", from + dir * 0.55, 1.4 if charged else 0.9, 3.0, Color(1.0, 0.95, 0.7), dir.x < 0)
+	_shot_feedback(dir, from, charged)
+	if pellets > 1:
+		velocity -= Vector3(dir.x, 0, dir.z) * 3.0  # scatter kick
+
+
+func _shot_feedback(dir: Vector3, from: Vector3, charged: bool) -> void:
+	var col := Color.from_string(str(Arsenal.stats("ranged").get("color", "#fff0b0")), Color(1.0, 0.95, 0.7))
+	FXSprite.play_at(get_parent(), "muzzle", from + dir * 0.55, 1.4 if charged else 0.9, 3.0, col, dir.x < 0)
 	_shoot_pose = 0.28
 	sprite.play("shoot", true)
 	velocity -= Vector3(dir.x, 0, dir.z) * (4.0 if charged else 0.8)  # recoil
+
+
+## Arc Thrower: instant lightning to the target, then jumps to the nearest others; stuns.
+func _arc_shot(w: Dictionary, dmg: float) -> void:
+	var rng := float(w.get("range", 10.0))
+	var first: Node3D = null
+	if target != null and is_instance_valid(target) and target.global_position.distance_to(global_position) <= rng:
+		first = target
+	else:
+		var best := INF
+		for e in get_tree().get_nodes_in_group("enemy"):
+			var to: Vector3 = (e.global_position - global_position) * Vector3(1, 0, 1)
+			if e.is_alive() and to.length() <= rng and facing.dot(to.normalized()) > 0.2 and to.length() < best:
+				best = to.length()
+				first = e
+	var from := muzzle.global_position
+	if first == null:
+		_zap(from, from + facing * 5.0)
+		Audio.play_sfx("shoot", 0.2, -2.0)
+		return
+	var chain: Array = [first]
+	for i in int(w.get("chains", 2)):
+		var cur: Node3D = chain[-1]
+		var nxt: Node3D = null
+		var best2 := 5.0
+		for e in get_tree().get_nodes_in_group("enemy"):
+			if chain.has(e) or not e.is_alive():
+				continue
+			var dd: float = e.global_position.distance_to(cur.global_position)
+			if dd < best2:
+				best2 = dd
+				nxt = e
+		if nxt == null:
+			break
+		chain.append(nxt)
+	var a := from
+	for e in chain:
+		var b: Vector3 = e.global_position + Vector3(0, 1.0, 0)
+		_zap(a, b)
+		e.take_hit({"damage": dmg, "attacker": self, "kind": "projectile", "subsystem": "", "position": b,
+			"stun": float(w.get("stun", 0.4)), "shield_damage": 1, "push": ((b - a) * Vector3(1, 0, 1)).normalized() * 1.0})
+		a = b
+		dmg *= 0.8
+	Audio.play_sfx("charge_shot", 0.2, -6.0)
+
+
+func _zap(a: Vector3, b: Vector3) -> void:
+	var pts := [a]
+	for i in 3:
+		var t := float(i + 1) / 4.0
+		pts.append(a.lerp(b, t) + Vector3(randf_range(-0.25, 0.25), randf_range(-0.2, 0.2), randf_range(-0.25, 0.25)))
+	pts.append(b)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = Color(0.6, 0.95, 1.0)
+	m.emission_enabled = true
+	m.emission = Color(0.5, 0.9, 1.0)
+	m.emission_energy_multiplier = 6.0
+	for i in pts.size() - 1:
+		var p0: Vector3 = pts[i]
+		var p1: Vector3 = pts[i + 1]
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.05, 0.05, p0.distance_to(p1))
+		bm.material = m
+		mi.mesh = bm
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		get_parent().add_child(mi)
+		mi.global_position = (p0 + p1) * 0.5
+		if p0.distance_to(p1) > 0.01:
+			mi.look_at(p1, Vector3.UP if absf((p1 - p0).normalized().y) < 0.99 else Vector3.RIGHT)
+		get_tree().create_timer(0.12).timeout.connect(mi.queue_free)
 
 
 func on_shot_missed() -> void:
@@ -288,6 +417,80 @@ func on_shot_missed() -> void:
 
 
 # --- Melee combo -------------------------------------------------------------------------------
+
+func _melee_pressed() -> void:
+	var foe := _dash_candidate()
+	if foe != null:
+		_dash_target = foe
+		_dash_time = 0.5
+		_dash_cd = 0.8
+		_iframes = maxf(_iframes, 0.32)
+		state = State.DASH
+		var to := (foe.global_position - global_position) * Vector3(1, 0, 1)
+		facing = to.normalized()
+		sprite.play("run", true)
+		sprite.squash(Vector2(1.25, 0.82))
+		FX.dust(get_parent(), global_position, 0.9)
+		Audio.play_sfx("roll", 0.1)
+		return
+	_start_combo(0)
+
+
+## A hostile 3-9 m away: the locked target, else the nearest one roughly in front of you.
+func _dash_candidate() -> Node3D:
+	if _dash_cd > 0.0:
+		return null
+	var cand: Array = []
+	if target != null and is_instance_valid(target) and target.is_in_group("enemy"):
+		cand.append(target)
+	var best: Node3D = null
+	var best_d := INF
+	for e in cand + get_tree().get_nodes_in_group("enemy"):
+		if not is_instance_valid(e) or e.is_queued_for_deletion() or not e.is_alive() or not e.get("hostile"):
+			continue
+		var to: Vector3 = (e.global_position - global_position) * Vector3(1, 0, 1)
+		var d := to.length()
+		if d < DASH_MIN or d > DASH_MAX:
+			continue
+		if e == target:
+			return e
+		if facing.dot(to.normalized()) > 0.35 and d < best_d:
+			best_d = d
+			best = e
+	return best
+
+
+func _dash_state(delta: float) -> void:
+	if _dash_target == null or not is_instance_valid(_dash_target) or not _dash_target.is_alive() or _dash_time <= 0.0:
+		state = State.NORMAL
+		_start_combo(0)
+		return
+	var to := (_dash_target.global_position - global_position) * Vector3(1, 0, 1)
+	if to.length() < 1.7:
+		velocity.x = 0.0
+		velocity.z = 0.0
+		_start_combo(0)
+		return
+	facing = to.normalized()
+	velocity.x = facing.x * DASH_SPEED * _oc_mult(1.1)
+	velocity.z = facing.z * DASH_SPEED * _oc_mult(1.1)
+	_ghost_timer -= delta
+	if _ghost_timer <= 0.0:
+		_ghost_timer = 0.03
+		sprite.spawn_afterimage(Color.from_string(str(Arsenal.stats("melee").get("color", "#9ff7ff")), Color(0.4, 1.0, 1.0)) * Color(1, 1, 1, 0.6))
+
+
+func _swap(slot: String) -> void:
+	var before := Arsenal.equipped(slot)
+	var now := Arsenal.cycle(slot)
+	if now == before:
+		EventBus.toast.emit("Only one %s so far - find more in shops and on enemies." % ("blade" if slot == "melee" else "gun"), Color(0.8, 0.8, 0.8))
+		return
+	Audio.play_sfx("blip", 0.1)
+	sprite.flash(Color.from_string(str(Arsenal.stats(slot).get("color", "#ffffff")), Color.WHITE) * 2.0, 0.12)
+	FX.damage_number(get_parent(), global_position + Vector3(0, 2.4, 0), Arsenal.label(slot).to_upper(),
+		Color.from_string(str(Arsenal.stats(slot).get("color", "#ffffff")), Color.WHITE))
+
 
 func _start_combo(step: int) -> void:
 	_combo_step = step
@@ -306,6 +509,7 @@ func _start_combo(step: int) -> void:
 	else:
 		_lunge = facing * step_data.lunge * 0.6
 	sprite.play(step_data.anim, true)
+	sprite.speed_scale = 1.0 / maxf(0.5, float(Arsenal.stats("melee").get("speed", 1.0)))
 	Audio.play_sfx("slash", 0.08, -2.0)
 
 
@@ -330,7 +534,10 @@ func _melee_target() -> Node3D:
 
 
 func _melee_state(delta: float, move_dir: Vector3) -> void:
-	var step: Dictionary = COMBO[_combo_step]
+	var step: Dictionary = COMBO[_combo_step].duplicate()
+	var wspeed := float(Arsenal.stats("melee").get("speed", 1.0))
+	step["time"] = float(step["time"]) * wspeed
+	step["hit"] = float(step["hit"]) * wspeed
 	_combo_time += delta
 	velocity.x = _lunge.x
 	velocity.z = _lunge.z
@@ -349,29 +556,48 @@ func _melee_state(delta: float, move_dir: Vector3) -> void:
 			_start_combo(_combo_step + 1)
 		else:
 			state = State.NORMAL
+			sprite.speed_scale = 1.0
 			_combo_grace = 0.3
 
 
 func _melee_hit(step: Dictionary) -> void:
-	var center := global_position + facing * 1.0 + Vector3(0, 1.0, 0)
-	FXSprite.play_at(get_parent(), step.fx, center, 1.5 if step.get("shield", 1) > 1 else 1.25, 2.6, Color(0.6, 1.0, 1.0), facing.x < 0)
+	var w := Arsenal.stats("melee")
+	var reach := float(step.reach) + float(w.get("reach", 0.0))
+	var col := Color.from_string(str(w.get("color", "#9ff7ff")), Color(0.6, 1.0, 1.0))
+	var center := global_position + facing * (1.0 + float(w.get("reach", 0.0)) * 0.5) + Vector3(0, 1.0, 0)
+	FXSprite.play_at(get_parent(), step.fx, center, (1.5 if step.get("shield", 1) > 1 else 1.25) * (1.0 + float(w.get("reach", 0.0)) * 0.35), 2.6, col, facing.x < 0)
 	var hits := 0
-	var dmg: float = Game.stat("damage") * 1.25 * float(step.dmg) * _oc_mult(1.0 + 0.25 * maxi(1, overclock_pips))
+	var dmg: float = Game.stat("damage") * 1.25 * float(step.dmg) * float(w.get("dmg", 1.0)) * _oc_mult(1.0 + 0.25 * maxi(1, overclock_pips))
+	var fin := _combo_step == COMBO.size() - 1
 	for n in get_tree().get_nodes_in_group("damageable"):
 		if n == self or not is_instance_valid(n) or not n is Node3D:
 			continue
 		var to: Vector3 = (n as Node3D).global_position - global_position
 		to.y = 0.0
 		var d := to.length()
-		if d > float(step.reach) or (d > 0.9 and facing.dot(to.normalized()) < 0.15):
+		if d > reach or (d > 0.9 and facing.dot(to.normalized()) < float(w.get("arc", 0.15))):
 			continue
 		var sub := target_subsystem if n == target else ""
-		n.take_hit({"damage": dmg, "attacker": self, "kind": "melee", "subsystem": sub,
-			"position": (n as Node3D).global_position + Vector3(0, 1.0, 0), "push": facing * float(step.push),
-			"shield_damage": int(step.shield)})
+		var info := {"damage": dmg, "attacker": self, "kind": "melee", "subsystem": sub,
+			"position": (n as Node3D).global_position + Vector3(0, 1.0, 0), "push": facing * float(step.push) * float(w.get("push", 1.0)),
+			"shield_damage": int(step.shield) + int(w.get("shield", 0))}
+		if float(w.get("stun", 0.0)) > 0.0:
+			info["stun"] = float(w["stun"]) * (1.6 if fin else 1.0)
+		if w.get("pierce", false):
+			info["pierce"] = true
+		n.take_hit(info)
 		hits += 1
+	if fin and str(w.get("finisher", "")) == "shockwave":
+		# Repo Hammer: the last hit slams the ground - everything around you gets thrown back.
+		FX.dust(get_parent(), global_position, 2.4)
+		FXSprite.play_at(get_parent(), "explosion", global_position + Vector3(0, 0.3, 0), 2.6, 1.6, col)
+		for e in get_tree().get_nodes_in_group("enemy"):
+			var to2: Vector3 = (e.global_position - global_position) * Vector3(1, 0, 1)
+			if e.is_alive() and to2.length() <= 3.0:
+				e.take_hit({"damage": dmg * 0.6, "attacker": self, "kind": "explosion", "position": e.global_position + Vector3(0, 1.0, 0),
+					"push": to2.normalized() * 8.0, "shield_damage": 1})
+				hits += 1
 	if hits > 0:
-		var fin := _combo_step == COMBO.size() - 1
 		FX.hitstop(get_tree(), 0.09 if fin else 0.05)
 		FX.shake(get_tree(), 0.35 if fin else 0.15)
 		FX.rumble(0.3, 0.5 if fin else 0.2, 0.12)
@@ -468,6 +694,8 @@ func _update_animation() -> void:
 			sprite.play("guard")
 		State.MELEE:
 			pass
+		State.DASH:
+			sprite.play("run")
 		State.HURT:
 			sprite.play("hurt")
 		State.DEAD:

@@ -14,6 +14,7 @@ var root: Control
 var _hp_bar: ProgressBar
 var _hp_label: Label
 var _credits_label: Label
+var _weapon_label: Label
 var _air_label: Label
 var _bounty_label: Label
 var _loc_label: Label
@@ -228,6 +229,8 @@ func _build_status() -> void:
 	_oc_bar.add_child(_oc_label)
 	_credits_label = make_label("", 17, Color(1.0, 0.85, 0.3))
 	v.add_child(_credits_label)
+	_weapon_label = make_label("", 14, Color(0.75, 0.95, 1.0))
+	v.add_child(_weapon_label)
 	_air_label = make_label("", 14, Color(0.4, 0.95, 1.0))
 	v.add_child(_air_label)
 	_bounty_label = make_label("", 14, Color(1.0, 0.35, 0.35))
@@ -379,6 +382,8 @@ func _build_touch() -> void:
 	_add_touch_button("overclock", "BOOST", Vector2(445, 112), 42, Color(1.0, 0.35, 0.9), 15)
 	_add_touch_button("target_cycle", "TGT", Vector2(420, 290), 36, Color(0.7, 0.6, 1.0), 15)
 	_add_touch_button("subsystem_next", "PART", Vector2(268, 405), 36, Color(0.7, 0.6, 1.0), 15)
+	_add_touch_button("swap_ranged", "GUN", Vector2(395, 190), 32, Color(1.0, 0.6, 0.3), 14)
+	_add_touch_button("swap_melee", "BLADE", Vector2(40, 245), 32, Color(0.4, 0.95, 0.9), 13)
 	var med := _add_touch_button("", "MED", Vector2(575, 92), 34, Color(0.4, 1.0, 0.6), 15)
 	med.tapped.connect(func(): Game.use_item("medkit") or Game.use_item("antihistamine"))
 	var menu := _add_touch_button("", "MENU", Vector2(60, 0), 34, Color(0.85, 0.97, 1.0), 14)
@@ -406,11 +411,11 @@ func _update_hint() -> void:
 		return
 	var dev := Router.input_device
 	if dev == "touch":
-		_hint_label.text = "MELEE combo  |  hold FIRE = charge shot  |  ROLL at the last moment = PERFECT  |  tap enemy parts to target"
+		_hint_label.text = "MELEE near a foe = DASH STRIKE  |  hold FIRE = charge  |  GUN / BLADE swap weapons  |  tap enemy parts to target"
 	elif dev == "gamepad":
-		_hint_label.text = "X melee  RT shoot (hold: charge)  A roll  RB parry  B overclock  LB/R-stick target  LT part  Y use  START menu"
+		_hint_label.text = "X melee (far: dash)  RT shoot  A roll  RB parry  B overclock  LB target  LT part  L3/R3 swap blade/gun  Y use"
 	else:
-		_hint_label.text = "J melee  K shoot (hold: charge)  SPACE roll  L parry  R overclock  TAB target  Q part  F use  ESC menu"
+		_hint_label.text = "J melee (far: dash)  K shoot  SPACE roll  L parry  R overclock  TAB target  Q part  1/2 swap blade/gun  F use"
 
 
 func _add_touch_button(action: String, text: String, from_br: Vector2, radius: float, color: Color, fs: int = 20) -> TouchButton:
@@ -522,6 +527,7 @@ func _build_modal() -> void:
 func _connect_signals() -> void:
 	EventBus.player_hp_changed.connect(func(_h, _m): _refresh_status())
 	EventBus.credits_changed.connect(func(_v, _d): _refresh_status())
+	EventBus.weapon_changed.connect(func(_s, _w): _refresh_status())
 	EventBus.air_billed.connect(func(_c, _d): _refresh_status())
 	EventBus.bounty_changed.connect(func(_f, _a): _refresh_status())
 	EventBus.ai_say.connect(_on_ai_say)
@@ -551,6 +557,11 @@ func _refresh_status() -> void:
 	_hp_bar.value = Game.hp
 	_hp_label.text = " %d/%d" % [roundi(Game.hp), roundi(Game.max_hp())]
 	_credits_label.text = "%d CR   MEDKITS x%d" % [Game.credits, Game.item_count("medkit")]
+	if _weapon_label:
+		var nb := Arsenal.owned("melee").size()
+		var ng := Arsenal.owned("ranged").size()
+		_weapon_label.text = "BLADE: %s%s   GUN: %s%s" % [Arsenal.label("melee").to_upper(), " (%d)" % nb if nb > 1 else "",
+			Arsenal.label("ranged").to_upper(), " (%d)" % ng if ng > 1 else ""]
 	_air_label.text = "O2 SUBSCRIPTION: ACTIVE" if Game.air_debt == 0 else "O2 DEBT: %d CR (Halcyon is watching)" % Game.air_debt
 	_air_label.add_theme_color_override("font_color", Color(0.4, 0.95, 1.0) if Game.air_debt == 0 else Color(1.0, 0.6, 0.2))
 	var b := Factions.total_bounty()
@@ -893,6 +904,9 @@ func _fill_shop(vendor: String, faction_id: String, stock: Array) -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	for item_id in stock:
+		var wid := str(DataDB.items.get(item_id, {}).get("weapon", ""))
+		if wid != "" and Arsenal.owns(wid):
+			continue  # you already carry it
 		var price := Game.price_of(item_id, faction_id)
 		var row := HBoxContainer.new()
 		list.add_child(row)

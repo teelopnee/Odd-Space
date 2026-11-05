@@ -388,5 +388,89 @@
 	],
 	"standdown:pirate": [
 		"Captain says we're done here."
+	],
+	"taunt:riot_trooper": [
+		"Shields up! Compliance incoming!",
+		"Step back from the shield, citizen!",
+		"This wall is property of Paragon!",
+		"Resistance is billed per impact!"
+	],
+	"hurt:riot_trooper": [
+		"My shield! Do you know what these COST?",
+		"Hold the line! HOLD!"
+	],
+	"yield:riot_trooper": [
+		"Shield down! Shield down!",
+		"I surrender! Please bill me instead!"
+	],
+	"standdown:riot_trooper": [
+		"Line dismissed."
+	],
+	"taunt:street_punk": [
+		"Fresh meat!",
+		"Nice boots. Mine now.",
+		"Get 'em!",
+		"This is OUR block!",
+		"Oi! Tourist!"
+	],
+	"hurt:street_punk": [
+		"Ow! Cheap shot!",
+		"My jacket!",
+		"That's gonna scar. COOL."
+	],
+	"yield:street_punk": [
+		"Alright, alright! Truce!",
+		"I was only borrowing!"
+	],
+	"standdown:street_punk": [
+		"Later, loser."
+	],
+	"taunt:boom_bot": [
+		"SPECIAL OFFER: DETONATION!",
+		"HUG ME. HUG ME NOW.",
+		"LIMITED TIME DEAL: 3... 2...",
+		"BEEP. BEEP. BEEEEP."
+	],
+	"hurt:boom_bot": [
+		"WARRANTY VOID!",
+		"DO NOT SHAKE!"
+	],
+	"yield:boom_bot": [
+		"ABORT? ABORT?"
+	],
+	"standdown:boom_bot": [
+		"DEAL EXPIRED."
+	],
+	"taunt:swarm_drone": [
+		"BUY! BUY! BUY!",
+		"YOU HAVE BEEN SELECTED!",
+		"SUBSCRIBE! SUBSCRIBE!",
+		"ONE NEW AD FOR YOU!"
+	],
+	"hurt:swarm_drone": [
+		"UNSUBSCRIBE?!",
+		"BZZT!"
+	],
+	"yield:swarm_drone": [
+		"OPT OUT ACCEPTED."
+	],
+	"standdown:swarm_drone": [
+		"CAMPAIGN PAUSED."
+	],
+	"taunt:vat_golem": [
+		"*GLORP*",
+		"BATCH... EIGHTY... EIGHT...",
+		"*a sound like a full vat being stirred*",
+		"HUNGRY. FOREVER."
+	],
+	"hurt:vat_golem": [
+		"*SPLUTCH*",
+		"*angry bubbling*"
+	],
+	"yield:vat_golem": [
+		"*sad gurgle*"
+	],
+	"standdown:vat_golem": [
+		"*settles*"
 	]
 }

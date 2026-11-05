@@ -64,4 +64,6 @@ signal cutscene_ended
 signal speech_bubble(speaker: Node, text: String)
 ## Something the player did that bystanders may see (NPC memory): "dance", "hurt", ...
 signal player_act(kind: String, target: String)
+## Equipped weapon changed (slot "melee" | "ranged") - HUD shows it.
+signal weapon_changed(slot: String, weapon_id: String)
 signal input_device_changed(device: String)  # "touch" | "keyboard" | "gamepad"

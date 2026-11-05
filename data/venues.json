@@ -602,7 +602,11 @@
 							"fake_id",
 							"cyberdeck",
 							"loaded_dice",
-							"bribe_voucher"
+							"bribe_voucher",
+							"weapon_chain",
+							"weapon_scatter",
+							"weapon_hammer",
+							"weapon_katana"
 						]
 					}
 				},
@@ -1154,7 +1158,10 @@
 							"air_canister",
 							"antihistamine",
 							"painkillers",
-							"paste_ration"
+							"paste_ration",
+							"weapon_baton",
+							"weapon_harpoon",
+							"weapon_grenade"
 						]
 					}
 				},

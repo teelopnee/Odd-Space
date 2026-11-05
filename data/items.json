@@ -202,5 +202,53 @@
 		"name": "Wedding Ring",
 		"desc": "Engraved with a name you whisper when the ship is quiet.",
 		"price": 0
+	},
+	"weapon_baton": {
+		"name": "Shock Baton",
+		"desc": "Fast, stuns on every hit, cracks shields. (Weapon: equips into your BLADE slot.)",
+		"price": 140,
+		"weapon": "baton"
+	},
+	"weapon_chain": {
+		"name": "Chain Whip",
+		"desc": "Long reach, hits everything in a wide arc. (Weapon: equips into your BLADE slot.)",
+		"price": 160,
+		"weapon": "chain"
+	},
+	"weapon_katana": {
+		"name": "Mono-Katana",
+		"desc": "Cuts through armour and riot shields. (Weapon: equips into your BLADE slot.)",
+		"price": 260,
+		"weapon": "katana"
+	},
+	"weapon_hammer": {
+		"name": "Repo Hammer",
+		"desc": "Slow. Enormous. The last hit sends out a shockwave. (Weapon: equips into your BLADE slot.)",
+		"price": 220,
+		"weapon": "hammer"
+	},
+	"weapon_scatter": {
+		"name": "Scatter Cannon",
+		"desc": "Six pellets, huge knockback. Get close. (Weapon: equips into your GUN slot.)",
+		"price": 180,
+		"weapon": "scatter"
+	},
+	"weapon_arc": {
+		"name": "Arc Thrower",
+		"desc": "Instant lightning that jumps to two more enemies and stuns. (Weapon: equips into your GUN slot.)",
+		"price": 240,
+		"weapon": "arc"
+	},
+	"weapon_harpoon": {
+		"name": "Repo Harpoon",
+		"desc": "Drags the target to you. Rips riot shields aside. (Weapon: equips into your GUN slot.)",
+		"price": 200,
+		"weapon": "harpoon"
+	},
+	"weapon_grenade": {
+		"name": "Paste Grenade",
+		"desc": "Lobbed. Explodes in a 3 m splash. Never hits civilians. (Weapon: equips into your GUN slot.)",
+		"price": 230,
+		"weapon": "grenade"
 	}
 }

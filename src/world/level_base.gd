@@ -13,7 +13,8 @@ const ENEMY_SCENE := preload("res://scenes/actors/enemy.tscn")
 const NPC_SCENE := preload("res://scenes/actors/npc.tscn")
 const HUD_SCENE := preload("res://scenes/ui/hud.tscn")
 
-const ENEMY_CHARS := {"E": "repo_drone", "G": "paragon_officer", "B": "gristle_grub", "H": "debt_brute", "R": "pirate"}
+const ENEMY_CHARS := {"E": "repo_drone", "G": "paragon_officer", "B": "gristle_grub", "H": "debt_brute", "R": "pirate",
+	"U": "riot_trooper", "F": "street_punk", "Q": "boom_bot", "J": "swarm_drone", "Z": "vat_golem"}
 const CIVILIAN_NAMES := ["Marla", "Dex", "Old Ivo", "Juno", "Tam", "Priya", "Bex", "Otto", "Sunny", "Kaz", "Wen", "Lula", "Rico", "Nan"]
 const CIVILIAN_SPRITES := ["civilian_a", "civilian_b", "civilian_c"]
 

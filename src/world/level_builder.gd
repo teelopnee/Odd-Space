@@ -15,6 +15,8 @@ extends RefCounted
 ##                      L  neon light                 R   pirate      N civilian
 ##                      T  terminal (causality log)   M   merchant    W recruitable crew
 ##                      K  pillar   X explosive tank  m   med-station
+##                                                    U riot unit  F gutter punk  Q ad-bomb bot
+##                                                    J ad-swarm drone  Z vat golem
 ##   planet decor: r rock  c crystal  u mushroom  p pipe  t tank  n antenna  z ruin
 ##   street life : k market stall  q parked hovercar  j trash  g tree  w bench
 ##                 i street sign  v steam vent  o habitat dome  Y billboard tower
@@ -38,7 +40,7 @@ const STALL_TYPES := ["food", "food", "food", "air", "implants", "fortune", "tap
 const STALL_SIGNS := ["NOODLES", "PASTE", "AIR 2GO", "CHIPS", "REPAIR", "DUMPLINGS", "SYNTH-RAMEN", "PAWN", "FORTUNES", "CRYO-POPS", "IMPLANTS", "TAPES"]
 const SHAFT_TEX := "res://assets/textures/light_shaft.png"
 const SPAWN_CHARS := {"1": "cryo_bay", "2": "cargo_hold", "3": "medbay", "4": "server_room", "P": "default"}
-const ACTOR_CHARS := ["E", "G", "B", "H", "R", "N", "M", "W"]
+const ACTOR_CHARS := ["E", "G", "B", "H", "R", "N", "M", "W", "U", "F", "Q", "J", "Z"]
 
 var root: Node3D
 var palette: Dictionary

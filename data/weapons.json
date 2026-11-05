@@ -1,0 +1,141 @@
+{
+	"_doc": "Player arsenal (src/core/arsenal.gd). melee: dmg/speed(time x)/reach(+m)/push/shield(+pips)/stun(s)/arc(min facing dot: lower = wider)/pierce(armor)/finisher. ranged: dmg/rate(shots per s x)/speed/pellets/spread(deg)/life(s)/push/special(chain|pull|grenade)/range/chains/stun/radius/charge. Unlock by picking up the item 'weapon_<id>' (shops, drops, starting kit by background).",
+	"melee": {
+		"pipe": {
+			"name": "Lead Pipe",
+			"desc": "Reliable. Dented. Yours.",
+			"dmg": 1.0,
+			"speed": 1.0,
+			"reach": 0.0,
+			"push": 1.0,
+			"shield": 0,
+			"stun": 0.0,
+			"arc": 0.15,
+			"color": "#9ff7ff"
+		},
+		"baton": {
+			"name": "Shock Baton",
+			"desc": "Fast, stuns on every hit, cracks shields.",
+			"dmg": 0.85,
+			"speed": 0.82,
+			"reach": 0.0,
+			"push": 0.8,
+			"shield": 1,
+			"stun": 0.55,
+			"arc": 0.15,
+			"color": "#7dc8ff"
+		},
+		"chain": {
+			"name": "Chain Whip",
+			"desc": "Long reach, hits everything in a wide arc.",
+			"dmg": 0.8,
+			"speed": 1.05,
+			"reach": 1.5,
+			"push": 1.4,
+			"shield": 0,
+			"stun": 0.0,
+			"arc": -0.45,
+			"color": "#ffd23e"
+		},
+		"katana": {
+			"name": "Mono-Katana",
+			"desc": "Cuts through armour and riot shields.",
+			"dmg": 1.45,
+			"speed": 0.9,
+			"reach": 0.3,
+			"push": 0.7,
+			"shield": 0,
+			"stun": 0.0,
+			"arc": 0.25,
+			"pierce": true,
+			"color": "#ff5ad2"
+		},
+		"hammer": {
+			"name": "Repo Hammer",
+			"desc": "Slow. Enormous. The last hit sends out a shockwave.",
+			"dmg": 2.1,
+			"speed": 1.4,
+			"reach": 0.2,
+			"push": 1.9,
+			"shield": 1,
+			"stun": 0.2,
+			"arc": 0.1,
+			"finisher": "shockwave",
+			"color": "#ffa040"
+		}
+	},
+	"ranged": {
+		"sidearm": {
+			"name": "Sidearm",
+			"desc": "Accurate. Hold to charge a piercing shot.",
+			"dmg": 1.0,
+			"rate": 1.0,
+			"speed": 26.0,
+			"pellets": 1,
+			"spread": 0,
+			"life": 1.6,
+			"charge": true,
+			"color": "#fff0b0"
+		},
+		"scatter": {
+			"name": "Scatter Cannon",
+			"desc": "Six pellets, huge knockback. Get close.",
+			"dmg": 0.45,
+			"rate": 0.55,
+			"speed": 22.0,
+			"pellets": 6,
+			"spread": 28,
+			"life": 0.4,
+			"push": 5.0,
+			"color": "#ff9a5a"
+		},
+		"arc": {
+			"name": "Arc Thrower",
+			"desc": "Instant lightning that jumps to two more enemies and stuns.",
+			"dmg": 0.75,
+			"rate": 1.2,
+			"special": "chain",
+			"range": 10.0,
+			"chains": 2,
+			"stun": 0.45,
+			"color": "#8ae8ff"
+		},
+		"harpoon": {
+			"name": "Repo Harpoon",
+			"desc": "Drags the target to you. Rips riot shields aside.",
+			"dmg": 0.7,
+			"rate": 0.7,
+			"speed": 30.0,
+			"special": "pull",
+			"life": 0.6,
+			"color": "#c8ff7a"
+		},
+		"grenade": {
+			"name": "Paste Grenade",
+			"desc": "Lobbed. Explodes in a 3 m splash. Never hits civilians.",
+			"dmg": 2.2,
+			"rate": 0.55,
+			"special": "grenade",
+			"radius": 3.0,
+			"color": "#7dff4a"
+		}
+	},
+	"start_kit": {
+		"_doc": "background -> extra weapon at the start of a life",
+		"bouncer": "hammer",
+		"repo_agent": "harpoon",
+		"ex_paragon": "baton",
+		"smuggler": "scatter",
+		"netrunner": "arc",
+		"air_chemist": "grenade",
+		"street_chef": "katana",
+		"asteroid_miner": "hammer",
+		"escaped_convict": "chain",
+		"android": "arc",
+		"courier": "chain",
+		"street_medic": "baton",
+		"gambler": "scatter",
+		"union_organiser": "chain",
+		"clone_reject": "katana"
+	}
+}
