@@ -437,7 +437,10 @@ func _building(x0: int, z0: int, x1: int, z1: int) -> void:
 	add_box_collider(body, Vector3(w, h, d), Vector3(0, h * 0.5, 0))
 	var mat := _textured("building_panel", pcolor("wall", "#4a3f6b").lightened(rng.randf_range(-0.1, 0.15)), 0.5, 0.7, 0.3)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_HASH
-	var roof_mat := _textured("concrete", pcolor("wall", "#4a3f6b").lightened(0.25), 0.5, 0.8, 0.1, 1.2)
+	# Rooftops face the camera: keep them light and textured (tar-paper concrete in the city,
+	# weathered planks on frontier huts) so they never read as black slabs.
+	var hut := float(hr[1]) < 7.0
+	var roof_mat := _textured("planks" if hut else "concrete", pcolor("wall", "#4a3f6b").lightened(0.45 if hut else 0.3), 0.5, 0.85, 0.05, 1.4)
 	roof_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_HASH
 	add_mesh(body, box(Vector3(w, h, d)), mat, Vector3(0, h * 0.5, 0))
 	add_mesh(body, box(Vector3(w + 0.3, 0.25, d + 0.3)), roof_mat, Vector3(0, h + 0.12, 0))

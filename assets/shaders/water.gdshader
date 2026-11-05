@@ -20,9 +20,9 @@ void fragment() {
 			cos(p.y * 2.3 - t * 1.1) * 0.18, 1.0));
 	NORMAL_MAP = n * 0.5 + 0.5;
 	ALBEDO = deep.rgb * (0.85 + 0.15 * w);
-	METALLIC = 0.6;
-	ROUGHNESS = 0.07;
-	SPECULAR = 0.8;
+	METALLIC = 0.15;
+	ROUGHNESS = 0.18;
+	SPECULAR = 0.45;
 	float sparkle = step(1.05, w) * 0.6;
 	EMISSION = glow.rgb * glow_strength * (0.75 + 0.25 * w) + glow.rgb * sparkle * glow_strength;
 }
