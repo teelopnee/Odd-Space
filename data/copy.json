@@ -1326,6 +1326,14 @@
 			"#pct#% slower than yesterday and #pct#% pricier",
 			"a stray cow on the hover-lane, nobody knows whose",
 			"a hologram fell over on the main drag - mind the dancing"
+		],
+		"sponsor_line": [
+			"#brand# reminds you: #pa_body#",
+			"This title screen is sponsored by #product#. #benefit#.",
+			"#brand#: #cta#",
+			"A message from #faction#: '#slogan#'",
+			"#product#. #disclaimer#",
+			"Now on Lumen: #media_product#. #show_opinion#"
 		]
 	}
 }

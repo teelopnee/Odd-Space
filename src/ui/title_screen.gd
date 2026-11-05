@@ -80,7 +80,8 @@ func _button(text: String, cb: Callable) -> Button:
 
 func _next_slogan() -> void:
 	_slogan_i = (_slogan_i + 1) % SLOGANS.size()
-	_slogan.text = SLOGANS[_slogan_i]
+	# Every other slot is a freshly written sponsor message.
+	_slogan.text = SLOGANS[_slogan_i] if _slogan_i % 2 == 0 else Copy.make("sponsor_line")
 
 
 func _on_continue() -> void:

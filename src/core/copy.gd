@@ -10,6 +10,7 @@ extends RefCounted
 
 static var _rules: Dictionary = {}
 static var _re: RegEx
+static var _tidy_re: RegEx
 static var _rng := RandomNumberGenerator.new()
 
 
@@ -33,6 +34,10 @@ static func make(symbol: String, rng: RandomNumberGenerator = null, vars: Dictio
 
 
 static func expand(text: String, rng: RandomNumberGenerator = null, vars: Dictionary = {}) -> String:
+	return _tidy(_expand(text, rng, vars))
+
+
+static func _expand(text: String, rng: RandomNumberGenerator, vars: Dictionary) -> String:
 	var r := rules()
 	if rng == null:
 		rng = _rng
@@ -48,7 +53,7 @@ static func expand(text: String, rng: RandomNumberGenerator = null, vars: Dictio
 			break
 		var alts: Array = r.get(m.get_string(1), [])
 		var pick: String = str(alts[rng.randi() % alts.size()]) if not alts.is_empty() else m.get_string(1)
-		pick = expand(pick, rng, vars) if pick.contains("#") else pick
+		pick = _expand(pick, rng, vars) if pick.contains("#") else pick
 		match m.get_string(2):
 			"cap":
 				pick = pick.substr(0, 1).to_upper() + pick.substr(1)
@@ -60,6 +65,24 @@ static func expand(text: String, rng: RandomNumberGenerator = null, vars: Dictio
 				pick = ("an " if pick.substr(0, 1).to_lower() in ["a", "e", "i", "o", "u"] else "a ") + pick
 		out = out.substr(0, m.get_start()) + pick + out.substr(m.get_end())
 	return _fill(out, vars)
+
+
+## Typography after expansion: "..", "!." and "?." collapse (an ellipsis survives), and each
+## line starts with a capital even when it opens on "the Forever Loan".
+static func _tidy(text: String) -> String:
+	if _tidy_re == null:
+		_tidy_re = RegEx.new()
+		_tidy_re.compile("(?<!\\.)\\.\\.(?!\\.)")
+	var out := _tidy_re.sub(text, ".", true).replace("!.", "!").replace("?.", "?")
+	var lines := out.split("\n")
+	for i in lines.size():
+		var l: String = lines[i]
+		var j := 0
+		while j < l.length() and l[j] in ["\"", "'", " ", "("]:
+			j += 1
+		if j < l.length() and l[j] != l[j].to_upper():
+			lines[i] = l.substr(0, j) + l[j].to_upper() + l.substr(j + 1)
+	return "\n".join(lines)
 
 
 static func _fill(text: String, vars: Dictionary) -> String:
