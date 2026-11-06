@@ -23,12 +23,16 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 | Systemic depth | 8 | 8 | The real selling point. |
 | Combat | 4 | 5 | Tokens, dash strike, 10 weapons, difficulty settings. Still unplaytested by humans. |
 | Onboarding | 2 | 6 | Just-in-time tips (wait for dialogues to close) + a 4-step FIRST DAY checklist that teaches by doing. |
-| UI / readability | 3 | 6 | 5 touch buttons instead of 11 out of combat, compact status panel, capped result text, UI scale. |
+| UI / readability | 3 | 7 | Contextual touch buttons, status panel that tucks away when calm, prompts that match the device, capped result text, UI scale. |
 | Writing | 5 | 7 | Authored act bookends + authored meetings: the ally sizes you up, the fixer and the villain talk before they fight, the villain calls you about what you did. Side quests still template-heavy. |
 | Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
 | Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
 | Tech / platforms | ? | 7 | Graphics presets, Back button, pause on leave, Windows + Linux builds, mouse, F11. Game-logic CPU measured and cut ~2.8x (tools/perf_probe.gd). Still unmeasured on real phones (GPU side). |
 | Commercial readiness | 2 | 5 | Credits/licences screen, parody names cleaned, trademarked terms out of store copy. Repo still public. |
+
+**Overall (v0.17.2): 6/10.** Deep, reactive and now reasonably polished in the first five minutes, but nobody outside
+the project has played it, the music is synthesised filler and the characters still read as programmer art at store
+size. Not ready to sell until the two P0s below are closed.
 
 ## Open issues (P0 = a buyer would refund)
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
