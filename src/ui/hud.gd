@@ -42,6 +42,10 @@ var _tip_text: Label
 var _tip_queue: Array = []
 var _tip_time := 0.0
 var _ctx_check := 0.0
+var _status_panel: PanelContainer
+var _calm_time := 0.0
+var _hud_sig := ""
+var _tucked := false
 var _use_btn: TouchButton
 var _objective_label: Label
 var _oc_bar: HBoxContainer
@@ -138,14 +142,37 @@ func _next_tip() -> void:
 
 
 ## Touch: show only the buttons that matter right now (fewer, bigger targets).
-func _update_context_buttons() -> void:
+func _in_combat() -> bool:
 	var p := get_tree().get_first_node_in_group("player") as Node3D
-	var fighting := false
 	if p:
 		for e in get_tree().get_nodes_in_group("enemy"):
 			if e.get("hostile") and (e as Node3D).global_position.distance_to(p.global_position) < 16.0:
-				fighting = true
-				break
+				return true
+	return false
+
+
+## Out of combat, with nothing changing, the status panel tucks away the rows you don't need on a
+## stroll (weapons, air/bounty, overclock) and its backdrop fades: on a phone it covered the street.
+## Any change - damage, money, a new weapon, a fight - brings everything back. Settings: hud_fade.
+func _update_calm(fighting: bool) -> void:
+	if _status_panel == null:
+		return
+	var sig := "%d|%d|%s|%s|%d" % [Game.hp, Game.credits, _weapon_label.text, _air_label.text, int(player.get("overclock_pips")) if player else 0]
+	var calm := not fighting and str(Game.settings.get("hud_fade", "on")) == "on" and Game.hp >= Game.max_hp() and sig == _hud_sig
+	_hud_sig = sig
+	_calm_time = _calm_time + 0.25 if calm else 0.0
+	var tucked := _calm_time >= 6.0
+	if tucked == _tucked:
+		return
+	_tucked = tucked
+	for c in [_weapon_label, _air_label, _oc_bar]:
+		c.visible = not tucked
+	var tw := create_tween()
+	tw.tween_property(_status_panel, "self_modulate:a", 0.35 if tucked else 1.0, 0.4)
+
+
+func _update_context_buttons(fighting: bool = _in_combat()) -> void:
+	var p := get_tree().get_first_node_in_group("player") as Node3D
 	for b in _touch_buttons:
 		var vis := true
 		match b.action:
@@ -276,6 +303,7 @@ func _build_status() -> void:
 	panel.position = Vector2(16, 14)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(panel)
+	_status_panel = panel
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
 	panel.add_child(v)
@@ -844,9 +872,12 @@ func _process(delta: float) -> void:
 				if _tip_time <= 0.0:
 					_tip_panel.visible = false
 	_ctx_check -= delta
-	if _ctx_check <= 0.0 and _touch_root and _touch_root.visible:
+	if _ctx_check <= 0.0:
 		_ctx_check = 0.25
-		_update_context_buttons()
+		var fighting := _in_combat()
+		if _touch_root and _touch_root.visible:
+			_update_context_buttons(fighting)
+		_update_calm(fighting)
 	if _hint_label and _hint_time > 0.0:
 		_hint_time -= delta
 		_hint_label.modulate.a = clampf(_hint_time / 3.0, 0.0, 1.0)

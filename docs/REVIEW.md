@@ -35,7 +35,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
 - P1 (partly done) FIRST DAY checklist teaches talk -> shop -> fight -> change someone's mind; a scripted first street encounter would still be stronger.
 - P1 (done for now) Authored bookends for acts I-III, authored meetings with the ally, the lieutenant and the antagonist, side quests with 6 offers per type, a manner per giver and a turn-in choice. Next: side quests are still three shapes (bounty / fetch / sabotage).
-- P2 HUD density: panel compacted (debt + bounty one line, short weapon names); consider auto-hiding out of combat.
+- P2 (done) HUD density: panel compacted, and out of combat it tucks away to name / HP / money / objective after 6 s of calm (Settings: off).
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
 - P2 (CPU done) Game-logic CPU per city 0.96-1.6 ms on a desktop core (was 2.1-4.5). Still to do: GPU/frame time on a real mid-range phone (owner).
@@ -85,3 +85,6 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   spared the bounty target, and a choice when you collect: take the money, waive it (a follower and some fame), or
   haggle for more (ruthless / charming always win, others 40%; a failed haggle costs reputation). story_test checks a
   run's offers are 70%+ unique, tokens are filled and every turn-in choice pays what it says.
+- v0.17.1: status panel tucks away when calm (no hostile within 16 m, full HP, nothing changed for 6 s): weapons,
+  air debt / bounty and overclock rows hide and the backdrop fades; anything new brings it back. Setting in the pause
+  menu. Checked at 1600x720 with tools/ui_review.gd (new "_calm" shot): 8 rows -> 4.
