@@ -1,5 +1,5 @@
 {
-	"_doc": "Hand-written act bookends (Saga._bookend): the authored anchors around the procedural saga (the Wildermyth model). open.<act>: title + frame + one line per motivation + one per wealth band (rich/middle/poor). close.<act>: frame + one line per dominant moral axis (mercy/order/greed/truth/none) + crew line. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {lieutenant} {personal} {macguffin} {scheme} {planet} {next_planet} {age} {heir}.",
+	"_doc": "Hand-written anchors around the procedural saga (the Wildermyth model). open.<act>: title + frame + one line per motivation + one per wealth band (rich/middle/poor). close.<act>: frame + one line per dominant moral axis (mercy/order/greed/truth/none) + crew line. meet.<scene> (Saga.play_meet, once per life): first meetings with the saga's people; 'parts' lists the pieces in order: a string part is used as is, a dictionary part is looked up by the player's personality / the persona's first trait / wealth band ('feud' for heirs whose family runs the villain's company) / lieutenant_fate / ally_fate / dominant axis, falling back to 'default' (missing = skipped). idle.<role>.<beat id>: what a saga person says when talked to outside their own beat. Tokens: {player} {ally} {ally_job} {antagonist} {antagonist_title} {lieutenant} {personal} {macguffin} {scheme} {clue} {faction} {planet} {next_planet} {age} {heir}.",
 	"open": {
 		"1": {
 			"title": "ACT I - THE STATIC",
@@ -107,6 +107,202 @@
 				"none": "You never let anyone decide who you were. The Sprawl will be arguing about you for years."
 			},
 			"crew": "{crew} raises a cup. 'To the worst decisions we ever made together.'"
+		}
+	},
+	"meet": {
+		"ally": {
+			"title": "FIRST CONTACT",
+			"speaker": "ally",
+			"persona": "ally",
+			"parts": [
+				"frame",
+				"personality",
+				"trait",
+				"wealth"
+			],
+			"frame": "{ally} finds you before you find them - which, in this line of work, is either a compliment or a warning. A {ally_job} in a coat too warm for the weather, with eyes that count the exits twice. They study you the way a pawnbroker studies a watch.",
+			"personality": {
+				"charming": "\"You're smiling at me like I'm the one being recruited. Cute. Keep that - we'll need someone who can talk their way past a door.\"",
+				"ruthless": "\"I asked around. The people who crossed you don't answer their phones any more. Good. I don't need nice. I need finished.\"",
+				"honest": "\"You look like someone who says what they mean. Out here that gets you killed - or makes you the only person I trust. Let's find out which.\"",
+				"coward": "\"Relax. If I wanted you dead you'd already be a sponsored obituary. You flinch at the right things. That's useful.\"",
+				"hothead": "\"Unclench your fists. I'm not the one you want to hit. But I can give you a list of who is.\"",
+				"cynic": "\"Go on, assume I'm lying. Everyone does. The difference is, I only lie about small things.\"",
+				"idealist": "\"You still think it can be fixed. I can see it on you, like a stain. Don't wash it off yet.\"",
+				"joker": "\"You're going to make a joke. Make it now and get it out of your system, because the next part isn't funny.\"",
+				"default": "\"You've got a face nobody remembers. In this business that's worth more than a gun.\""
+			},
+			"trait": {
+				"paranoid": "They keep their back to a wall and switch your wristband off without asking. \"Paragon licenses the microphones in those. Every third word gets sold to a jingle writer.\"",
+				"flamboyant": "Their jacket is lined with stolen ad-silk that cycles slogans while they talk. \"If you're going to be hunted, be hunted in colour.\"",
+				"gentle": "They buy you a cup of hot paste before they say anything, and wait until you've drunk half. \"Sorry. Nobody's done that for you in a while, have they?\"",
+				"greedy": "They name a price before they name the job. \"Nothing personal. Saving the galaxy is still a gig, and gigs pay.\"",
+				"poetic": "\"The Consortium writes its laws in the fine print,\" they say, \"so we'll write ours in the margins.\" You suspect they've said it before. You suspect it worked.",
+				"blunt": "\"I need someone expendable who isn't stupid. You're the best I could find at short notice. Don't take it personally. Do take the job.\"",
+				"nervous": "They keep checking a cracked watch that stopped years ago. \"Habit. The last person who helped me was always on time. Then they were on the news.\"",
+				"cheerfully nihilistic": "\"We're all going to die in debt,\" they say brightly. \"So we might as well choose who we owe.\"",
+				"devoutly brand-loyal": "They still wear a polished loyalty pin. \"I'm not against the Consortium. I'm against the people ruining it. There's a difference, and I'll die explaining it.\"",
+				"conspiracy-minded": "They carry a notebook full of red-string diagrams. Most of it is nonsense. One page has your face on it. \"That's the part that isn't nonsense.\"",
+				"romantic": "\"You've got someone you're doing this for. Everyone worth recruiting does.\" They don't ask who. They just nod, as if they already know.",
+				"exhausted": "They look like someone who has been awake since the last war. \"I've done this alone for three years. I'm done doing it alone. That's the whole pitch.\""
+			},
+			"wealth": {
+				"rich": "\"And yes, I know where your money comes from. It opens doors I've been kicking for years. Try not to buy the doorframes.\"",
+				"middle": "\"You've got a job, a rent cheque and a little left to lose. That makes you careful. Careful lives longer.\"",
+				"poor": "\"You've got nothing they can repossess. That makes you the most dangerous person on {planet}.\"",
+				"feud": "\"One more thing. The paperwork on this whole mess has your family's crest on it. I'll understand if that changes things. I'd understand less if it didn't.\""
+			}
+		},
+		"lieutenant": {
+			"title": "THE FIXER",
+			"speaker": "lieutenant",
+			"persona": "lieutenant",
+			"parts": [
+				"frame",
+				"trait",
+				"wealth"
+			],
+			"frame": "{lieutenant} is waiting for you, which is never a good sign. {antagonist}'s fixer: the one who signs the eviction notices nobody else will sign. They crack their knuckles like they're billing for each one.",
+			"trait": {
+				"paranoid": "\"I knew you'd come. I've known for days. I've been sleeping in my armour. Do you know what that does to a spine?\"",
+				"flamboyant": "They've had entrance music synced to your arrival. It's terrible. They're proud of it. \"Smile! Corporate wants footage for the quarterly.\"",
+				"gentle": "\"I'd rather not do this,\" they say softly, and draw anyway. \"But I've got a mortgage, and you're the only line item between me and paying it off.\"",
+				"greedy": "\"{antagonist} pays me by the head. Yours comes with a bonus. Nothing personal - it's a very nice bonus.\"",
+				"poetic": "\"Every ledger ends in a line,\" they say. \"Under the line, a total. You're about to be underlined.\"",
+				"blunt": "\"You found {clue}. Clever. Then you came here. Stupid. Let's get this over with.\"",
+				"nervous": "Their hands shake on the trigger guard. \"Stay back! I've done the training! There was a video! I passed the quiz!\"",
+				"cheerfully nihilistic": "\"Win or lose, the shareholders get paid,\" they shrug, delighted. \"Might as well enjoy it.\"",
+				"devoutly brand-loyal": "\"You don't get it. {faction} gave me everything - my name, my teeth, my sense of purpose. You want that? Come through me.\"",
+				"conspiracy-minded": "\"You think YOU'RE the one asking questions? I've seen the real files. {antagonist} isn't even the top of it. Doesn't matter. You won't get to the top either.\"",
+				"romantic": "\"I had someone too, once. Then I had a job. Guess which one called back.\"",
+				"exhausted": "\"I've pulled eleven double shifts this month,\" they sigh. \"You're overtime. I hate overtime.\""
+			},
+			"wealth": {
+				"rich": "\"Rich and bored and slumming it with the help. They'll put this in the business pages.\"",
+				"middle": "\"Middle-tier nobody with a grudge. We let people like you go every Tuesday.\"",
+				"poor": "\"Nobody's going to file a report when you're gone. That's the nice thing about your kind.\"",
+				"feud": "\"Your family sends its regards, by the way. Through me. With interest.\""
+			}
+		},
+		"call": {
+			"title": "INCOMING CALL",
+			"speaker": "antagonist",
+			"persona": "antagonist",
+			"parts": [
+				"frame",
+				"lieutenant_fate",
+				"wealth",
+				"trait",
+				"coda"
+			],
+			"frame": "Every screen within thirty metres switches to the same face at once - the billboards, the vending machines, the wristband of a man eating noodles. {antagonist}, {antagonist_title} at {faction}, smiling the smile they practise for earnings calls.",
+			"lieutenant_fate": {
+				"killed": "\"You killed {lieutenant}. Do you know how much paperwork that generates? I've had to cancel a funeral AND a performance review.\"",
+				"spared": "\"You let {lieutenant} go. They came straight to me, crying. I fired them, of course. Mercy is so expensive for everyone except the person who gives it.\"",
+				"arrested": "\"You handed {lieutenant} to Paragon. Charming. Paragon accepted a donation this morning. {lieutenant} will be back at work on Monday.\"",
+				"recruited": "\"And now {lieutenant} works for you. Poaching my staff. I'd be impressed if I hadn't already cancelled their pension.\"",
+				"broken": "\"Whatever {lieutenant} told you, I've changed it. Every lock, every route, every password. They're all 'Password1' now. Joke. Unless?\"",
+				"robbed": "\"You robbed {lieutenant}. Took the watch. That watch was a gift from me, so technically you robbed me. I'm adding it to your file.\"",
+				"exposed": "\"Four million viewers. My PR team hasn't slept. Our stock went UP, though - outrage is engagement. So thank you, I suppose.\"",
+				"default": "\"{lieutenant} is no longer with the company. Neither, soon, will you be.\""
+			},
+			"wealth": {
+				"feud": "\"And let's be honest about why you're doing this. You were always the one at family dinners who asked where the money came from. Now you know. Come home. We'll say you were on sabbatical.\"",
+				"rich": "\"You were born on the top floor. You could have stayed there. Half the Sprawl would trade places with you, and you're throwing it away for people who'd sell you for a coupon.\"",
+				"middle": "\"I've seen your file. Mid-tier rent, mid-tier credit, mid-tier future. I could fix all three tonight. Name a number. Everybody has a number.\"",
+				"poor": "\"I have your debt file open. It's very long and very sad. I could close it with one click. Or I could sell it to someone with fewer manners than me.\""
+			},
+			"trait": {
+				"paranoid": "Their eyes keep flicking to something off-screen. \"I know about {ally}. I know about the duck. I have people whose whole job is knowing things.\"",
+				"flamboyant": "A string quartet plays behind them. They don't acknowledge it. \"I'll see you soon, darling. Wear something.\"",
+				"gentle": "\"I don't want you hurt,\" they say, and the terrible thing is that they seem to mean it. \"I want you employed.\"",
+				"greedy": "\"Everything has a price. I bought the street you're standing on while we were talking. Don't scuff anything.\"",
+				"poetic": "\"You and I are the same sentence,\" they say, \"with different punctuation. Mine ends in a full stop.\"",
+				"blunt": "\"Stop. You can't win. I'm only calling because Legal says I have to warn you first.\"",
+				"nervous": "They clear their throat three times. \"This is a threat. I am being threatening. Legal approved the wording.\"",
+				"cheerfully nihilistic": "\"In a thousand years none of this will matter,\" they beam. \"Until then, I own it.\"",
+				"devoutly brand-loyal": "\"{faction} is a family. Families have rules. You broke one. In this family we don't forgive - we invoice.\"",
+				"conspiracy-minded": "\"You think you found your way here on your own? Someone led you. Ask yourself who.\"",
+				"romantic": "\"In another life I think we'd have been very good together. In this one I'm going to have to ruin you.\"",
+				"exhausted": "\"I have nine meetings after this one,\" they sigh, \"and you're the only one I'm looking forward to.\""
+			},
+			"coda": "The screens cut back to an ad for breathable water. The man with the noodles keeps eating."
+		},
+		"faceoff": {
+			"title": "FACE TO FACE",
+			"speaker": "antagonist",
+			"persona": "antagonist",
+			"parts": [
+				"frame",
+				"axis",
+				"ally_fate",
+				"wealth"
+			],
+			"frame": "{antagonist} doesn't run. People like {antagonist} never run - they have people to run for them, and you have spent weeks working through those people. Behind them, the plan to {scheme} glows on a screen big enough to be seen from orbit.",
+			"axis": {
+				"mercy": "\"Look at you. You spared everyone. Saved every stray. Do you know what kindness is out here? A subscription someone else pays for. I'm cancelling yours.\"",
+				"order": "\"Paragon loves you, did you know? You've filed more reports than my audit team. You're not a rebel. You're a compliance officer with a hobby.\"",
+				"greed": "\"Every account you drained, every pocket you lightened - I had analysts watching. You're not here to stop me. You're here to replace me. I respect that. I'll still have you killed.\"",
+				"truth": "\"The whole Sprawl watched you tell the truth. Do you know what truth is worth on the market? Nothing. That's why I never bothered with it.\"",
+				"none": "\"Funny. I've studied every move you made, and I still can't tell what you want. I don't think you can either. Let's find out.\""
+			},
+			"ally_fate": {
+				"loyal": "{ally} stands at your shoulder. \"Still with you,\" they mutter. \"Even after all that.\"",
+				"estranged": "You came alone. Somewhere out there {ally} is watching the feed and not calling.",
+				"betrayed": "\"Thank you for {ally}, by the way,\" {antagonist} says. \"We're keeping them somewhere comfortable. Mostly.\"",
+				"dead": "\"I heard what you did to {ally},\" {antagonist} says, almost admiring. \"You'd have done well here.\"",
+				"double": "{ally}'s intel is the only reason you got this far. {antagonist} doesn't know that yet. You'd like to be there when they find out.",
+				"partner": "{ally} squeezes your hand once before letting go. Whatever happens next happens to both of you.",
+				"confidant": "{ally} knows everything about you now, and stayed anyway. It feels like armour."
+			},
+			"wealth": {
+				"feud": "\"Last chance, family,\" they say. \"Kneel, and the name survives. Stand, and I'll have it taken off the building.\""
+			}
+		}
+	},
+	"idle": {
+		"ally": {
+			"clue": [
+				"\"{clue}. {planet}. I'm not saying it a third time - they can lip-read.\"",
+				"\"Every hour you stand here, {antagonist} bills someone for it. {clue} is on {planet}. Go.\""
+			],
+			"personal": [
+				"\"Go and see {personal} on {planet}. Whatever's between you two, finish it before {antagonist} uses it.\"",
+				"\"You've got that look people get before they visit someone from the old days. {planet}. I'll wait.\""
+			],
+			"lieutenant": [
+				"\"{lieutenant} is on {planet}. Bring something heavier than an opinion.\"",
+				"\"If you're going after {lieutenant}, stock up on medkits. They don't fight fair. Neither should you.\""
+			],
+			"macguffin": [
+				"\"{macguffin} is on {planet}. 'Premium security' - badly paid guards with expensive guns.\"",
+				"\"Get {macguffin} and we finally have leverage. Get caught and we have a funeral. {planet}.\""
+			],
+			"finale": [
+				"\"{antagonist} is on {planet}. This is it. Whatever I said back there... just go.\"",
+				"\"Don't look at me like that. Go and end it. We can hate each other afterwards.\""
+			],
+			"default": [
+				"\"Not now. They're watching. They're always watching.\"",
+				"\"Walk with me. No - walk away from me. Slowly. We'll talk later.\""
+			]
+		},
+		"personal": {
+			"lieutenant": [
+				"\"{lieutenant} is on {planet}. I know what they did. Don't let them do it again.\"",
+				"\"Go. Finish what we started. Then come back and tell me about it.\""
+			],
+			"default": [
+				"\"You know where to find me. You always did.\"",
+				"\"I'm still here. Funny, isn't it - so are you.\""
+			]
+		},
+		"default": {
+			"default": [
+				"\"Not now. They're watching. They're always watching.\"",
+				"\"Do I know you? No. Good. Let's keep it that way for now.\"",
+				"\"Come back when the cameras are looking the other way.\""
+			]
 		}
 	}
 }

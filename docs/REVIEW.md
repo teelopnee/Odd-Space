@@ -24,7 +24,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 | Combat | 4 | 5 | Tokens, dash strike, 10 weapons, difficulty settings. Still unplaytested by humans. |
 | Onboarding | 2 | 6 | Just-in-time tips (wait for dialogues to close) + a 4-step FIRST DAY checklist that teaches by doing. |
 | UI / readability | 3 | 6 | 5 touch buttons instead of 11 out of combat, compact status panel, capped result text, UI scale. |
-| Writing | 5 | 6 | Hand-written act openings/closings now frame the procedural saga (Wildermyth model). Middle still template-heavy. |
+| Writing | 5 | 7 | Authored act bookends + authored meetings: the ally sizes you up, the fixer and the villain talk before they fight, the villain calls you about what you did. Side quests still template-heavy. |
 | Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
 | Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
 | Tech / platforms | ? | 6 | Graphics presets, Back button, pause on leave, Windows + Linux builds (CI, verified), mouse, F11. Unmeasured on real devices. |
@@ -34,7 +34,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
 - P1 (partly done) FIRST DAY checklist teaches talk -> shop -> fight -> change someone's mind; a scripted first street encounter would still be stronger.
-- P1 (partly done) Authored bookends exist for acts I-III; next: authored mid-act scenes for the ally and the antagonist.
+- P1 (mostly done) Authored bookends for acts I-III and authored meetings with the ally, the lieutenant and the antagonist. Next: side-quest givers are still one-template people.
 - P2 HUD density: panel compacted (debt + bounty one line, short weapon names); consider auto-hiding out of combat.
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
@@ -61,3 +61,12 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   player's HP). Arc Thrower was 88 dps with a stun (best gun by far) -> 55 dps, shorter stun; Mono-Katana was the
   only blade worth using -> on par with the Repo Hammer; Repo Harpoon was a trap pick -> stronger pull hit;
   pirates fired 3-shot bursts that took 30% of your HP -> 2 shots. Vat Golem still hits for 24% but telegraphs a full second.
+- v0.15: the villain used to be a name in other people's sentences until the final fight. Now: an authored FIRST CONTACT
+  scene with the ally (by your personality x their trait x your wealth / family), THE FIXER speaks before the lieutenant
+  fight (their trait x your wealth), the antagonist hijacks every screen nearby to CALL you about what you did to their
+  fixer (7 fates x wealth / family feud x their trait), and a FACE TO FACE before the finale reflects your moral axis and
+  what you did to the ally. Saga people talked to outside their beat now point you at the next goal in their own voice
+  instead of "Not now. They're watching." Bugs found by the new story test: every "{faction}" in the saga printed the
+  internal id ("VP at gristle"), including the very first story dialogue; ending headlines were first-match, so 6 of 6
+  random lives became "THE PROPHET OF FREE AIR" (now the strongest qualifying legacy wins: Prophet / Mercenary / Martyr /
+  Turncoat across the same 6 lives); "WHO CHOSE THEMSELF" read as a typo.

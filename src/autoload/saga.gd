@@ -191,6 +191,7 @@ func fill(text: String, beat: Dictionary = {}) -> String:
 	}
 	for k in world:
 		vars[k] = str(world[k])
+	vars["faction"] = str(world.get("faction_name", "?"))  # world.faction is the id ("gristle"), never shown
 	var planet_id: String = beat.get("planet", "")
 	vars["planet"] = Game.planet_by_id(planet_id).get("name", "the station") if planet_id != "" else "?"
 	if index + 1 < beats.size():
@@ -439,7 +440,10 @@ func on_persona_talk(persona_id: String) -> void:
 				return
 	var b := current()
 	if b.is_empty() or _beat_type(b) != "talk" or cast.get(b.get("who", ""), "") != persona_id:
-		EventBus.dialogue_requested.emit(p.get("name", "?"), "%s\n\n\"Not now. They're watching. They're always watching.\"" % persona_greeting(p), [], Callable())
+		EventBus.dialogue_requested.emit(p.get("name", "?"), persona_greeting(p) + "\n\n" + idle_line(str(cast.find_key(persona_id))), [], Callable())
+		return
+	# The first time you meet the ally: an authored scene written around who you are.
+	if b.id == "contact" and play_meet("ally", on_persona_talk.bind(persona_id)):
 		return
 	var text := persona_greeting(p) + "\n\n" + fill(b.get("talk", "..."), b)
 	match str(b.id):
@@ -732,7 +736,7 @@ func _finale_tag(finale_id: String) -> String:
 	var tags := {"broadcast": "WHO TOLD THE TRUTH", "seize_company": "WHO TOOK THE THRONE", "destroy": "WHO BURNED IT ALL",
 		"sell_paragon": "WHO SOLD IT TO THE LAW", "sell_halcyon": "WHO SOLD IT TO THE BANK", "sell_gristle": "WHO SOLD IT TO THE KITCHEN",
 		"sell_oxy": "WHO SOLD THE AIR", "sell_lumen": "WHO SOLD THE STORY", "give_ally": "WHO TRUSTED A FRIEND",
-		"give_people": "WHO GAVE IT AWAY", "personal_use": "WHO CHOSE THEMSELF", "leverage": "WHO KEPT THE KEY",
+		"give_people": "WHO GAVE IT AWAY", "personal_use": "WHO PUT THEMSELVES FIRST", "leverage": "WHO KEPT THE KEY",
 		"upload_self": "WHO BECAME THE MACHINE", "walk_away": "WHO WALKED AWAY", "ransom": "WHO NAMED A PRICE",
 		"serve": "WHO SERVED THE CROWN", "double_cross": "WHO LAUGHED LAST"}
 	if finale_id.begins_with("early_"):
@@ -743,18 +747,55 @@ func _finale_tag(finale_id: String) -> String:
 func legacy_for(finale_id: String) -> Dictionary:
 	var prev: String = state.get("finale", "")
 	state["finale"] = finale_id
+	# Every legacy you qualify for is scored by how far past its bar you went; the strongest wins
+	# (first-match used to hand "THE PROPHET" to anyone who chatted to enough fans).
 	var found := {"id": "survivor", "title": "THE SURVIVOR", "text": "You made it."}
+	var best := 0.0
 	for l in data().get("legacy", []):
 		var w: Dictionary = (l.get("when", {}) as Dictionary).duplicate()
 		var min_cr := int(w.get("min_credits", -1))
 		w.erase("min_credits")
 		if min_cr >= 0 and Game.credits < min_cr:
 			continue
-		if cond_ok(w):
+		if not cond_ok(w):
+			continue
+		var score := legacy_strength(l.get("when", {}))
+		if score > best:
+			best = score
 			found = l
-			break
 	state["finale"] = prev if prev != "" else finale_id
 	return found
+
+
+## How strongly a legacy's condition is met: 1.0 = just over the bar, 2.0 = twice the bar.
+## Story conditions (a flag, a state, the finale you chose) are authored moments and weigh more.
+func legacy_strength(w: Dictionary) -> float:
+	if w.is_empty():
+		return 0.01  # THE SURVIVOR: only when nothing else fits
+	var ratios: Array[float] = []
+	var ratio := func(have: float, need: float) -> float: return have / maxf(1.0, need)
+	if w.has("min_followers"):
+		ratios.append(ratio.call(float(followers()), float(w.min_followers)))
+	if w.has("min_fame"):
+		ratios.append(ratio.call(float(fame()), float(w.min_fame)))
+	if w.has("min_credits"):
+		ratios.append(ratio.call(float(Game.credits), float(w.min_credits)))
+	if w.has("min_bounty"):
+		ratios.append(ratio.call(float(Factions.total_bounty()), float(w.min_bounty)))
+	if w.has("min_axis"):
+		for k in w.min_axis:
+			ratios.append(float(axes.get(k, 0.0)) / maxf(0.5, float(w.min_axis[k])))
+	var score: float = 1.0 if ratios.is_empty() else ratios.reduce(func(a, b): return a + b, 0.0) / float(ratios.size())
+	score = minf(score, 3.0)  # nobody wins on one runaway stat
+	if w.has("finale_in"):
+		score += 1.25
+	if w.has("max_axis"):
+		score += 0.25
+	if w.has("flag") or w.has("state"):
+		score += 2.5
+	if w.has("max_reported"):
+		score = maxf(score, 1.6)  # never once reported: rare, and earned
+	return score
 
 
 func _codas() -> String:
@@ -831,6 +872,8 @@ func _advance() -> void:
 		if prev_act != "" and act != prev_act:
 			play_bookend("close", prev_act)
 			play_bookend("open", act)
+		if b.id == "macguffin":
+			play_meet("call")  # the villain finally speaks to you, about what you did to their fixer
 	objective_changed.emit()
 	get_tree().call_group("level", "refresh_quests")
 
@@ -863,9 +906,7 @@ func play_bookend(kind: String, act: String) -> void:
 		var mot := str(Game.tags.get("motivation", ""))
 		if d.get("motivation", {}).has(mot):
 			parts.append(fill(str(d.motivation[mot]), beat))
-		var w := Origin.wealth()
-		var band := "rich" if w >= 4 else ("poor" if w <= 1 else "middle")
-		parts.append(fill(str(d.get("wealth", {}).get(band, "")), beat))
+		parts.append(fill(str(d.get("wealth", {}).get(wealth_band(), "")), beat))
 	else:
 		parts.append(fill(str(d.get("axis", {}).get(dominant_axis(), "")), beat))
 		if not Crew.members.is_empty():
@@ -877,6 +918,92 @@ func play_bookend(kind: String, act: String) -> void:
 	if hud and hud.has_method("title_card"):
 		hud.title_card(str(d.get("title", "")), "", 2.0)
 	EventBus.dialogue_requested.emit(str(d.get("title", "")), text, [], Callable())
+
+
+func wealth_band() -> String:
+	var w := Origin.wealth()
+	return "rich" if w >= 4 else ("poor" if w <= 1 else "middle")
+
+
+# --- Meetings: authored first encounters with the saga's people (data/bookends.json "meet") --
+# The ally on first contact, the lieutenant when they first see you, the antagonist's call after
+# you deal with their fixer, and the face-off at the finale. Each is pieced together from lines
+# picked by your personality, wealth / family, the persona's own trait and what you have done.
+
+## Plays a meeting once per life; `then` runs after it is closed. False if it already played.
+func play_meet(scene: String, then: Callable = Callable()) -> bool:
+	var flag := "meet_" + scene
+	var d: Dictionary = bookends().get("meet", {}).get(scene, {})
+	if Game.flags.get(flag, false) or d.is_empty():
+		return false
+	Game.flags[flag] = true
+	var text := meet_text(scene)
+	_log(str(d.get("title", "")), text)
+	var who := str(persona_by_role(str(d.get("speaker", ""))).get("name", d.get("title", "")))
+	if scene == "call":
+		who += " - INCOMING CALL"
+	EventBus.dialogue_requested.emit(who, text, [], _after_meet.bind(then))
+	return true
+
+
+func _after_meet(_choice: String, then: Callable) -> void:
+	if then.is_valid():
+		then.call()
+
+
+func meet_text(scene: String) -> String:
+	var d: Dictionary = bookends().get("meet", {}).get(scene, {})
+	var persona := persona_by_role(str(d.get("persona", "")))
+	var beat := current()
+	var parts: Array[String] = []
+	for part in d.get("parts", []):
+		var v = d.get(part, "")
+		if v is Dictionary:
+			var key := _meet_key(str(part), persona)
+			v = v.get(key, v.get("default", ""))
+		var line := fill(str(v), beat)
+		if line.strip_edges() != "":
+			parts.append(line)
+	return "\n\n".join(parts)
+
+
+func _meet_key(part: String, persona: Dictionary) -> String:
+	match part:
+		"personality":
+			return str(Game.tags.get("personality", ""))
+		"trait":
+			var tr: Array = persona.get("traits", [""])
+			return str(tr[0]) if not tr.is_empty() else ""
+		"wealth":
+			return "feud" if world.get("family_feud", false) else wealth_band()
+		"lieutenant_fate":
+			return str(state.get("lieutenant_fate", "unknown"))
+		"ally_fate":
+			return str(state.get("ally_fate", "unknown"))
+		"axis":
+			return dominant_axis()
+	return ""
+
+
+## A saga person talked to outside their own beat points you at what to do next, in their voice.
+func idle_line(role: String) -> String:
+	var all: Dictionary = bookends().get("idle", {})
+	var d: Dictionary = all.get(role, all.get("default", {}))
+	var b := current()
+	var lines: Array = d.get(str(b.get("id", "")), d.get("default", all.get("default", {}).get("default", ["\"Not now.\""])))
+	return fill(str(lines[_rng.randi() % lines.size()]), b) if not lines.is_empty() else "\"Not now.\""
+
+
+## An elite with a saga tag has just noticed you: the lieutenant and the antagonist speak first.
+func on_boss_sighted(enemy: Node) -> void:
+	var b := current()
+	var tag := str(enemy.get_meta("saga_tag", ""))
+	if b.is_empty() or tag != str(b.get("id", "")):
+		return
+	if tag == "lieutenant":
+		play_meet("lieutenant")
+	elif tag == "finale" and not state.get("defected", false):
+		play_meet("faceoff")
 
 
 ## The moral axis the player has leaned into most so far ("none" if they haven't).

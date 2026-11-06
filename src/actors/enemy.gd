@@ -365,6 +365,9 @@ func _separation() -> Vector3:
 func _set_state(new_state: String, duration: float = 0.0) -> void:
 	state = new_state
 	_state_time = duration
+	if new_state == "chase" and has_meta("saga_tag") and not has_meta("sighted") and hostile:
+		set_meta("sighted", true)
+		Saga.on_boss_sighted(self)  # the lieutenant / antagonist have something to say first
 	if _telegraph and is_instance_valid(_telegraph) and new_state != "windup":
 		_telegraph.queue_free()
 		_telegraph = null

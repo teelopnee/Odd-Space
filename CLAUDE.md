@@ -103,7 +103,13 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   every pass (score, open issues, fix log).
 - Authored act bookends: `data/bookends.json` -> `Saga.play_bookend(open|close, act)` (once per life, flag
   `bookend_<kind>_<act>`): openings by motivation + wealth band, closings by `Saga.dominant_axis()` + crew. Act numbers in
-  saga beats are floats ("1.0") - normalise with int(). Test: `tools/story_test.gd`.
+  saga beats are floats ("1.0") - normalise with int(). Authored meetings `bookends.json meet.<scene>` ->
+  `Saga.play_meet` (flag `meet_<scene>`): ally on first contact, lieutenant + antagonist face-off when the elite first
+  enters "chase" (`Enemy._set_state` -> `Saga.on_boss_sighted`), the antagonist's call on reaching the MacGuffin beat;
+  parts picked by personality / persona trait / wealth band or `feud` / lieutenant_fate / ally_fate / axis.
+  `idle.<role>.<beat>` = saga people talked to outside their beat (points you at the next goal).
+  `Saga.fill`: `{faction}` = display name (world.faction is the id). Legacy titles are scored (`legacy_strength`),
+  not first-match. Test: `tools/story_test.gd`.
 - `src/core/first_day.gd`: 4-step onboarding checklist for a new life (talk / shop / fight / change), shown as the first
   objective line; steps fire from NPC talk, open_venue, enemy kills, relation changes. UI review shots: `tools/ui_review.gd`.
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
