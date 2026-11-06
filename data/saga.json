@@ -520,19 +520,108 @@
 	"side": {
 		"bounty": {
 			"title": "Bounty: {target}",
-			"offer": "\"{target} has been squeezing this block dry. Paragon won't touch them - they pay their fees on time. You could, though.\"",
-			"done": "\"Gone? Really? Here - take this before I feel like an accomplice.\""
+			"offer": [
+				"\"{target} has been squeezing this block dry. Paragon won't touch them - they pay their fees on time. You could, though.\"",
+				"\"{target} runs a 'protection' racket on this street. Protection from {target}, mostly. Make it stop. I don't care how.\"",
+				"\"My brother borrowed from {target}. Now my brother works for {target}, forever, for free. Somebody has to send a message.\"",
+				"\"{target} repossessed my mother's lungs. The good ones. She's breathing on a rental now. I want {target} to have a very bad day.\"",
+				"\"Everyone on {planet} knows what {target} does after dark. Nobody says it. You look like someone who doesn't care what people say.\"",
+				"\"{target} sold my address to a debt agency for a coupon. A COUPON. Find them. Bring back some dignity.\""
+			],
+			"done": [
+				"\"Gone? Really? Here - take this before I feel like an accomplice.\"",
+				"\"They won't be squeezing anyone for a while. Here. I'd shake your hand, but I don't want to know what's on it.\"",
+				"\"The whole block heard. Old Mrs Ferro across the street cried. Good tears, I think. Here.\"",
+				"\"You did it. I thought I'd feel better. I feel about the same - but you're richer, so somebody won.\""
+			],
+			"done_spared": [
+				"\"You let {target} WALK? ...They came by an hour ago and paid back everything they took from me. Every credit. What did you SAY to them?\"",
+				"\"{target} left town with their tail between their legs. Not what I asked for. Better, maybe. Here.\"",
+				"\"I saw {target} on the corner, handing out free water. FREE. I don't know what you did. Take this before I start believing in things.\""
+			]
 		},
 		"fetch": {
 			"title": "Lost & Found: {item}",
-			"offer": "\"I left {item} in a crate when the drones came. It's worth nothing to anyone but me. Please.\"",
-			"done": "\"You actually found it.\" They hold {item} like it might evaporate. \"I owe you. Literally - here.\""
+			"offer": [
+				"\"I left {item} in a crate when the drones came. It's worth nothing to anyone but me. Please.\"",
+				"\"The drones took my stall, but they missed {item}. It's out there in a crate with my name on it. I can't go - they know my face.\"",
+				"\"I need {item} back before my kid's birthday. I told them it was safe. I don't lie to my kid. Not about that.\"",
+				"\"{item}. Don't laugh. It's the only thing I own that nobody ever tried to sell me an upgrade for.\"",
+				"\"Paragon impounded {item} as 'evidence'. Of what, they won't say. It's in a crate near here. Bring it back and I'll pretend I never asked.\"",
+				"\"My landlord threw {item} out with the rest of my life. The rest I can replace. Not that.\""
+			],
+			"done": [
+				"\"You actually found it.\" They hold {item} like it might evaporate. \"I owe you. Literally - here.\"",
+				"\"Oh. Oh, you found it.\" They don't say anything for a while. Then they pay you, and their hand is shaking.",
+				"\"I'm not going to cry in front of a stranger. Turn around.\" You turn around. You hear them cry anyway.",
+				"They check {item} for scratches, find one, and decide they love it more for it. \"Here. You earned this.\""
+			]
 		},
 		"sabotage": {
 			"title": "Ad Blocker",
-			"offer": "\"These billboards scream at my kids all night. Break {count} of them. I'll pay. Lumen won't know it was me.\"",
-			"done": "\"Quiet. Actual quiet. I forgot what it sounds like.\""
-		}
+			"offer": [
+				"\"These billboards scream at my kids all night. Break {count} of them. I'll pay. Lumen won't know it was me.\"",
+				"\"There's a billboard outside my window that says my name every morning. It knows when I wake up. Break {count} of them. Please.\"",
+				"\"My grandmother fainted when an ad told her she was 'pre-approved for a funeral'. Break {count} of those screens and I'll call it even with the universe.\"",
+				"\"The ads here play while you sleep now. I dreamt about soda for a week. Break {count} of them and I'll sleep like a person again.\"",
+				"\"Every screen on this street makes money for {faction}. Break {count} and they lose an hour of revenue. It's the only language they speak.\"",
+				"\"I'm a painter. My mural got covered by an ad for a mural app. Break {count} of their screens. I'll paint the holes.\""
+			],
+			"done": [
+				"\"Quiet. Actual quiet. I forgot what it sounds like.\"",
+				"\"I heard them pop from my kitchen. Best sound all year. Here - and if anyone asks, it was a power surge.\"",
+				"\"The street's actually dark. You can see a star. ONE star, but still. Here.\"",
+				"\"{faction} sent a repair drone. It looked so sad. Anyway - your money.\""
+			]
+		},
+		"_doc": "Side quests (Saga._generate_side): offer/done are lists (one is picked per quest, so a run rarely repeats a line), done_spared = the bounty target surrendered and walked. manner.<giver trait> = how the giver talks. waiting = talked to before the job is done. turn_in = choices when you collect: take / free (waive the fee) / double (haggle: ruthless or charming always win, others 40%). Vars: {target} {item} {count} {planet} {faction} {title}.",
+		"manner": {
+			"paranoid": "They talk out of the side of their mouth, eyes on the nearest camera.",
+			"flamboyant": "They tell it like an audition, with hand gestures.",
+			"gentle": "They apologise twice before they even ask.",
+			"greedy": "They mention the reward before the problem.",
+			"poetic": "They describe it like a sad song they have been writing for years.",
+			"blunt": "No small talk. They just say it.",
+			"nervous": "They keep starting the sentence over.",
+			"cheerfully nihilistic": "They are smiling the whole time, which is worse.",
+			"devoutly brand-loyal": "They lower their voice for brand names, as if in church.",
+			"conspiracy-minded": "They swear this is connected to something bigger. It might be.",
+			"romantic": "There is someone in this story they are not mentioning. You can tell.",
+			"exhausted": "They sound like they have already asked a dozen people."
+		},
+		"waiting": [
+			"\"Still waiting on that job. {title}.\"",
+			"\"Any news? No? Then why are you standing here? {title}.\"",
+			"\"Don't come back empty-handed - they're watching me now. {title}.\"",
+			"\"I check the door every hour. {title}. Please.\""
+		],
+		"turn_in": [
+			{
+				"id": "take",
+				"text": "Take the money"
+			},
+			{
+				"id": "free",
+				"text": "Keep it. You need it more.",
+				"reply": [
+					"\"Nobody's ever... okay. Okay. I'm telling everyone about you.\"",
+					"They stare at you like you've spoken a dead language. Then they hug you. It's awkward. It's nice.",
+					"\"I'll pay it forward. I won't, probably. But I'll think about it, and that's new.\""
+				]
+			},
+			{
+				"id": "double",
+				"text": "That was harder than you said. Double it.",
+				"reply": [
+					"They pay. They don't like it. They pay.",
+					"\"Fine. FINE. I hope it chokes you.\" The credits arrive anyway."
+				],
+				"fail_reply": [
+					"\"Double? I'm selling my blood plasma for this.\" They pay the agreed price and don't say goodbye.",
+					"\"We had a deal.\" They count out the original amount, slowly, so you can watch."
+				]
+			}
+		]
 	},
 	"side_items": [
 		"my grandmother's air canister",

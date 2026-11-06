@@ -406,7 +406,7 @@ func _generate_side(planet_id: String) -> void:
 		var kind: String = _pick(["bounty", "fetch", "sabotage"])
 		var giver := make_persona("giver", controller, planet_id, "civilian")
 		var q := {"id": "q%d_%s" % [i, planet_id], "type": kind, "giver": giver.id, "status": "offered",
-			"planet": planet_id, "reward": 40 + _rng.randi() % 90, "progress": 0}
+			"planet": planet_id, "reward": 40 + _rng.randi() % 90, "progress": 0, "line": _rng.randi() % 60}
 		match kind:
 			"bounty":
 				var tgt := make_persona("target", controller, planet_id, "punk")
@@ -487,16 +487,37 @@ func _on_twist_choice(choice: String) -> void:
 
 func _talk_side(q: Dictionary, p: Dictionary) -> void:
 	var d: Dictionary = data().get("side", {}).get(q.type, {})
-	var vars := {"target": personas.get(q.get("target", ""), {}).get("name", "them"), "item": q.get("item", "it"), "count": q.get("count", 2)}
+	var sd: Dictionary = data().get("side", {})
+	var controller := str(Game.planet_by_id(str(q.get("planet", ""))).get("controller", ""))
+	var vars := {"target": personas.get(q.get("target", ""), {}).get("name", "them"), "item": q.get("item", "it"), "count": q.get("count", 2),
+		"planet": Game.location_name, "faction": DataDB.faction_name(controller) if controller != "" else "Lumen", "title": q.get("title", "")}
 	match q.status:
 		"offered":
-			EventBus.dialogue_requested.emit(p.get("name", "?"), persona_greeting(p) + "\n\n" + str(d.get("offer", "")).format(vars) + "\n\n[color=#ffd23e]Reward: %d cr[/color]" % q.reward,
+			var manner := str(sd.get("manner", {}).get(str(p.get("traits", [""])[0]), ""))
+			var text := persona_greeting(p) + "\n\n"
+			if manner != "":
+				text += "[i]%s[/i]\n\n" % manner
+			text += _side_line(d.get("offer", ""), int(q.get("line", 0))).format(vars) + "\n\n[color=#ffd23e]Reward: %d cr[/color]" % q.reward
+			EventBus.dialogue_requested.emit(p.get("name", "?"), text,
 				[{"id": "accept", "text": "I'll do it."}, {"id": "no", "text": "Not now."}], func(c: String): _accept_side(q, c))
 		"active":
 			if q.get("ready", false):
-				_complete_side(q, p, str(d.get("done", "Thanks.")).format(vars))
+				var key := "done_spared" if q.get("spared", false) and d.has("done_spared") else "done"
+				var done := _side_line(d.get(key, "Thanks."), int(q.get("line", 0))).format(vars)
+				var choices: Array = []
+				for c in sd.get("turn_in", [{"id": "take", "text": "Take the money"}]):
+					choices.append({"id": c.id, "text": str(c.text) + (" (%d cr)" % int(q.reward) if c.id == "take" else "")})
+				EventBus.dialogue_requested.emit(p.get("name", "?"), done, choices, func(c: String): _complete_side(q, p, c))
 			else:
-				EventBus.dialogue_requested.emit(p.get("name", "?"), "\"Still waiting on that job. %s\"" % q.title, [], Callable())
+				var waiting: Array = sd.get("waiting", ["\"Still waiting on that job. {title}.\""])
+				EventBus.dialogue_requested.emit(p.get("name", "?"), str(waiting[_rng.randi() % waiting.size()]).format(vars), [], Callable())
+
+
+## One authored line from a side-quest list (old saves stored plain strings).
+func _side_line(v, i: int) -> String:
+	if v is Array:
+		return str(v[posmod(i, v.size())]) if not v.is_empty() else ""
+	return str(v)
 
 
 func _accept_side(q: Dictionary, choice: String) -> void:
@@ -509,15 +530,46 @@ func _accept_side(q: Dictionary, choice: String) -> void:
 	get_tree().call_group("level", "refresh_quests")
 
 
-func _complete_side(q: Dictionary, p: Dictionary, text: String) -> void:
+## Collecting the reward: take it, waive it (the street hears) or squeeze them for more.
+func _complete_side(q: Dictionary, p: Dictionary, choice: String = "take") -> void:
 	q.status = "done"
-	Game.add_credits(int(q.reward))
-	if p.get("faction", "") != "":
-		Factions.change_rep(p.faction, 5, "helped a local")
-	axes["mercy"] = float(axes.get("mercy", 0.0)) + 0.5
-	Causality.record("mercy", {"target": p.get("name", ""), "note": "side quest"})
-	EventBus.dialogue_requested.emit(p.get("name", "?"), text + "\n\n[color=#ffd23e]+%d cr[/color]" % q.reward, [], Callable())
-	_log("SIDE DONE: " + str(q.title), "Paid %d cr." % q.reward)
+	var opts: Array = data().get("side", {}).get("turn_in", [])
+	var opt := _find(opts, choice)
+	var pay := int(q.reward)
+	var mercy := 0.5
+	var rep := 5
+	var reply := ""
+	match choice:
+		"free":
+			pay = 0
+			mercy = 1.5
+			rep = 8
+			Game.flags["followers"] = followers() + 1
+			Game.flags["fame"] = fame() + 1
+		"double":
+			mercy = 0.0
+			var haggler: bool = str(Game.tags.get("personality", "")) in ["ruthless", "charming"]
+			if haggler or _rng.randf() < 0.4:
+				pay = roundi(pay * 1.6)
+				axes["greed"] = float(axes.get("greed", 0.0)) + 1.0
+				rep = 0
+			else:
+				axes["greed"] = float(axes.get("greed", 0.0)) + 0.5
+				rep = -3
+				var fails: Array = opt.get("fail_reply", [])
+				reply = str(fails[_rng.randi() % fails.size()]) if not fails.is_empty() else ""
+	if reply == "" and not opt.is_empty():
+		var oks: Array = opt.get("reply", [])
+		reply = str(oks[_rng.randi() % oks.size()]) if not oks.is_empty() else ""
+	if pay > 0:
+		Game.add_credits(pay)
+	if p.get("faction", "") != "" and rep != 0:
+		Factions.change_rep(p.faction, rep, "helped a local" if rep > 0 else "haggled a local")
+	axes["mercy"] = float(axes.get("mercy", 0.0)) + mercy
+	Causality.record({"free": "charity", "double": "choice"}.get(choice, "mercy"), {"target": p.get("name", ""), "note": "side quest"})
+	var paid := "[color=#ffd23e]+%d cr[/color]" % pay if pay > 0 else "[color=#7dffb0]You waived the fee. The street will hear about it.[/color]"
+	EventBus.dialogue_requested.emit(p.get("name", "?"), (reply + "\n\n" if reply != "" else "") + paid, [], Callable())
+	_log("SIDE DONE: " + str(q.title), "Paid %d cr." % pay if pay > 0 else "Did it for free.")
 	objective_changed.emit()
 
 
@@ -557,6 +609,10 @@ func _on_bounty_surrender(choice: String, tag: String) -> void:
 	if is_instance_valid(_pending_enemy):
 		_pending_enemy.set_meta("saga_resolved", true)
 		_pending_enemy.resolve_surrender("kill" if choice == "kill" else "leave")
+	for planet_id in side:
+		for q in side[planet_id]:
+			if q.id == tag:
+				q["spared"] = choice == "spare"  # the client hears how it ended
 	if choice == "spare":
 		Game.add_credits(roundi(40 * Game.stat("loot_mult")))
 		axes["mercy"] = float(axes.get("mercy", 0.0)) + 1.0

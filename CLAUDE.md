@@ -109,7 +109,8 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   enters "chase" (`Enemy._set_state` -> `Saga.on_boss_sighted`), the antagonist's call on reaching the MacGuffin beat;
   parts picked by personality / persona trait / wealth band or `feud` / lieutenant_fate / ally_fate / axis.
   `idle.<role>.<beat>` = saga people talked to outside their beat (points you at the next goal).
-  `Saga.fill`: `{faction}` = display name (world.faction is the id). Legacy titles are scored (`legacy_strength`),
+  Side quests: `saga.json side.<type>.offer/done` lists (index `q.line`), `manner.<trait>`, `waiting`, `turn_in` (take /
+  free / double -> `Saga._complete_side`). `Saga.fill`: `{faction}` = display name (world.faction is the id). Legacy titles are scored (`legacy_strength`),
   not first-match. Test: `tools/story_test.gd`.
 - `src/core/first_day.gd`: 4-step onboarding checklist for a new life (talk / shop / fight / change), shown as the first
   objective line; steps fire from NPC talk, open_venue, enemy kills, relation changes. UI review shots: `tools/ui_review.gd`.

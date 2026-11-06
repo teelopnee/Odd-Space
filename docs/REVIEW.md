@@ -34,7 +34,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
 - P1 (partly done) FIRST DAY checklist teaches talk -> shop -> fight -> change someone's mind; a scripted first street encounter would still be stronger.
-- P1 (mostly done) Authored bookends for acts I-III and authored meetings with the ally, the lieutenant and the antagonist. Next: side-quest givers are still one-template people.
+- P1 (done for now) Authored bookends for acts I-III, authored meetings with the ally, the lieutenant and the antagonist, side quests with 6 offers per type, a manner per giver and a turn-in choice. Next: side quests are still three shapes (bounty / fetch / sabotage).
 - P2 HUD density: panel compacted (debt + bounty one line, short weapon names); consider auto-hiding out of combat.
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
@@ -79,3 +79,9 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   corporate store in a city was run by the same person ("Zeb", 13 times, one face, one shared memory and ban list)
   because the owner's identity was keyed on the brand sign; owners are now one per door (keeper_test checks it).
   Name grammar no longer stacks titles ("Auntie Grandma Lin").
+- v0.17: side quests had ONE offer and ONE thank-you line per type, so a run (7-14 side quests) repeated the same speech
+  on several planets ("These billboards scream at my kids all night"). Now: 6 offers and 4 thank-yous per type (picked
+  per quest), a line for how each giver talks (12 traits), varied "still waiting" lines, a different ending when you
+  spared the bounty target, and a choice when you collect: take the money, waive it (a follower and some fame), or
+  haggle for more (ruthless / charming always win, others 40%; a failed haggle costs reputation). story_test checks a
+  run's offers are 70%+ unique, tokens are filled and every turn-in choice pays what it says.

@@ -64,6 +64,40 @@ func _process(_d: float) -> bool:
 	for m in meetings:
 		distinct[m] = true
 	_check_t(distinct.size() == meetings.size(), "%d lives -> %d different meeting texts" % [meetings.size(), distinct.size()])
+	# Side quests: varied offers (no repeats in a run), filled tokens, and a real choice at turn-in.
+	var gs = root.get_node("Game")
+	gs.new_game("Side Tester", {"class": "gig_worker", "personality": "ruthless"}, 99)
+	var offers: Array = []
+	var sq: Array = []
+	for pl in gs.galaxy:
+		saga.spawns_for(pl.id)
+		for q in saga.side.get(pl.id, []):
+			sq.append(q)
+	texts.clear()
+	for q in sq:
+		saga._talk_side(q, saga.personas.get(q.giver, {}))
+	for t in texts:
+		offers.append(str(t[1]).split("\n\n")[-2])
+	var uniq := {}
+	for o in offers:
+		uniq[o] = true
+	_check_t(sq.size() >= 7 and uniq.size() * 10 >= offers.size() * 7, "%d side quests, %d different offer lines" % [offers.size(), uniq.size()])
+	var bad := texts.filter(func(t): return re.search(str(t[1])) != null)
+	_check_t(bad.is_empty(), "side-quest offers have no unfilled tokens" + ("" if bad.is_empty() else ": " + str(bad[0][1])))
+	var results := {}
+	for choice in ["take", "free", "double"]:
+		var q: Dictionary = sq[["take", "free", "double"].find(choice)]
+		q.status = "active"
+		q["ready"] = true
+		var cr: int = gs.credits
+		var fol: int = int(gs.flags.get("followers", 0))
+		texts.clear()
+		saga._talk_side(q, saga.personas.get(q.giver, {}))
+		saga._complete_side(q, saga.personas.get(q.giver, {}), choice)
+		results[choice] = [gs.credits - cr, int(gs.flags.get("followers", 0)) - fol, int(q.reward)]
+	_check_t(results.take[0] == results.take[2], "turn-in 'take' pays the reward (%d)" % results.take[0])
+	_check_t(results.free[0] == 0 and results.free[1] == 1, "turn-in 'free' pays nothing and wins a follower")
+	_check_t(results.double[0] > results.double[2], "a ruthless haggler gets more (%d for a %d job)" % [results.double[0], results.double[2]])
 	# First day checklist: four steps, rewards, done.
 	var g = root.get_node("Game")
 	g.new_game("First Day", {"class": "gig_worker"}, 3)
