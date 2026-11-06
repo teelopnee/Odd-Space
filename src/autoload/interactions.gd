@@ -271,6 +271,7 @@ func resolve(npc: Node, verb_id: String) -> bool:
 	if was_reporting and is_instance_valid(npc):
 		impact.append(_witness_outcome(npc, verb_id, success))
 	EventBus.interaction_done.emit(verb_id, success, npc)  # bystanders see it now
+	FirstDay.done("talk")
 	var kind := str(NPCVoice.reactions().get("verb_kind", {}).get(verb_id, "talk"))
 	if is_instance_valid(npc):
 		# Every outcome leaves a mark: the verb's own reaction, or the default for its kind.
@@ -607,6 +608,7 @@ func open_venue(venue_id: String, sign_text: String, faction: String, door: Node
 	if v.is_empty():
 		return
 	Tips.show("shops")
+	FirstDay.done("shop")
 	var keeper: Node = door.get_meta("keeper") if door and door.has_meta("keeper") else null
 	if keeper != null and (not is_instance_valid(keeper) or keeper.state == "dead"):
 		keeper = null

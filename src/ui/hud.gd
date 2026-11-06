@@ -122,20 +122,17 @@ func _build_tip() -> void:
 	v.add_child(_tip_text)
 	_tip_panel.visible = false
 	root.add_child(_tip_panel)
-	EventBus.tip_shown.connect(func(t, x):
-		_tip_queue.append([t, x])
-		if not _tip_panel.visible:
-			_next_tip())
+	EventBus.tip_shown.connect(func(t, x): _tip_queue.append([t, x]))
 
 
 func _next_tip() -> void:
 	if _tip_queue.is_empty():
 		_tip_panel.visible = false
+		_tip_time = 0.0
 		return
 	var t: Array = _tip_queue.pop_front()
 	_tip_title.text = "TIP  //  " + str(t[0])
 	_tip_text.text = str(t[1])
-	_tip_panel.visible = true
 	_tip_panel.modulate.a = 1.0
 	_tip_time = clampf(3.5 + str(t[1]).length() * 0.045, 5.0, 9.0)
 
@@ -625,6 +622,7 @@ func _connect_signals() -> void:
 	EventBus.inventory_changed.connect(func(_i, _c): _refresh_status())
 	EventBus.overclock_changed.connect(_on_overclock)
 	Saga.objective_changed.connect(_refresh_objective)
+	EventBus.stats_changed.connect(_refresh_objective)  # FirstDay steps
 	_refresh_objective()
 
 
@@ -638,13 +636,21 @@ func _refresh_status() -> void:
 	if _weapon_label:
 		var nb := Arsenal.owned("melee").size()
 		var ng := Arsenal.owned("ranged").size()
-		_weapon_label.text = "BLADE: %s%s   GUN: %s%s" % [Arsenal.label("melee").to_upper(), " (%d)" % nb if nb > 1 else "",
-			Arsenal.label("ranged").to_upper(), " (%d)" % ng if ng > 1 else ""]
-	_air_label.text = "O2 SUBSCRIPTION: ACTIVE" if Game.air_debt == 0 else "O2 DEBT: %d CR (Halcyon is watching)" % Game.air_debt
-	_air_label.add_theme_color_override("font_color", Color(0.4, 0.95, 1.0) if Game.air_debt == 0 else Color(1.0, 0.6, 0.2))
+		# Short names keep the panel narrow on phones: "PIPE / SCATTER".
+		var ml := Arsenal.label("melee").to_upper()
+		var rl := Arsenal.label("ranged").to_upper()
+		_weapon_label.text = "%s%s  /  %s%s" % [ml.get_slice(" ", ml.count(" ")), "+" if nb > 1 else "",
+			rl.get_slice(" ", rl.count(" ")), "+" if ng > 1 else ""]
+	# One line for the two things that hunt you: air debt and bounty.
 	var b := Factions.total_bounty()
-	_bounty_label.text = "BOUNTY: %d CR" % b if b > 0 else ""
-	_bounty_label.visible = b > 0
+	var bits: Array[String] = []
+	if Game.air_debt > 0:
+		bits.append("O2 DEBT %d" % Game.air_debt)
+	if b > 0:
+		bits.append("BOUNTY %d" % b)
+	_air_label.text = "   ".join(bits) if not bits.is_empty() else "O2: PAID UP"
+	_air_label.add_theme_color_override("font_color", Color(0.4, 0.95, 1.0) if bits.is_empty() else (Color(1.0, 0.4, 0.35) if b > 0 else Color(1.0, 0.6, 0.2)))
+	_bounty_label.visible = false
 	_loc_label.text = "  @ " + Game.location_name
 
 
@@ -668,6 +674,9 @@ func _refresh_objective() -> void:
 	if _objective_label == null:
 		return
 	var lines: Array[String] = []
+	var fd := FirstDay.next_text()
+	if fd != "":
+		lines.append("* " + fd)
 	var main := Saga.objective_text()
 	if main != "":
 		lines.append("> " + main)
@@ -822,11 +831,18 @@ func _process(delta: float) -> void:
 			_next_ticker()
 	_update_target_panel()
 	_update_witness_alert()
-	if _tip_panel and _tip_panel.visible:
-		_tip_time -= delta
-		_tip_panel.modulate.a = clampf(_tip_time / 0.6, 0.0, 1.0)
-		if _tip_time <= 0.0:
-			_next_tip()
+	if _tip_panel and (_tip_time > 0.0 or not _tip_queue.is_empty()):
+		# Tips wait while a dialogue or menu is open - otherwise they expire unseen.
+		var blocked: bool = _dialogue_open or (_modal != null and _modal.visible)
+		_tip_panel.visible = not blocked and _tip_time > 0.0
+		if not blocked:
+			if _tip_time <= 0.0:
+				_next_tip()
+			else:
+				_tip_time -= delta
+				_tip_panel.modulate.a = clampf(_tip_time / 0.6, 0.0, 1.0)
+				if _tip_time <= 0.0:
+					_tip_panel.visible = false
 	_ctx_check -= delta
 	if _ctx_check <= 0.0 and _touch_root and _touch_root.visible:
 		_ctx_check = 0.25

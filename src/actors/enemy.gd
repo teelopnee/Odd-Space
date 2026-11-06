@@ -880,6 +880,7 @@ func _die(attacker, push: Vector3) -> void:
 	EventBus.enemy_killed.emit(self, {"by_player": by_player, "type": enemy_type})
 	if by_player:
 		Tips.show("parts")
+		FirstDay.done("fight")
 	Audio.play_sfx("enemy_die")
 	FX.rumble(0.3, 0.3, 0.12)
 	var tw := create_tween()

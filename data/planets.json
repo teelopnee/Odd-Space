@@ -103,9 +103,9 @@
 			"puddles": "toxic",
 			"weather": "spores",
 			"path_tex": "planks",
-			"water": "#0a2e10",
-			"water_glow": "#5aff3a",
-			"water_glow_strength": 0.2,
+			"water": "#061a0a",
+			"water_glow": "#4ad82e",
+			"water_glow_strength": 0.09,
 			"building_h": [
 				3.2,
 				5.0

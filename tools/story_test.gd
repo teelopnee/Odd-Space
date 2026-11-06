@@ -44,6 +44,18 @@ func _process(_d: float) -> bool:
 			for t in texts:
 				if str(t[0]).begins_with("ACT II"):
 					print("\n--- sample: ", t[0], "\n", t[1], "\n---")
+	# First day checklist: four steps, rewards, done.
+	var g = root.get_node("Game")
+	g.new_game("First Day", {"class": "gig_worker"}, 3)
+	var fd = load("res://src/core/first_day.gd")
+	var cr: int = g.credits
+	var shown: String = fd.next_text()
+	for id in ["talk", "shop", "fight", "change"]:
+		fd.done(id)
+	var ok2: bool = shown.begins_with("FIRST DAY 1/4") and not fd.active() and g.credits - cr == 70 and g.item_count("medkit") >= 1
+	print(("  PASS  " if ok2 else "  FAIL  ") + "first day checklist: '%s' -> done, +%d CR" % [shown, g.credits - cr])
+	if not ok2:
+		_fails += 1
 	print("STORY TEST DONE - %d failures" % _fails)
 	quit(_fails)
 	return false

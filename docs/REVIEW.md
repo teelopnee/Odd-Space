@@ -22,8 +22,8 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 |---|---|---|---|
 | Systemic depth | 8 | 8 | The real selling point. |
 | Combat | 4 | 5 | Tokens, dash strike, 10 weapons, difficulty settings. Still unplaytested by humans. |
-| Onboarding | 2 | 5 | Just-in-time tips for 14 situations. Needs a guided first mission. |
-| UI / readability | 3 | 5 | Contextual touch buttons, capped result text, UI scale. HUD still busy. |
+| Onboarding | 2 | 6 | Just-in-time tips (wait for dialogues to close) + a 4-step FIRST DAY checklist that teaches by doing. |
+| UI / readability | 3 | 6 | 5 touch buttons instead of 11 out of combat, compact status panel, capped result text, UI scale. |
 | Writing | 5 | 6 | Hand-written act openings/closings now frame the procedural saga (Wildermyth model). Middle still template-heavy. |
 | Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
 | Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
@@ -33,9 +33,9 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 ## Open issues (P0 = a buyer would refund)
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
-- P1 No guided first mission: the opening should teach move -> talk -> fight -> witness -> shop in order.
+- P1 (partly done) FIRST DAY checklist teaches talk -> shop -> fight -> change someone's mind; a scripted first street encounter would still be stronger.
 - P1 (partly done) Authored bookends exist for acts I-III; next: authored mid-act scenes for the ally and the antagonist.
-- P1 HUD density on phones: status panel is 6-7 lines; consider auto-hiding when not in combat.
+- P2 HUD density: panel compacted (debt + bounty one line, short weapon names); consider auto-hiding out of combat.
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
 - P2 Performance budget per device class; profile a 40-NPC city on a mid-range phone.
@@ -53,3 +53,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   player's motivation (12) and wealth (3), and closes with a reflection on their dominant moral axis and their crew;
   Act I plays after the first landing. tools/story_test.gd checks four very different lives see every bookend with no
   unfilled tokens. Windows + Linux zips now ship next to the APK on the "latest" release.
+- v0.14: critique pass at phone size (1600x720, tools/ui_review.gd). Found and fixed: the first tip expired unseen behind the
+  Act I popup (tips now wait for dialogues and menus); swamp water read as flat neon slabs (darker, lower glow); status panel
+  ran to 10 lines (air debt + bounty merged, short weapon names). Added the FIRST DAY checklist (talk, shop, fight, change
+  someone's mind; small rewards, medkit at the end).

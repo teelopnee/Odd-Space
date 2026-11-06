@@ -33,7 +33,7 @@ func _process(_delta: float) -> bool:
 		2:
 			_approaches_start()
 			_step = 3
-			_wait = 90
+			_wait = 200
 		3:
 			_approaches_check()
 			print("\nINTERACT-BACK TEST DONE - %d failures" % _fails)

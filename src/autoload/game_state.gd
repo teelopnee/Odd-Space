@@ -87,6 +87,7 @@ func new_game(p_name: String, p_tags: Dictionary, seed_value: int = -1, look: Di
 	world_seed = seed_value if seed_value >= 0 else randi()
 	Origin.apply_new_game(tags)
 	Arsenal.start_kit(tags)
+	FirstDay.start()
 	hp = max_hp()
 	galaxy = PlanetGenerator.generate_galaxy(world_seed, 7)
 	location_id = "station_lot47"

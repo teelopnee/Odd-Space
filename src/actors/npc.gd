@@ -566,6 +566,7 @@ func _on_recruit_choice(choice: String) -> void:
 
 
 func _talk_civilian() -> void:
+	FirstDay.done("talk")
 	var lines: Array[String] = []
 	var known := Causality.known_crimes_at(Game.location_id, faction)
 	if not known.is_empty():
@@ -775,6 +776,7 @@ func after_interaction(before_rel: String, before_att: int) -> String:
 		FX.damage_number(get_parent(), global_position + Vector3(0, 2.6, 0), "%+d" % d, Color(0.5, 1, 0.6) if d > 0 else Color(1, 0.4, 0.4))
 	if rel != before_rel:
 		Tips.show("labels")
+		FirstDay.done("change")
 		return "%s: %s -> %s" % [npc_name, before_rel.capitalize() if before_rel != "" else "Neutral", rel.capitalize() if rel != "" else "Neutral"]
 	return ""
 

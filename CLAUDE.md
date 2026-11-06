@@ -104,6 +104,8 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
 - Authored act bookends: `data/bookends.json` -> `Saga.play_bookend(open|close, act)` (once per life, flag
   `bookend_<kind>_<act>`): openings by motivation + wealth band, closings by `Saga.dominant_axis()` + crew. Act numbers in
   saga beats are floats ("1.0") - normalise with int(). Test: `tools/story_test.gd`.
+- `src/core/first_day.gd`: 4-step onboarding checklist for a new life (talk / shop / fight / change), shown as the first
+  objective line; steps fire from NPC talk, open_venue, enemy kills, relation changes. UI review shots: `tools/ui_review.gd`.
 - `src/ui/` HUD (code-built), touch controls, pause menu, title, character creation, star map.
 - `docs/ARCHITECTURE.md` explains the systems; `docs/GDD.md` the design.
 
