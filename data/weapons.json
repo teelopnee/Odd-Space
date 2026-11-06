@@ -40,7 +40,7 @@
 		"katana": {
 			"name": "Mono-Katana",
 			"desc": "Cuts through armour and riot shields.",
-			"dmg": 1.45,
+			"dmg": 1.25,
 			"speed": 0.9,
 			"reach": 0.3,
 			"push": 0.7,
@@ -53,7 +53,7 @@
 		"hammer": {
 			"name": "Repo Hammer",
 			"desc": "Slow. Enormous. The last hit sends out a shockwave.",
-			"dmg": 2.1,
+			"dmg": 1.95,
 			"speed": 1.4,
 			"reach": 0.2,
 			"push": 1.9,
@@ -93,17 +93,17 @@
 			"name": "Arc Thrower",
 			"desc": "Instant lightning that jumps to two more enemies and stuns.",
 			"dmg": 0.75,
-			"rate": 1.2,
+			"rate": 0.75,
 			"special": "chain",
 			"range": 10.0,
 			"chains": 2,
-			"stun": 0.45,
+			"stun": 0.3,
 			"color": "#8ae8ff"
 		},
 		"harpoon": {
 			"name": "Repo Harpoon",
 			"desc": "Drags the target to you. Rips riot shields aside.",
-			"dmg": 0.7,
+			"dmg": 0.95,
 			"rate": 0.7,
 			"speed": 30.0,
 			"special": "pull",

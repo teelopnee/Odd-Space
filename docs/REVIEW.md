@@ -57,3 +57,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   Act I popup (tips now wait for dialogues and menus); swamp water read as flat neon slabs (darker, lower glow); status panel
   ran to 10 lines (air debt + bounty merged, short weapon names). Added the FIRST DAY checklist (talk, shop, fight, change
   someone's mind; small rewards, medkit at the end).
+- v0.14.1: weapon/enemy balance audit (tools/balance_audit.py: damage per second per weapon, enemy hit as % of the
+  player's HP). Arc Thrower was 88 dps with a stun (best gun by far) -> 55 dps, shorter stun; Mono-Katana was the
+  only blade worth using -> on par with the Repo Hammer; Repo Harpoon was a trap pick -> stronger pull hit;
+  pirates fired 3-shot bursts that took 30% of your HP -> 2 shots. Vat Golem still hits for 24% but telegraphs a full second.

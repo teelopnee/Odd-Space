@@ -255,7 +255,7 @@
 		"damage": 8,
 		"cooldown": 1.2,
 		"telegraph": 0.4,
-		"burst": 3,
+		"burst": 2,
 		"projectile_speed": 14.0,
 		"credits": [
 			15,
