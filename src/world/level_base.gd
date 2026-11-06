@@ -238,7 +238,10 @@ func _spawn_keepers() -> void:
 func spawn_keeper(it: Node3D) -> NPC:
 	var vid := str(it.get("venue_id"))
 	var sign := str(it.get("venue_sign"))
-	var key := "%s|%s" % [vid, sign]
+	# One owner per DOOR: chain stores share a brand sign, so "venue|sign" alone made every corp
+	# store in a city the same person (same name and face, one shared memory and ban list).
+	var key := "%s|%s|%d,%d" % [vid, sign, roundi(it.global_position.x), roundi(it.global_position.z)]
+	it.set_meta("keeper_key", key)
 	var saved: Dictionary = Game.flags.get("keepers_" + Game.location_id, {}).get(key, {})
 	if saved.get("dead", false):
 		return null  # the shop stays dark (Interactions.open_venue shows what's left)

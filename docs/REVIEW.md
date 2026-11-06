@@ -27,7 +27,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 | Writing | 5 | 7 | Authored act bookends + authored meetings: the ally sizes you up, the fixer and the villain talk before they fight, the villain calls you about what you did. Side quests still template-heavy. |
 | Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
 | Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
-| Tech / platforms | ? | 6 | Graphics presets, Back button, pause on leave, Windows + Linux builds (CI, verified), mouse, F11. Unmeasured on real devices. |
+| Tech / platforms | ? | 7 | Graphics presets, Back button, pause on leave, Windows + Linux builds, mouse, F11. Game-logic CPU measured and cut ~2.8x (tools/perf_probe.gd). Still unmeasured on real phones (GPU side). |
 | Commercial readiness | 2 | 5 | Credits/licences screen, parody names cleaned, trademarked terms out of store copy. Repo still public. |
 
 ## Open issues (P0 = a buyer would refund)
@@ -38,7 +38,7 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 - P2 HUD density: panel compacted (debt + bounty one line, short weapon names); consider auto-hiding out of combat.
 - P1 Music: replace at least the title, city and combat tracks with real compositions.
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
-- P2 Performance budget per device class; profile a 40-NPC city on a mid-range phone.
+- P2 (CPU done) Game-logic CPU per city 0.96-1.6 ms on a desktop core (was 2.1-4.5). Still to do: GPU/frame time on a real mid-range phone (owner).
 
 ## Fix log
 - v0.12: just-in-time tips (data/tips.json, 14 situations, Settings: off / show again); NPC follow-up dialogues only
@@ -70,3 +70,12 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
   internal id ("VP at gristle"), including the very first story dialogue; ending headlines were first-match, so 6 of 6
   random lives became "THE PROPHET OF FREE AIR" (now the strongest qualifying legacy wins: Prophet / Mercenary / Martyr /
   Turncoat across the same 6 lives); "WHO CHOSE THEMSELF" read as a typo.
+- v0.16: performance + identity pass. Measured the CPU cost of a city properly (tools/perf_probe.gd; the engine monitor
+  is a per-second maximum and headless runs sleep 6.9 ms a frame, so the first numbers were wrong). Found: every walking
+  NPC pushed itself into the floor and collided with the seams between floor chunks on every step (4x the cost of a
+  clean step); 34 shop owners per city sat in physics every frame and some were wedged on a kerb "falling" at -143 m/s
+  forever; off-screen people and foes ran at full rate; every sprite re-sent its shader parameters every frame. Fixed
+  all four: densest city 4.5 -> 1.4 ms, 5 of 7 planets over budget -> 0. Hostile catch from the same probe: every
+  corporate store in a city was run by the same person ("Zeb", 13 times, one face, one shared memory and ban list)
+  because the owner's identity was keyed on the brand sign; owners are now one per door (keeper_test checks it).
+  Name grammar no longer stacks titles ("Auntie Grandma Lin").

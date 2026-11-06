@@ -174,9 +174,29 @@ func set_targeted(on: bool, sub: String) -> void:
 
 # --- Main loop ------------------------------------------------------------------------------
 
+## Idle foes the camera can't see (ViewLod; aggro range is ~10 m) think 4x less often.
+var _lod_n := 0
+var _lod_acc := 0.0
+var _lod_step := 1.0
+
+
 func _physics_process(delta: float) -> void:
 	if _player == null or not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
+	_lod_step = 1.0
+	if state == "idle" and _knock == Vector3.ZERO and ViewLod.off_screen(global_position):
+		_lod_acc += delta
+		_lod_n += 1
+		if _lod_n < 4:
+			return
+		_lod_step = _lod_acc / maxf(delta, 0.0001)
+		delta = _lod_acc
+		_lod_n = 0
+		_lod_acc = 0.0
+	elif _lod_n > 0:
+		delta += _lod_acc
+		_lod_n = 0
+		_lod_acc = 0.0
 	_state_time -= delta
 	_attack_cd -= delta
 	_hostility_check -= delta
@@ -242,7 +262,7 @@ func _physics_process(delta: float) -> void:
 
 	var speed := float(def.get("speed", 3.0)) * _speed_mult * world_speed_mult
 	if state == "idle":
-		speed *= 0.4
+		speed *= 0.4 * _lod_step
 	velocity.x = move.x * speed + _knock.x
 	velocity.z = move.z * speed + _knock.z
 	_knock = _knock.move_toward(Vector3.ZERO, 22.0 * delta)

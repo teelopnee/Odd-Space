@@ -616,7 +616,8 @@ func open_venue(venue_id: String, sign_text: String, faction: String, door: Node
 	var title := "%s  //  %s" % [sign_text, v.get("name", "")]
 	var greet: Array = v.get("greet", ["..."])
 	var scene := Copy.expand(str(greet[_rng.randi() % greet.size()]), _rng).split("\n")[0]
-	if keeper == null and _keeper_dead(venue_id, sign_text):
+	_venue_ctx["key"] = str(door.get_meta("keeper_key", "%s|%s" % [venue_id, sign_text])) if door else "%s|%s" % [venue_id, sign_text]
+	if keeper == null and _keeper_dead(_venue_ctx.key):
 		_closed_shop(sign_text)
 		return
 	if keeper != null:
@@ -684,15 +685,15 @@ func _venue_cost(o: Dictionary) -> int:
 	return maxi(1, roundi(base * float(keeper.price_mult())))
 
 
-func _keeper_dead(venue_id: String, sign_text: String) -> bool:
+func _keeper_dead(key: String) -> bool:
 	var store: Dictionary = Game.flags.get("keepers_" + Game.location_id, {})
-	return store.get("%s|%s" % [venue_id, sign_text], {}).get("dead", false)
+	return store.get(key, {}).get("dead", false)
 
 
 ## The owner is gone: the shop is dark, and what you do with that says something about you.
 func _closed_shop(sign_text: String) -> void:
 	var store: Dictionary = Game.flags.get("keepers_" + Game.location_id, {})
-	var who := str(store.get("%s|%s" % [_venue_ctx.id, sign_text], {}).get("name", "the owner"))
+	var who := str(store.get(str(_venue_ctx.get("key", "")), {}).get("name", "the owner"))
 	var text := "The shutters of %s are half down. Nobody's behind the counter any more. Someone has left flowers and a photo of %s by the door." % [sign_text, who]
 	var choices := [{"id": "loot", "text": "Empty the till"}, {"id": "flowers", "text": "Leave something for the family (10 cr)", "disabled": not Game.can_afford(10)},
 		{"id": "leave", "text": "Leave"}]

@@ -79,6 +79,14 @@ func _run_shops() -> void:
 	_check(doors.size() >= 3, "owners stand at the shop doors")
 	if doors.is_empty():
 		return
+	# One owner per door: chain stores share a brand sign but not a shopkeeper.
+	var keys := {}
+	var names := {}
+	for d in doors:
+		keys[d.get_meta("keeper").keeper_key] = true
+		names[d.get_meta("keeper").npc_name] = true
+	_check(keys.size() == doors.size(), "every door has its own owner (%d keys for %d doors)" % [keys.size(), doors.size()])
+	_check(names.size() * 10 >= doors.size() * 7, "owners have different names (%d names for %d shops)" % [names.size(), doors.size()])
 	# Greeting + personal prices.
 	var d0 = doors[0]
 	var k0 = d0.get_meta("keeper")

@@ -73,7 +73,8 @@ with the Godot Android editor and syncs through GitHub (`main`), so:
   Test: `tools/interact_back_test.gd` (every verb x outcome answers back + changes something; every counter choice played).
 - Shop owners: `LevelBuilder.venue_spots` (venue doors) -> `Level.spawn_keeper` puts an NPC with role "keeper" beside every
   door (stands at `post_pos`, skips physics while idle; Talk disabled - the door is the way in, except mid-call). Same person
-  every visit: state saved in `Game.flags["keepers_<planet>"][<venue>|<sign>]` (`persist_keeper` on change + `_exit_tree`;
+  every visit: state saved in `Game.flags["keepers_<planet>"][<venue>|<sign>|<x>,<z>]` (one key per DOOR, also on the door as
+  meta `keeper_key` - chain stores share a brand sign) (`persist_keeper` on change + `_exit_tree`;
   `{"dead": true}` -> the shop stays dark with its own scene). `Interactions.open_venue(..., door)` greets by memory /
   mood / regular / fan / partner, shows personal prices (`price_mult`: attitude, regular, fear), adds 3 owner verbs, turns
   away banned customers (`counters.venue.keeper_banned`). Every shop option maps to an act kind
@@ -155,6 +156,11 @@ Commit the generated `*.uid` / `*.import` files; never commit `.godot/`.
 - Depth-based DOF (`CameraAttributesPractical`) blurred everything on lavapipe; default is the
   screen-space HD-2D lens (`assets/shaders/hd2d_post.gdshader`, tilt-shift etc.), selectable in Settings.
 - Mobile renderer: max 8 omni lights per mesh → floors are built in 6x6-tile chunks.
+- CPU budget: `tools/perf_probe.gd` (times player/NPC/enemy physics + sprite frame work per planet; keep < 2.5 ms on a
+  desktop core). Don't trust `Performance.TIME_PHYSICS_PROCESS` (per-second MAX) or headless frame time (headless sleeps
+  ~6.9 ms per frame). Crowd LOD: `ViewLod.off_screen()` (camera view box, focus set by CameraRig) -> idle NPCs / foes tick
+  4x less often, sprites skip frame work. Walkers on the ground use velocity.y = 0 (a downward push collided with
+  floor-chunk seams on every step: 2+ slide iterations); owners at their post never run move_and_slide.
 - Particle quads with billboard materials ignore particle scale unless `billboard_keep_scale = true`.
 - Godot's GUI focus + `ui_*` actions give gamepad menu navigation; always `grab_focus()` the first button of
   every screen/modal. BUT Godot 4.7's built-in `ui_accept`/`ui_cancel` have NO joypad buttons (and a joypad

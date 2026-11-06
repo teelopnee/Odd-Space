@@ -366,9 +366,6 @@
 			"Vik",
 			"Yara",
 			"Zeb",
-			"Grandma Lin",
-			"Old Mo",
-			"Little Pip",
 			"Mags",
 			"Dov",
 			"Nell",
@@ -1023,7 +1020,10 @@
 			"#nick#",
 			"Doc #last#",
 			"Ms. #last#",
-			"Mr. #last#"
+			"Mr. #last#",
+			"Grandma Lin",
+			"Old Mo",
+			"Little Pip"
 		],
 		"robot_name": [
 			"UNIT-#num#",

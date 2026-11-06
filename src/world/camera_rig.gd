@@ -126,6 +126,7 @@ func _process(delta: float) -> void:
 			if e.hostile and e.global_position.distance_to(target.global_position) < 11.0:
 				near += 1
 		_combat_zoom = lerpf(_combat_zoom, 0.12 if near > 0 else 0.0, 1.0 - exp(-1.5 * rdelta))
+	ViewLod.focus = global_position  # what the lens is centred on (player, or a cutscene subject)
 	var punch_amt := 0.0
 	if _punch_time > 0.0:
 		_punch_time -= rdelta
@@ -193,3 +194,7 @@ func _set_faded(body: Object, faded: bool) -> void:
 	for n in body.get_meta("fade_hide", []):
 		if is_instance_valid(n):
 			n.visible = not faded
+
+
+func _exit_tree() -> void:
+	ViewLod.focus = Vector3.INF  # next scene: unknown until its camera runs

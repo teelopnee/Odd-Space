@@ -47,6 +47,10 @@ var _base_y := 0.0
 var _mat: ShaderMaterial
 var _look: Dictionary = {}
 var _alpha := 1.0
+var _sent_flash := true  # what the shader was last given (skip identical updates)
+var _sent_tint := Color(-1, -1, -1)
+var _sent_scale := -1.0
+var _sent_y := -999.0
 
 
 func _ready() -> void:
@@ -116,6 +120,9 @@ func _load_sheet() -> void:
 		var foot := float(meta.get("foot_row", _fh - 4))
 		_base_y = (foot - _fh * 0.5) * pixel_size
 		position.y = _base_y
+	_sent_flash = true  # new material / size: push everything again next frame
+	_sent_tint = Color(-1, -1, -1)
+	_sent_y = -999.0
 	if current != "":
 		_apply_frame()
 
@@ -170,29 +177,42 @@ func squash(amount: Vector2) -> void:
 
 
 func _process(delta: float) -> void:
+	if ViewLod.off_screen(global_position) and _flash_time <= 0.0 and not holo:
+		_time += delta * speed_scale  # keep the clock; skip the frame work nobody can see
+		return
 	if current != "":
 		var before := frame_index
 		_time += delta * speed_scale
 		_apply_frame()
 		if finished and before != frame_index:
 			animation_finished.emit(current)
+	# Shader parameters only change on a flash or a new tint: pushing them every frame for every
+	# person on the street was a measurable part of the frame on phones.
 	if _flash_time > 0.0:
 		_flash_time -= delta
 		if _mat:
 			_mat.set_shader_parameter("flash", 0.85)
 			_mat.set_shader_parameter("flash_color", Color(clampf(_flash_color.r / 3.0, 0, 1), clampf(_flash_color.g / 3.0, 0, 1), clampf(_flash_color.b / 3.0, 0, 1)))
+			_sent_flash = true
 		else:
 			modulate = _flash_color
-	else:
-		if _mat:
+	elif _mat:
+		if _sent_flash or _sent_tint != base_modulate:
 			_mat.set_shader_parameter("flash", 0.0)
 			_mat.set_shader_parameter("tint", base_modulate)
-		else:
-			modulate = base_modulate
-	_squash = _squash.lerp(Vector2.ONE, 1.0 - exp(-14.0 * delta))
-	scale = Vector3(_squash.x, _squash.y, 1.0) * scale_base
-	if ground_align:
-		position.y = _base_y * _squash.y * scale_base + y_offset
+			_sent_flash = false
+			_sent_tint = base_modulate
+	elif modulate != base_modulate:
+		modulate = base_modulate
+	if _squash != Vector2.ONE or _sent_scale != scale_base or _sent_y != y_offset:
+		_squash = _squash.lerp(Vector2.ONE, 1.0 - exp(-14.0 * delta))
+		if _squash.distance_squared_to(Vector2.ONE) < 0.00001:
+			_squash = Vector2.ONE
+		scale = Vector3(_squash.x, _squash.y, 1.0) * scale_base
+		if ground_align:
+			position.y = _base_y * _squash.y * scale_base + y_offset
+		_sent_scale = scale_base
+		_sent_y = y_offset
 
 
 func _apply_frame() -> void:
@@ -210,8 +230,11 @@ func _apply_frame() -> void:
 	frame_index = idx
 	var rows: Dictionary = a.get("rows", {})
 	var row := int(rows.get(direction, rows.get("S", 0)))
-	region_rect = Rect2(idx * _fw, row * _fh, _fw, _fh)
-	flip_h = mirrored
+	var rect := Rect2(idx * _fw, row * _fh, _fw, _fh)
+	if rect != region_rect:
+		region_rect = rect
+	if flip_h != mirrored:
+		flip_h = mirrored
 
 
 ## Fade the whole sprite (dithered, keeps shadows) - use instead of modulate:a.

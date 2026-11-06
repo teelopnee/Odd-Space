@@ -144,9 +144,30 @@ func is_alive() -> bool:
 	return state != "dead"
 
 
+## People the camera can't see (ViewLod) think 4x less often: on a phone the crowd was most of the
+## CPU frame. Timers get the accumulated time, steps are scaled to match.
+const LOD_EVERY := 4
+var _lod_n := 0
+var _lod_acc := 0.0
+
+
 func _physics_process(delta: float) -> void:
 	if state == "dead":
 		return
+	var step := 1.0
+	if state == "idle" and _approach_kind == "" and ViewLod.off_screen(global_position):
+		_lod_acc += delta
+		_lod_n += 1
+		if _lod_n < LOD_EVERY:
+			return
+		step = _lod_acc / maxf(delta, 0.0001)
+		delta = _lod_acc
+		_lod_n = 0
+		_lod_acc = 0.0
+	elif _lod_n > 0:
+		delta += _lod_acc
+		_lod_n = 0
+		_lod_acc = 0.0
 	_timer -= delta
 	_talking -= delta
 	_life(delta)
@@ -189,11 +210,18 @@ func _physics_process(delta: float) -> void:
 				if to2.length() > 2.6:
 					move = to2.normalized()
 	var speed := 4.2 if state == "flee" else (2.8 if state in ["approach", "follow"] else 1.4)
-	velocity.x = move.x * speed
-	velocity.z = move.z * speed
-	velocity.y = -0.5 if is_on_floor() else velocity.y - GRAVITY * gravity_scale * delta
-	# Owners standing at their post don't need physics every frame (dozens of shops per city).
-	if not (role == "keeper" and state == "idle" and move == Vector3.ZERO and is_on_floor()):
+	velocity.x = move.x * speed * step
+	velocity.z = move.z * speed * step
+	# On the ground: no downward push (floor_snap keeps them down). Pushing into the floor made every
+	# step collide with the seams between floor chunks: 2+ slide iterations, ~4x the cost per person.
+	velocity.y = 0.0 if is_on_floor() else maxf(velocity.y - GRAVITY * gravity_scale * delta, -30.0)
+	# Standing still on the ground (phone, bench, queue) needs no physics. Shop owners at their post
+	# never do: some posts sit on a kerb edge that doesn't count as floor, and they used to "fall"
+	# in place forever (vertical speed -143 m/s and climbing, a full collision solve every step).
+	var at_post: bool = role == "keeper" and state == "idle" and move == Vector3.ZERO
+	if at_post:
+		velocity.y = 0.0
+	elif move != Vector3.ZERO or not is_on_floor():
 		move_and_slide()
 	if move.length() > 0.1:
 		sprite.set_facing(move)
