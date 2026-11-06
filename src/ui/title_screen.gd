@@ -42,7 +42,18 @@ func _ready() -> void:
 		v.add_child(cont)
 		var info := HUD.make_label(Game.save_summary(Game.AUTOSAVE_SLOT), 14, Color(0.8, 0.8, 1.0))
 		info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		v.add_child(info)
+		# A dark plate: the line used to sit straight on the striped sun and was hard to read.
+		var plate := PanelContainer.new()
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.03, 0.01, 0.08, 0.82)
+		sb.content_margin_left = 10
+		sb.content_margin_right = 10
+		sb.content_margin_top = 2
+		sb.content_margin_bottom = 2
+		plate.add_theme_stylebox_override("panel", sb)
+		plate.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		plate.add_child(info)
+		v.add_child(plate)
 	v.add_child(_button("NEW GAME", func(): Router.goto(Router.CREATOR)))
 	v.add_child(_button("CREDITS & LICENSES", _show_credits))
 	if not OS.has_feature("mobile") and not OS.has_feature("web"):

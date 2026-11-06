@@ -385,4 +385,16 @@ func save_summary(slot: int) -> String:
 	var g: Dictionary = parsed.get("game", {})
 	return "%s  |  %s  |  %d cr  |  %s" % [
 		g.get("player_name", "?"), g.get("location_name", "?"),
-		int(g.get("credits", 0)), parsed.get("saved_at", "")]
+		int(g.get("credits", 0)), pretty_time(str(parsed.get("saved_at", "")))]
+
+
+## "2026-11-06T12:35:49" -> "6 Nov, 12:35" (a raw ISO stamp on the title screen looked unfinished).
+static func pretty_time(iso: String) -> String:
+	var parts := iso.split("T")
+	if parts.size() != 2:
+		return iso
+	var d := parts[0].split("-")
+	if d.size() != 3:
+		return iso
+	var months := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+	return "%d %s, %s" % [int(d[2]), months[clampi(int(d[1]) - 1, 0, 11)], parts[1].left(5)]

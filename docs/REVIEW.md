@@ -88,3 +88,9 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 - v0.17.1: status panel tucks away when calm (no hostile within 16 m, full HP, nothing changed for 6 s): weapons,
   air debt / bounty and overclock rows hide and the backdrop fades; anything new brings it back. Setting in the pause
   menu. Checked at 1600x720 with tools/ui_review.gd (new "_calm" shot): 8 rows -> 4.
+- v0.17.2: first-five-minutes pass on the title and the creation form at 1600x720. Found: pressing Esc in the creation
+  form (Esc is also "pause") STARTED a new life instead of going back; the footer always showed gamepad hints
+  ("LB/RB = category") to keyboard and touch players; touch controls forced on still produced "press F" tips; the
+  save line was a raw ISO timestamp printed over the striped sun; "WAKE UP IN: CARGO HOLD" contradicted "Cold Storage
+  Lot 47" beside it. All fixed (START begins only from a pad; hints follow the input device; touch-on = touch prompts;
+  "6 Nov, 12:35" on a dark plate; "COLD STORAGE LOT 47 - CARGO HOLD").

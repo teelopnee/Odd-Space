@@ -182,7 +182,10 @@ func _ready() -> void:
 	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_theme_constant_override("separation", 12)
 	v.add_child(foot)
-	foot.add_child(HUD.make_label("LB/RB = category  |  START = begin  |  B = back  ", 13, Color(0.7, 0.8, 1.0)))
+	_hint = HUD.make_label("", 13, Color(0.7, 0.8, 1.0))
+	foot.add_child(_hint)
+	_update_hint(Router.input_device)
+	EventBus.input_device_changed.connect(_update_hint)
 	foot.add_child(_button("< BACK", func(): Router.goto(Router.TITLE)))
 	foot.add_child(_button("RANDOMIZE ALL", _randomize_all))
 	var go := _button("BEGIN >", _start)
@@ -275,6 +278,16 @@ func _sync_age_slider(randomize_age: bool) -> void:
 	_age_label.text = str(_age)
 
 
+var _hint: Label
+
+
+func _update_hint(dev: String) -> void:
+	if _hint == null or not is_instance_valid(_hint):
+		return
+	_hint.text = {"gamepad": "LB/RB = category  |  START = begin  |  B = back  ",
+		"touch": "Tap a tab to change category  |  BEGIN when ready  "}.get(dev, "Click a tab to change category  |  Esc = back  ")
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("target_cycle"):
 		_step_category(-1)
@@ -284,7 +297,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_step_category(1)
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("pause"):
+	# START on a pad begins; Esc (also bound to "pause") must mean BACK on a keyboard - it used to
+	# start a new life when you tried to leave the form.
+	if event.is_action_pressed("pause") and event is InputEventJoypadButton:
 		_start()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_cancel") and not _name_edit.has_focus() and not _seed_edit.has_focus():
@@ -466,7 +481,8 @@ func _update_preview() -> void:
 	for fid in p.rep:
 		reps.append("%s %+d" % [DataDB.factions.get(fid, {}).get("short", fid), p.rep[fid]])
 	var native := _start_planet_id() != START_CRYO
-	var wake: String = str(_galaxy[_start_option.selected - 1].get("name", "?")).to_upper() + " (HOME)" if native else str(p.spawn).replace("_", " ").to_upper()
+	var wake: String = str(_galaxy[_start_option.selected - 1].get("name", "?")).to_upper() + " (HOME)" if native \
+		else "COLD STORAGE LOT 47 - " + str(p.spawn).replace("_", " ").to_upper()
 	text += "\n[color=#3ee6ff]WAKE UP IN:[/color] %s    [color=#3ee6ff]CREDITS:[/color] %d    [color=#3ee6ff]AIR DEBT:[/color] %d    [color=#3ee6ff]ITEMS:[/color] %s" % [
 		wake, int(p.credits) + (40 if native else 0), int(p.get("air_debt", 0)), ", ".join(PackedStringArray(items)) if not items.is_empty() else "none"]
 	if not reps.is_empty():

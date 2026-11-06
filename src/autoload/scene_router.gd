@@ -29,8 +29,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	ensure_gamepad_ui()
 	get_tree().root.content_scale_factor = float(Game.settings.get("ui_scale", 1.0))
-	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
-		input_device = "touch"
+	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available() or str(Game.settings.get("touch", "auto")) == "on":
+		input_device = "touch"  # touch controls forced on = touch prompts ("press F" on a touch screen read as a lazy port)
 	if not Input.get_connected_joypads().is_empty():
 		input_device = "gamepad"
 	Input.joy_connection_changed.connect(_on_joy_changed)
