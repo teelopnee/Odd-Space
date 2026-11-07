@@ -16,31 +16,85 @@ Players of 2.5D diorama action-RPGs, immersive sims and systemic "the world reme
 | Good onboarding teaches one mechanic at a time, at the moment it is needed, by doing - not with text walls ([GDevelop](https://gdevelop.io/blog/improve-game-tutorials), [Apple](https://developer.apple.com/app-store/onboarding-for-games/), [Wayline](https://www.wayline.io/blog/tutorials-onboarding-level-design)) | Just-in-time tips, never a manual up front. |
 | Touch controls: keep the button count low, make them big, give press feedback, never cover the hero ([Game Developer](https://www.gamedeveloper.com/game-platforms/designing-better-controls-for-the-touchscreen-experience), [Flowlab](https://www.flowlab.io/lab/blog/designing-for-mobile)) | We had 11 buttons on screen at all times. |
 | Immersive-sim fans want reactions with tangible effects, consistent rules, and no punishment for a playstyle ([GMTK/Reddit discussions, NO LAW dev interview](https://wccftech.com/no-law-lets-you-kill-any-character-inspired-immersive-sims/amp/)) | Our reactivity is strong; it must stay legible (show what changed) and fair (stealth and violence both viable). |
+| The Outer Worlds: a colonist left in cryosleep for decades by corporate mismanagement wakes in the **Halcyon** system, run by a corporate Board, with a sardonic ship AI (ADA). Its satire was called broad enough to dismiss ([Vice](https://www.vice.com/en_us/article/vb5j88/outer-worlds-review)); the sequel's was called so over the top it undermines its point ([Reason](https://reason.com/2026/02/20/the-outer-worlds-2/), [PC Gamer](https://pcgamer.com/a-newcomers-guide-to-halcyon-in-the-outer-worlds)) | Our premise (thawed from cryo over debt, the Consortium, sarcastic ship AI, a faction literally named Halcyon) will be summed up as "The Outer Worlds in 2D". Our satire is broader still. |
+| Citizen Sleeper also runs on corporate debt, but is praised because it shows people persevering under the system, not because the critique is new ([Game Informer](https://gameinformer.com/review/citizen-sleeper/a-sleeper-hit), [Press Start](https://press-start.com.au/reviews/ps5-reviews/2023/03/29/citizen-sleeper-review-slick-and-succinct-sci-fi/)) | Debt should be felt through people, not repeated as the punchline. |
+| Kate Compton's "procedural oatmeal": 10,000 mathematically unique bowls still read as oatmeal; her test is "would anyone write fanfic about this generated thing?" ([Wikipedia](https://en.wikipedia.org/wiki/Procedural_generation), [Emily Short](https://emshort.blog/2016/09/21/bowls-of-oatmeal-and-text-generation/)). Same lesson from Shadows of Doubt (cases repeat once you learn the patterns, [PC Gamer](https://pcgamer.com/games/sim/shadows-of-doubt-review)), Starfield (an ex-Bethesda artist said fewer hand-crafted planets would have been better, [eXputer](https://exputer.com/news/games/former-bethesda-dev-admits-starfields-1000-planets-feature-was-a-mistake/)) and No Man's Sky (Sean Murray: procedural gameplay only goes so far before it all looks and feels the same, [Massively OP](https://massivelyop.com/?p=101912)) | "62.9 billion lines / 2.2M origins / 3.1M endings" are not selling points; players will only notice what differs in a way they can name. |
+| HD-2D (Tomoya Asano): the pixel characters had to be attractive as pixel art in their own right before realistic effects were layered on; tuning the look took about a month and a half ([Nintendo Life](https://www.nintendolife.com/news/2022/05/triangle-strategy-producers-talk-hd-2d-and-why-other-devs-havent-used-it)) | Our generated 64x64 sprites fail the first step: the effects are carrying characters that don't read on their own. |
+| Octopath's music is one of its most praised parts; Nishiki's character themes run about a minute and their motifs return in field and battle tracks ([RPGFan](https://rpgfan.com/music-review/octopath-traveler-ii-original-soundtrack)). Octopath 0's combat is its most praised element ([RPG Site](https://www.rpgsite.net/review/19069-octopath-traveler-0-review)) | Our loops are 12-27 s with no combat track, and our climax fight is a stat-scaled grunt. |
+| Steam requires a generative-AI disclosure on the store page. One analysis found disclosed games got ~53% fewer reviews than similar games (correlation, not proven cause); backlash targets visible content that replaces human creative work ([Digital Citizen](https://www.digitalcitizen.life/steam-games-that-disclose-ai-use-may-sell-far-less-new-study-finds/), [Gamepressure](https://www.gamepressure.com/newsroom/discussion-about-ai-label-on-steam-continues-the-dev-is-being-pun/ze8ab3)) | All our text, sprites and music come from AI-written generators: we must disclose, and repetitive content invites the "AI slop" label. |
 
 ## Scorecard
-| Area | v0.11 | Now | Notes |
-|---|---|---|---|
-| Systemic depth | 8 | 8 | The real selling point. |
-| Combat | 4 | 5 | Tokens, dash strike, 10 weapons, difficulty settings. Still unplaytested by humans. |
-| Onboarding | 2 | 6 | Just-in-time tips (wait for dialogues to close) + a 4-step FIRST DAY checklist that teaches by doing. |
-| UI / readability | 3 | 7 | Contextual touch buttons, status panel that tucks away when calm, prompts that match the device, capped result text, UI scale. |
-| Writing | 5 | 7 | Authored act bookends + authored meetings: the ally sizes you up, the fixer and the villain talk before they fight, the villain calls you about what you did. Side quests still template-heavy. |
-| Visuals | 5 | 5 | Atmospheric, but generated characters look like programmer art at store-page size. |
-| Audio | 3 | 3 | Synthesised music and SFX: thin. Needs real tracks. |
-| Tech / platforms | ? | 7 | Graphics presets, Back button, pause on leave, Windows + Linux builds, mouse, F11. Game-logic CPU measured and cut ~2.8x (tools/perf_probe.gd). Still unmeasured on real phones (GPU side). |
-| Commercial readiness | 2 | 5 | Credits/licences screen, parody names cleaned, trademarked terms out of store copy. Repo still public. |
+"Self" = scored by the same sessions that built the game. "Indep." = the independent pass below (v0.17.2).
 
-**Overall (v0.17.2): 6/10.** Deep, reactive and now reasonably polished in the first five minutes, but nobody outside
-the project has played it, the music is synthesised filler and the characters still read as programmer art at store
-size. Not ready to sell until the two P0s below are closed.
+| Area | v0.11 | Self | Indep. | Notes |
+|---|---|---|---|---|
+| Systemic depth | 8 | 8 | 6 | The real selling point, but very wide and shallow: 12 game systems built in 3 days. |
+| Combat | 4 | 5 | 3 | Tokens, dash strike, 10 weapons, difficulty settings. The final boss is a stock enemy with x5 HP; 10 enemy types for 7 planets. Unplaytested. |
+| Onboarding | 2 | 6 | 5 | Just-in-time tips + FIRST DAY checklist, but landing opens with a 3-paragraph Act I popup plus a tip box. |
+| UI / readability | 3 | 7 | 5 | Contextual touch buttons, status panel tucks away. At 1600x720, name tags vanish into the scene and floor text collides with props. |
+| Writing | 5 | 7 | 4 | Single lines are often sharp; across a run it is one joke (13% of all lines) and visible repetition (see below). |
+| Visuals | 5 | 5 | 4 | Monochrome tint per biome, unreadable faces, chromatic fringe, mixed pixel density, stock synthwave title. |
+| Audio | 3 | 3 | 2 | Music loops 12-27 s, no combat track. |
+| Identity / originality | - | - | 2 | Reads as "The Outer Worlds in 2D" (see research). |
+| Tech / platforms | ? | 7 | 7 | Graphics presets, Back button, pause on leave, Windows + Linux builds, mouse, F11. Game-logic CPU cut ~2.8x. GPU on real phones unmeasured. |
+| Commercial readiness | 2 | 5 | 2 | Repo public, needs a generative-AI disclosure, no store assets, no human playtest. |
+
+**Overall (v0.17.2): self 6/10, independent 4/10.** The 6 was given by the sessions that built the game, with no human
+player involved. As a three-day systems demo it is impressive; as something a stranger pays for, it is derivative,
+repetitive at run scale, climaxes on a stat-scaled grunt and loops 18-second music. Not ready to sell.
+
+## Independent hostile pass (v0.17.2, review only - no code changed)
+Method: smoke test (6 bot lives to an ending, 0 SCRIPT ERRORs, save/load ok), phone-size shots with `tools/ui_review.gd`,
+content counts over `data/*.json` and `assets/audio`, research in the table above.
+- **Identity.** Cryo thaw over debt + the Consortium + a sarcastic ship AI on a second-hand ship + a faction named
+  Halcyon = The Outer Worlds' premise. A reviewer's first line writes itself.
+- **One joke.** Of 3,722 strings longer than 25 characters in `data/*.json`, 482 (13%) are a bill / debt / air /
+  paste / repossession gag. Satire that is all punchline tires fast (Outer Worlds criticism); Citizen Sleeper shows the
+  alternative.
+- **Procedural oatmeal, with evidence.** `tools/count_copy.py`: 62,915,697,913 possible lines from 2,110 hand-written
+  alternatives. In the smoke run: the planet nickname pool has 10 entries, so "Dividend Bay" appeared 5 times in 6
+  lives, one universe had two "Brand Haven" planets and one life visited two "Equity Falls"; generated names blur
+  (Lunivex / Lunonvex / Lunislon / Lunuldor); 5 of 6 endings were "bittersweet"; ending titles contradict themselves
+  ("THE PROPHET OF FREE AIR - WHO SOLD IT TO THE LAW"). Origin tags have no exclusions: "16-year-old Gristle Heir
+  Corporate Lawyer", "Street Beggar Street Chef", a Lumen heir who wakes as cryo-collateral holding 2,510 CR.
+- **Boss.** The antagonist is a `debt_brute` with HP x5, shield +6, sprite x1.4 and 4 guards
+  (`src/world/level_base.gd:303-310`, `src/autoload/saga.gd:378-381`); lieutenants are x2.6. No new moves, no phases.
+  3.1M composed endings all lead into an HP sponge.
+- **Audio.** `neon_city.wav` 17.8 s (about 67 repeats in 20 minutes of city), `rust_run` 16 s, the main theme 19 s,
+  ambience 12 s, other biome tracks 23-27 s. No combat music.
+- **Visuals at phone size (1600x720).** The swamp shot is one green wash; the hero's face is a blob; "<STREET MEDIC>"
+  and "<DISLIKES YOU>" labels disappear into the scene; "KEEP OFF THE PAINT" floor text runs under props; rainbow
+  chromatic fringe on sprites; grass, sprites and UI use three different pixel densities. Title = stock synthwave
+  sun + grid with a monospace logo; the creation form is a 6-tab x 14-option spreadsheet.
+- **Process.** 50 commits and 17,397 lines of GDScript in three days (4-6 Nov). Tests prove code paths run, not that
+  anything is fun. GDD items still open: walkable ship, bosses, crew in the field, Causality-generated quests, Thai
+  (0 `tr()` calls in `src/`).
+- **What holds up.** The witness / phone-call / memory loop is a genuinely sellable idea; many single lines are sharp
+  ("The Odd Duck hums like a fridge that has seen things"); performance work, test tooling and save/load are solid.
 
 ## Open issues (P0 = a buyer would refund)
 - P0 **Never playtested end to end by a human.** Owner + 5 outside players, watch where they quit.
 - P0 Repository and CI "latest" APK are public: anyone can get the game free (owner decision).
+- P0 **Identity: reads as "The Outer Worlds in 2D".** Rename Halcyon Debt & Trust; find an opening that is not
+  "thawed from cryo, greeted by a sarcastic ship AI".
+- P0 **No real bosses.** Lieutenants and the antagonist are stock enemies with scaled HP. One authored boss per act
+  (own moves, phases, BREAK parts) - the GDD's Paragon mech / Halcyon repo-walker.
+- P1 **Oatmeal fixes (cheap):** planet nicknames unique per universe (pool of 10 today); exclusion rules for origin tags
+  (age vs class/background, heir vs cryo-collateral); spread ending tones (5/6 "bittersweet"); stop composed ending
+  titles from contradicting themselves. Stop marketing raw combination counts.
+- P1 **Bigger cut:** 7 generated planets -> 3 hand-tuned ones that a player could describe to a friend.
+- P1 **One-joke satire:** cut the bill/debt gags (13% of lines) in half; give named characters something besides
+  the joke.
+- P1 **Readability at phone size:** per-biome tint is too strong; name tags need a backing plate; drop the chromatic
+  fringe on sprites; hand-pixel the hero and the 5 main saga roles.
+- P1 **Steam generative-AI disclosure** is required for text, sprites and music made by AI-written generators; plan the
+  store page around it (or replace the visible content with human work first).
+- P2 Localization: no `tr()` anywhere; Thai needs string extraction and a Thai-capable font.
 - P1 (partly done) FIRST DAY checklist teaches talk -> shop -> fight -> change someone's mind; a scripted first street encounter would still be stronger.
 - P1 (done for now) Authored bookends for acts I-III, authored meetings with the ally, the lieutenant and the antagonist, side quests with 6 offers per type, a manner per giver and a turn-in choice. Next: side quests are still three shapes (bounty / fetch / sabotage).
 - P2 (done) HUD density: panel compacted, and out of combat it tucks away to name / HP / money / objective after 6 s of calm (Settings: off).
-- P1 Music: replace at least the title, city and combat tracks with real compositions.
+- P1 Music: replace at least the title, city and combat tracks with real compositions (2+ minutes each; today's
+  loops are 12-27 s and there is no combat track at all).
 - P2 Store assets: capsule art, 5 screenshots, 30 s trailer, honest feature list.
 - P2 (CPU done) Game-logic CPU per city 0.96-1.6 ms on a desktop core (was 2.1-4.5). Still to do: GPU/frame time on a real mid-range phone (owner).
 
